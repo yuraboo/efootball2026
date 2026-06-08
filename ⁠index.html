@@ -1,1 +1,864 @@
-1
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eFootball 2026 - Турнирная Панель</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        efootball: {
+                            indigo: '#05030a',
+                            violet: '#a13bf7',
+                            green: '#00ff87',
+                            pink: '#f00056',
+                            yellow: '#e6fd02',
+                            cardBg: 'rgba(10, 10, 15, 0.25)'
+                        }
+                    },
+                    boxShadow: {
+                        'neon-violet': '0 0 15px rgba(161, 59, 247, 0.5)',
+                        'neon-green': '0 0 15px rgba(0, 255, 135, 0.5)',
+                        'premium': '0 20px 50px rgba(0, 0, 0, 0.6)'
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        rajdhani: ['Rajdhani', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: #05030a;
+            overflow-x: hidden;
+        }
+        
+        /* Стилизация скроллбара */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(5, 3, 10, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #a13bf7;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00ff87;
+        }
+
+        /* Эффект легкой тени для текста на ярких участках постера */
+        .text-shadow-strong {
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+        }
+
+        /* Контейнер с постером eFootball 2026 */
+        #tournament-wrapper {
+            background-image: 
+                linear-gradient(to bottom, rgba(5, 3, 10, 0.1) 0%, rgba(5, 3, 10, 0.15) 35%, rgba(5, 3, 10, 0.85) 65%, rgba(5, 3, 10, 0.98) 85%, #05030a 100%), 
+                url('https://res.cloudinary.com/dc1ybvaxd/image/upload/v1780845516/poster_muiejo.png');
+            background-size: contain;
+            background-position: center top;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="text-white antialiased">
+
+    <!-- ГЛАВНЫЙ КОНТЕЙНЕР (ПОСТЕР) -->
+    <div id="tournament-wrapper" class="relative pb-24">
+        
+        <!-- Индикатор режима в самом верху -->
+        <header class="w-full max-w-7xl mx-auto px-4 pt-4 flex justify-between items-center z-50 relative">
+            <div class="flex items-center gap-2">
+                <span class="inline-flex h-2.5 w-2.5 rounded-full bg-efootball-green animate-pulse"></span>
+                <span class="text-[11px] tracking-widest uppercase font-bold text-efootball-green font-orbitron">Tournament Board Active</span>
+            </div>
+        </header>
+
+        <!-- HERO-СПЕЙСЕР: Оставляет лица участников и логотип полностью открытыми -->
+        <div class="w-full h-[65vh] md:h-[68vh] pointer-events-none"></div>
+
+        <!-- ТУРНИРНЫЙ ИНТЕРФЕЙС (Начинается сразу под лицами игроков) -->
+        <main class="w-full max-w-7xl mx-auto px-4 relative z-20">
+            
+            <!-- Стеклянная панель вкладок -->
+            <div class="w-full bg-efootball-cardBg border border-white/10 rounded-[20px] backdrop-blur-[4px] p-2 mb-8 shadow-premium">
+                <div class="grid grid-cols-3 gap-1">
+                    <button onclick="switchTab('tab-setup')" id="btn-tab-setup" class="tab-btn px-4 py-3 rounded-xl font-orbitron text-xs sm:text-sm font-bold tracking-wider transition-all duration-300 text-efootball-violet bg-white/5 border border-white/5 shadow-neon-violet">
+                        <i class="fas fa-users-cog mr-2"></i>Настройка
+                    </button>
+                    <button onclick="switchTab('tab-matches')" id="btn-tab-matches" class="tab-btn px-4 py-3 rounded-xl font-orbitron text-xs sm:text-sm font-bold tracking-wider transition-all duration-300 text-white hover:bg-white/5">
+                        <i class="fas fa-gamepad mr-2"></i>Матчи
+                    </button>
+                    <button onclick="switchTab('tab-tables')" id="btn-tab-tables" class="tab-btn px-4 py-3 rounded-xl font-orbitron text-xs sm:text-sm font-bold tracking-wider transition-all duration-300 text-white hover:bg-white/5">
+                        <i class="fas fa-trophy mr-2"></i>Таблица / Сетка
+                    </button>
+                </div>
+            </div>
+
+            <!-- ВКЛАДКА 1: НАСТРОЙКИ ТУРНИРА И ИГРОКИ -->
+            <section id="tab-setup" class="tab-content block">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Панель управления игроками -->
+                    <div class="lg:col-span-1 bg-efootball-cardBg border border-white/10 rounded-[24px] backdrop-blur-[4px] p-6 shadow-premium">
+                        <h2 class="text-xl font-black font-orbitron mb-6 text-white flex items-center gap-2">
+                            <i class="fas fa-user-plus text-efootball-violet"></i> Участники
+                        </h2>
+                        
+                        <!-- Форма добавления -->
+                        <div class="flex gap-2 mb-6">
+                            <input type="text" id="player-name-input" placeholder="Имя игрока..." class="flex-1 bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-efootball-violet transition-all font-semibold placeholder-gray-500 text-sm">
+                            <button onclick="addPlayer()" class="bg-gradient-to-r from-efootball-violet to-purple-600 hover:opacity-90 text-white px-5 rounded-xl font-orbitron font-extrabold transition-all shadow-neon-violet flex items-center justify-center">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+
+                        <!-- Список участников -->
+                        <div class="space-y-2 max-h-[300px] overflow-y-auto pr-1" id="players-list">
+                            <!-- Заполняется из JS -->
+                        </div>
+                    </div>
+
+                    <!-- Формат соревнования -->
+                    <div class="lg:col-span-2 bg-efootball-cardBg border border-white/10 rounded-[24px] backdrop-blur-[4px] p-6 shadow-premium flex flex-col justify-between">
+                        <div>
+                            <h2 class="text-xl font-black font-orbitron mb-6 text-white flex items-center gap-2">
+                                <i class="fas fa-sliders-h text-efootball-green"></i> Настройки Чемпионата
+                            </h2>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <!-- Режим Лига -->
+                                <label class="relative flex flex-col justify-between p-5 rounded-2xl border-2 cursor-pointer transition-all duration-300 bg-black/20 border-efootball-green/50 shadow-neon-green" id="mode-league-label">
+                                    <input type="radio" name="tournament-mode" value="league" checked onchange="toggleModeSelect('league')" class="absolute top-4 right-4 accent-efootball-green w-4 h-4">
+                                    <div>
+                                        <span class="block font-orbitron text-base font-black text-white">КРУГОВАЯ ЛИГА</span>
+                                        <span class="block text-xs text-gray-400 mt-1">Каждый соперник встречается друг с другом. Борьба по набранным очкам.</span>
+                                    </div>
+                                    <div class="mt-4 flex items-center gap-3">
+                                        <span class="text-[11px] uppercase tracking-wider font-bold text-efootball-green">Круги лиги:</span>
+                                        <div class="flex gap-1.5">
+                                            <button onclick="setLeagueRounds(1, event)" id="btn-round-1" class="px-2.5 py-0.5 bg-efootball-green text-black font-bold text-[10px] rounded transition-all">1 круг</button>
+                                            <button onclick="setLeagueRounds(2, event)" id="btn-round-2" class="px-2.5 py-0.5 bg-white/10 hover:bg-white/20 text-white font-bold text-[10px] rounded transition-all">2 круга</button>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <!-- Режим Плей-офф -->
+                                <label class="relative flex flex-col justify-between p-5 rounded-2xl border-2 cursor-pointer transition-all duration-300 bg-black/20 border-white/10 hover:border-efootball-violet/40" id="mode-playoff-label">
+                                    <input type="radio" name="tournament-mode" value="playoff" onchange="toggleModeSelect('playoff')" class="absolute top-4 right-4 accent-efootball-violet w-4 h-4">
+                                    <div>
+                                        <span class="block font-orbitron text-base font-black text-white">ПЛЕЙ-ОФФ СЕТКА</span>
+                                        <span class="block text-xs text-gray-400 mt-1">Турнир на вылет. Подходит для любого количества участников (включая 3 игрока).</span>
+                                    </div>
+                                    <span class="block mt-4 text-[10px] font-bold text-efootball-violet uppercase tracking-wider">Автопропуск нечетных игроков (BYE)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Генерация -->
+                        <div class="pt-6 border-t border-white/5 flex flex-col sm:flex-row gap-4 items-center justify-between">
+                            <p class="text-xs text-gray-400 max-w-sm">Приложение автоматически сохраняет все внесённые изменения в памяти вашего устройства.</p>
+                            <button onclick="generateTournament()" class="w-full sm:w-auto bg-gradient-to-r from-efootball-green to-emerald-500 hover:opacity-90 text-black font-orbitron font-black text-sm py-3 px-6 rounded-xl shadow-neon-green transform active:scale-95 transition-all">
+                                НАЧАТЬ ТУРНИР <i class="fas fa-play-circle ml-1.5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ВКЛАДКА 2: КАЛЕНДАРЬ МАТЧЕЙ -->
+            <section id="tab-matches" class="tab-content hidden">
+                <div class="max-w-4xl mx-auto space-y-4">
+                    <div class="flex justify-between items-center bg-efootball-cardBg border border-white/10 rounded-2xl p-4 backdrop-blur-[4px]">
+                        <h3 class="font-orbitron font-extrabold text-lg text-white flex items-center gap-2">
+                            <i class="fas fa-calendar-alt text-efootball-violet"></i> Календарь встреч
+                        </h3>
+                        <span id="completed-count" class="bg-efootball-violet/20 border border-efootball-violet/40 text-efootball-violet px-3 py-1 rounded-full text-xs font-bold font-orbitron">Сыграно: 0 / 0</span>
+                    </div>
+                    
+                    <div class="space-y-3 max-h-[550px] overflow-y-auto pr-1" id="matches-container">
+                        <!-- Сюда вставляются матчи -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ВКЛАДКА 3: ТАБЛИЦА / СЕТКА -->
+            <section id="tab-tables" class="tab-content hidden">
+                
+                <!-- Вид Лиги -->
+                <div id="league-view" class="space-y-6">
+                    <div class="bg-efootball-cardBg border border-white/10 rounded-[24px] backdrop-blur-[4px] p-6 shadow-premium overflow-x-auto">
+                        <h3 class="font-orbitron font-extrabold text-xl text-white mb-6 flex items-center gap-2">
+                            <i class="fas fa-list-ol text-efootball-green"></i> Турнирная Таблица Лиги
+                        </h3>
+                        <table class="w-full text-left border-collapse min-w-[500px]">
+                            <thead>
+                                <tr class="border-b border-white/10 text-[11px] uppercase tracking-wider font-bold text-gray-400">
+                                    <th class="py-3 px-4 text-center">#</th>
+                                    <th class="py-3 px-4">Игрок</th>
+                                    <th class="py-3 px-4 text-center">И</th>
+                                    <th class="py-3 px-4 text-center">В</th>
+                                    <th class="py-3 px-4 text-center">Н</th>
+                                    <th class="py-3 px-4 text-center">П</th>
+                                    <th class="py-3 px-4 text-center">Мячи</th>
+                                    <th class="py-3 px-4 text-center text-efootball-green font-orbitron">Очки</th>
+                                </tr>
+                            </thead>
+                            <tbody id="league-table-body" class="divide-y divide-white/5">
+                                <!-- Рендерится через JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Пьедестал лидеров -->
+                    <div class="bg-efootball-cardBg border border-white/10 rounded-[24px] backdrop-blur-[4px] p-6 shadow-premium">
+                        <div class="flex flex-col items-center">
+                            <h3 class="font-orbitron font-black text-base mb-6 text-efootball-yellow uppercase tracking-wider">
+                                <i class="fas fa-crown"></i> Победители Лиги
+                            </h3>
+                            <div class="flex items-end justify-center gap-4 sm:gap-6 w-full max-w-sm pt-4" id="podium-container">
+                                <!-- Генерируется из JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Вид Сетки Плей-офф -->
+                <div id="playoff-view" class="hidden space-y-6">
+                    <div class="bg-efootball-cardBg border border-white/10 rounded-[24px] backdrop-blur-[4px] p-6 shadow-premium overflow-x-auto">
+                        <h3 class="font-orbitron font-extrabold text-xl text-white mb-6 flex items-center gap-2">
+                            <i class="fas fa-sitemap text-efootball-violet"></i> Турнирная Сетка Плей-офф
+                        </h3>
+                        
+                        <div class="flex justify-around items-stretch gap-6 min-w-[700px] py-4" id="bracket-stages">
+                            <!-- Сетка плей-офф из JS -->
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Модальное окно ввода счета (Без браузерных алертов) -->
+    <div id="score-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm hidden p-4">
+        <div class="bg-[#120b24] border border-efootball-violet/40 rounded-[24px] max-w-sm w-full p-6 shadow-premium relative transform scale-95 transition-transform duration-200">
+            
+            <button onclick="closeScoreModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+
+            <h3 class="font-orbitron font-black text-base text-center mb-6 uppercase tracking-wider text-white">Ввести Результат</h3>
+            
+            <div class="flex items-center justify-between gap-4 mb-6">
+                <!-- Игрок 1 -->
+                <div class="flex-1 text-center">
+                    <div class="font-orbitron font-black text-sm text-white mb-2 truncate" id="modal-p1-name">Игрок 1</div>
+                    <input type="number" id="modal-p1-score" min="0" placeholder="0" class="w-16 bg-black/50 border border-white/15 rounded-xl py-2 text-center font-orbitron font-black text-2xl text-efootball-green focus:outline-none focus:border-efootball-green transition-all">
+                </div>
+
+                <div class="font-orbitron font-black text-base text-gray-500">VS</div>
+
+                <!-- Игрок 2 -->
+                <div class="flex-1 text-center">
+                    <div class="font-orbitron font-black text-sm text-white mb-2 truncate" id="modal-p2-name">Игрок 2</div>
+                    <input type="number" id="modal-p2-score" min="0" placeholder="0" class="w-16 bg-black/50 border border-white/15 rounded-xl py-2 text-center font-orbitron font-black text-2xl text-efootball-pink focus:outline-none focus:border-efootball-pink transition-all">
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="closeScoreModal()" class="flex-1 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-orbitron font-bold py-2.5 rounded-lg transition-all text-xs">Отмена</button>
+                <button onclick="saveMatchScore()" class="flex-1 bg-gradient-to-r from-efootball-violet to-purple-600 hover:opacity-90 text-white font-orbitron font-black py-2.5 rounded-lg shadow-neon-violet transition-all text-xs">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомления (Тосты) -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 bg-[#160e2d] border border-efootball-green text-white font-bold px-5 py-3 rounded-xl shadow-premium transform translate-y-12 opacity-0 transition-all duration-300 flex items-center gap-2 text-xs">
+        <i class="fas fa-check-circle text-efootball-green"></i> <span id="toast-text">Изменения сохранены</span>
+    </div>
+
+    <script>
+        // Глобальное состояние
+        let state = {
+            players: [],
+            matches: [],
+            mode: 'league', // league или playoff
+            leagueRounds: 2 // 1 или 2 круга
+        };
+
+        // Загрузка сохраненного турнира
+        function loadSavedState() {
+            const saved = localStorage.getItem('ef_tournament_state');
+            if (saved) {
+                try {
+                    state = JSON.parse(saved);
+                    if (!state.players) state.players = [];
+                    if (!state.matches) state.matches = [];
+                } catch (e) {
+                    console.error("Ошибка чтения памяти", e);
+                }
+            } else {
+                // По умолчанию добавляем троих участников
+                state.players = ["Алексей", "Дмитрий", "Сергей"];
+            }
+        }
+
+        function saveCurrentState() {
+            localStorage.setItem('ef_tournament_state', JSON.stringify(state));
+        }
+
+        // Показ уведомлений
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const textSpan = document.getElementById('toast-text');
+            textSpan.innerText = message;
+            
+            if (isError) {
+                toast.classList.replace('border-efootball-green', 'border-efootball-pink');
+                toast.querySelector('i').className = "fas fa-exclamation-circle text-efootball-pink";
+            } else {
+                toast.classList.replace('border-efootball-pink', 'border-efootball-green');
+                toast.querySelector('i').className = "fas fa-check-circle text-efootball-green";
+            }
+            
+            toast.classList.remove('translate-y-12', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-12', 'opacity-0');
+            }, 2500);
+        }
+
+        // Вкладки
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-4 py-3 rounded-xl font-orbitron text-xs sm:text-sm font-bold tracking-wider transition-all duration-300 text-white hover:bg-white/5";
+            });
+
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            if (activeBtn) {
+                if (tabId === 'tab-setup') {
+                    activeBtn.className = "tab-btn px-4 py-3 rounded-xl font-orbitron text-xs sm:text-sm font-bold tracking-wider transition-all duration-300 text-efootball-violet bg-white/5 border border-white/5 shadow-neon-violet";
+                } else if (tabId === 'tab-matches') {
+                    activeBtn.className = "tab-btn px-4 py-3 rounded-xl font-orbitron text-xs sm:text-sm font-bold tracking-wider transition-all duration-300 text-efootball-pink bg-white/5 border border-white/5 shadow-neon-pink";
+                } else if (tabId === 'tab-tables') {
+                    activeBtn.className = "tab-btn px-4 py-3 rounded-xl font-orbitron text-xs sm:text-sm font-bold tracking-wider transition-all duration-300 text-efootball-green bg-white/5 border border-white/5 shadow-neon-green";
+                }
+            }
+
+            if (tabId === 'tab-tables') {
+                updateTablesAndSchedules();
+            } else if (tabId === 'tab-matches') {
+                renderMatches();
+            }
+        }
+
+        // Управление списком участников
+        function renderSetupPlayers() {
+            const list = document.getElementById('players-list');
+            list.innerHTML = '';
+            state.players.forEach((player, idx) => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-black/40 border border-white/5 p-3 rounded-xl hover:border-white/10 transition-all";
+                div.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-5 h-5 flex items-center justify-center bg-efootball-violet/20 border border-efootball-violet/30 rounded text-efootball-violet font-bold text-[10px] font-orbitron">${idx + 1}</span>
+                        <span class="font-bold text-white text-sm">${player}</span>
+                    </div>
+                    <button onclick="removePlayer(${idx})" class="text-gray-500 hover:text-efootball-pink transition-colors p-1">
+                        <i class="fas fa-trash-alt text-xs"></i>
+                    </button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function addPlayer() {
+            const input = document.getElementById('player-name-input');
+            const name = input.value.trim();
+            if (!name) return;
+            if (state.players.includes(name)) {
+                showToast("Участник с таким именем уже в списке!", true);
+                return;
+            }
+            state.players.push(name);
+            input.value = '';
+            saveCurrentState();
+            renderSetupPlayers();
+            showToast(`Добавлен участник: ${name}`);
+        }
+
+        function removePlayer(idx) {
+            const removed = state.players.splice(idx, 1);
+            saveCurrentState();
+            renderSetupPlayers();
+            showToast(`Участник ${removed[0]} удален`);
+        }
+
+        function setLeagueRounds(rounds, event) {
+            if (event) event.preventDefault();
+            state.leagueRounds = rounds;
+            const b1 = document.getElementById('btn-round-1');
+            const b2 = document.getElementById('btn-round-2');
+            if (rounds === 1) {
+                b1.className = "px-2.5 py-0.5 bg-efootball-green text-black font-bold text-[10px] rounded transition-all";
+                b2.className = "px-2.5 py-0.5 bg-white/10 hover:bg-white/20 text-white font-bold text-[10px] rounded transition-all";
+            } else {
+                b1.className = "px-2.5 py-0.5 bg-white/10 hover:bg-white/20 text-white font-bold text-[10px] rounded transition-all";
+                b2.className = "px-2.5 py-0.5 bg-efootball-green text-black font-bold text-[10px] rounded transition-all";
+            }
+            saveCurrentState();
+        }
+
+        function toggleModeSelect(mode) {
+            state.mode = mode;
+            const ml = document.getElementById('mode-league-label');
+            const mp = document.getElementById('mode-playoff-label');
+            if (mode === 'league') {
+                ml.className = "relative flex flex-col justify-between p-5 rounded-2xl border-2 cursor-pointer transition-all duration-300 bg-black/20 border-efootball-green/50 shadow-neon-green";
+                mp.className = "relative flex flex-col justify-between p-5 rounded-2xl border-2 cursor-pointer transition-all duration-300 bg-black/20 border-white/10 hover:border-efootball-violet/40";
+            } else {
+                ml.className = "relative flex flex-col justify-between p-5 rounded-2xl border-2 cursor-pointer transition-all duration-300 bg-black/20 border-white/10 hover:border-efootball-green/40";
+                mp.className = "relative flex flex-col justify-between p-5 rounded-2xl border-2 cursor-pointer transition-all duration-300 bg-black/20 border-efootball-violet/50 shadow-neon-violet";
+            }
+            saveCurrentState();
+        }
+
+        // Генератор матчей
+        function generateTournament() {
+            if (state.players.length < 2) {
+                showToast("Добавьте хотя бы 2-х участников!", true);
+                return;
+            }
+
+            state.matches = [];
+
+            if (state.mode === 'league') {
+                let count = state.players.length;
+                let roster = [...state.players];
+                if (count % 2 !== 0) roster.push("Пропуск"); // BYE
+
+                const roundsCount = roster.length - 1;
+                const matchesPerRound = roster.length / 2;
+                let generatedSchedule = [];
+
+                for (let r = 0; r < roundsCount; r++) {
+                    let roundMatches = [];
+                    for (let m = 0; m < matchesPerRound; m++) {
+                        const home = roster[m];
+                        const away = roster[roster.length - 1 - m];
+                        if (home !== "Пропуск" && away !== "Пропуск") {
+                            roundMatches.push({ p1: home, p2: away });
+                        }
+                    }
+                    generatedSchedule.push(roundMatches);
+                    roster.splice(1, 0, roster.pop()); // Сдвиг по кругу
+                }
+
+                // Запись игр в БД
+                let currentId = 1;
+                for (let r = 0; r < state.leagueRounds; r++) {
+                    generatedSchedule.forEach(round => {
+                        round.forEach(m => {
+                            state.matches.push({
+                                id: currentId++,
+                                p1: r === 0 ? m.p1 : m.p2,
+                                p2: r === 0 ? m.p2 : m.p1,
+                                score1: null,
+                                score2: null,
+                                completed: false,
+                                isBye: false
+                            });
+                        });
+                    });
+                }
+            } else {
+                // Плей-офф
+                const playersPowerOf2 = Math.pow(2, Math.ceil(Math.log2(state.players.length)));
+                let playoffList = [...state.players];
+                while (playoffList.length < playersPowerOf2) {
+                    playoffList.push("Пропуск");
+                }
+
+                let currentId = 1;
+                for (let i = 0; i < playoffList.length; i += 2) {
+                    const home = playoffList[i];
+                    const away = playoffList[i+1];
+                    let comp = false;
+                    let s1 = null;
+                    let s2 = null;
+                    let isBye = false;
+
+                    // Автозаполнение если противник "Пропуск"
+                    if (away === "Пропуск") {
+                        s1 = 3; s2 = 0; comp = true; isBye = true;
+                    } else if (home === "Пропуск") {
+                        s1 = 0; s2 = 3; comp = true; isBye = true;
+                    }
+
+                    state.matches.push({
+                        id: currentId++,
+                        stage: `1/${playersPowerOf2 / 2}`,
+                        p1: home,
+                        p2: away,
+                        score1: s1,
+                        score2: s2,
+                        completed: comp,
+                        isBye: isBye
+                    });
+                }
+            }
+
+            saveCurrentState();
+            showToast("Календарь успешно сгенерирован!");
+            switchTab('tab-matches');
+        }
+
+        // Рендер календаря
+        function renderMatches() {
+            const container = document.getElementById('matches-container');
+            container.innerHTML = '';
+            let completedNum = 0;
+
+            state.matches.forEach(match => {
+                if (match.completed) completedNum++;
+                const isPlayoff = !!match.stage;
+                const div = document.createElement('div');
+                div.className = `bg-efootball-cardBg border ${match.completed ? 'border-efootball-green/20' : 'border-white/10'} rounded-2xl p-4 backdrop-blur-[4px] hover:border-white/20 transition-all flex items-center justify-between gap-4`;
+                
+                div.innerHTML = `
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            ${isPlayoff ? `<span class="bg-efootball-violet/20 text-efootball-violet text-[9px] font-bold font-orbitron px-2 py-0.5 rounded border border-efootball-violet/30 uppercase">${match.stage}</span>` : ''}
+                            <span class="text-[10px] text-gray-500 font-bold font-orbitron">МАТЧ #${match.id}</span>
+                            ${match.isBye ? `<span class="text-[9px] font-bold text-efootball-green uppercase bg-efootball-green/10 px-2 py-0.5 rounded">Пропуск</span>` : ''}
+                        </div>
+                        <div class="flex flex-col gap-1 w-full">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold font-orbitron text-white text-sm truncate flex items-center gap-2">
+                                    <i class="fas fa-tshirt text-efootball-violet text-xs"></i> ${match.p1}
+                                </span>
+                                <span class="font-bold font-orbitron text-lg text-efootball-green">${match.completed ? match.score1 : '-'}</span>
+                            </div>
+                            <div class="h-px bg-white/5 my-0.5"></div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold font-orbitron text-white text-sm truncate flex items-center gap-2">
+                                    <i class="fas fa-tshirt text-efootball-pink text-xs"></i> ${match.p2}
+                                </span>
+                                <span class="font-bold font-orbitron text-lg text-efootball-pink">${match.completed ? match.score2 : '-'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        ${match.isBye ? `
+                            <span class="bg-white/5 text-gray-500 text-[10px] font-bold font-orbitron px-3 py-2.5 rounded-xl block">BYE</span>
+                        ` : `
+                            <button onclick="openScoreModal(${match.id})" class="bg-gradient-to-r ${match.completed ? 'from-white/10 to-white/5 hover:from-white/20' : 'from-efootball-violet to-purple-600 shadow-neon-violet'} text-white font-orbitron font-extrabold text-xs py-2.5 px-3.5 rounded-xl transition-all">
+                                ${match.completed ? 'РЕДАКТ.' : 'ВВЕСТИ'}
+                            </button>
+                        `}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            document.getElementById('completed-count').innerText = `Сыграно: ${completedNum} / ${state.matches.length}`;
+        }
+
+        // Модальное окно результатов
+        let activeMatchId = null;
+
+        function openScoreModal(matchId) {
+            activeMatchId = matchId;
+            const match = state.matches.find(m => m.id === matchId);
+            if (!match) return;
+
+            document.getElementById('modal-p1-name').innerText = match.p1;
+            document.getElementById('modal-p2-name').innerText = match.p2;
+            document.getElementById('modal-p1-score').value = match.completed ? match.score1 : '';
+            document.getElementById('modal-p2-score').value = match.completed ? match.score2 : '';
+
+            const m = document.getElementById('score-modal');
+            m.classList.remove('hidden');
+            setTimeout(() => {
+                m.querySelector('.transform').classList.remove('scale-95');
+                m.querySelector('.transform').classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeScoreModal() {
+            const m = document.getElementById('score-modal');
+            m.querySelector('.transform').classList.replace('scale-100', 'scale-95');
+            setTimeout(() => {
+                m.classList.add('hidden');
+            }, 100);
+        }
+
+        function saveMatchScore() {
+            const score1 = parseInt(document.getElementById('modal-p1-score').value);
+            const score2 = parseInt(document.getElementById('modal-p2-score').value);
+
+            if (isNaN(score1) || isNaN(score2)) {
+                showToast("Пожалуйста, заполните результаты голов!", true);
+                return;
+            }
+
+            const match = state.matches.find(m => m.id === activeMatchId);
+            if (match) {
+                match.score1 = score1;
+                match.score2 = score2;
+                match.completed = true;
+
+                if (state.mode === 'playoff') {
+                    advanceWinner(match);
+                }
+
+                saveCurrentState();
+                renderMatches();
+                closeScoreModal();
+                showToast("Результат успешно обновлен!");
+            }
+        }
+
+        // Автоматическое продвижение в сетке плей-офф
+        function advanceWinner(match) {
+            const winner = match.score1 > match.score2 ? match.p1 : match.p2;
+            const curStage = match.stage;
+            if (curStage === '1/1' || curStage === 'Финал') return; // Конец сетки
+
+            const stagesFlow = { '1/8': '1/4', '1/4': '1/2', '1/2': '1/1' };
+            const nextStage = stagesFlow[curStage];
+            if (!nextStage) return;
+
+            const stageMatches = state.matches.filter(m => m.stage === curStage);
+            const currentMatchIndex = stageMatches.findIndex(m => m.id === match.id);
+            const nextMatchIndexInStage = Math.floor(currentMatchIndex / 2);
+
+            const nextStageMatches = state.matches.filter(m => m.stage === nextStage);
+            let nextMatch = nextStageMatches[nextMatchIndexInStage];
+
+            if (!nextMatch) {
+                const nextId = Math.max(...state.matches.map(m => m.id)) + 1;
+                nextMatch = {
+                    id: nextId,
+                    stage: nextStage,
+                    p1: null,
+                    p2: null,
+                    score1: null,
+                    score2: null,
+                    completed: false,
+                    isBye: false
+                };
+                state.matches.push(nextMatch);
+            }
+
+            if (currentMatchIndex % 2 === 0) {
+                nextMatch.p1 = winner;
+            } else {
+                nextMatch.p2 = winner;
+            }
+
+            // Авто пропуск в следующем раунде, если соперник "Пропуск"
+            if (nextMatch.p1 === 'Пропуск' || nextMatch.p2 === 'Пропуск') {
+                nextMatch.completed = true;
+                nextMatch.isBye = true;
+                if (nextMatch.p1 === 'Пропуск') {
+                    nextMatch.score1 = 0; nextMatch.score2 = 3;
+                } else {
+                    nextMatch.score1 = 3; nextMatch.score2 = 0;
+                }
+                advanceWinner(nextMatch);
+            }
+        }
+
+        // Обновление таблиц и сеток
+        function updateTablesAndSchedules() {
+            if (state.mode === 'league') {
+                document.getElementById('league-view').classList.remove('hidden');
+                document.getElementById('playoff-view').classList.add('hidden');
+                calculateLeagueTable();
+            } else {
+                document.getElementById('league-view').classList.add('hidden');
+                document.getElementById('playoff-view').classList.remove('hidden');
+                renderPlayoffBracket();
+            }
+        }
+
+        // Расчет лиги
+        function calculateLeagueTable() {
+            let stats = {};
+            state.players.forEach(p => {
+                stats[p] = { name: p, played: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 };
+            });
+
+            state.matches.forEach(m => {
+                if (m.completed && !m.isBye) {
+                    if (!stats[m.p1]) stats[m.p1] = { name: m.p1, played: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 };
+                    if (!stats[m.p2]) stats[m.p2] = { name: m.p2, played: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 };
+
+                    stats[m.p1].played++;
+                    stats[m.p2].played++;
+                    stats[m.p1].gf += m.score1;
+                    stats[m.p1].ga += m.score2;
+                    stats[m.p2].gf += m.score2;
+                    stats[m.p2].ga += m.score1;
+
+                    if (m.score1 > m.score2) {
+                        stats[m.p1].w++;
+                        stats[m.p2].l++;
+                        stats[m.p1].pts += 3;
+                    } else if (m.score2 > m.score1) {
+                        stats[m.p2].w++;
+                        stats[m.p1].l++;
+                        stats[m.p2].pts += 3;
+                    } else {
+                        stats[m.p1].d++;
+                        stats[m.p2].d++;
+                        stats[m.p1].pts += 1;
+                        stats[m.p2].pts += 1;
+                    }
+                }
+            });
+
+            const sorted = Object.values(stats).sort((a, b) => {
+                if (b.pts !== a.pts) return b.pts - a.pts;
+                const diffA = a.gf - a.ga;
+                const diffB = b.gf - b.ga;
+                if (diffB !== diffA) return diffB - diffA;
+                return b.gf - a.gf;
+            });
+
+            const tbody = document.getElementById('league-table-body');
+            tbody.innerHTML = '';
+
+            sorted.forEach((row, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-white/5 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-center font-bold font-orbitron text-xs">${idx + 1}</td>
+                    <td class="py-3 px-4 font-black font-orbitron text-sm text-white flex items-center gap-2">
+                        <i class="fas fa-trophy text-[10px] ${idx === 0 ? 'text-efootball-yellow' : idx === 1 ? 'text-gray-400' : idx === 2 ? 'text-amber-600' : 'text-gray-600'}"></i>
+                        ${row.name}
+                    </td>
+                    <td class="py-3 px-4 text-center font-bold text-gray-300 text-xs">${row.played}</td>
+                    <td class="py-3 px-4 text-center text-efootball-green font-bold text-xs">${row.w}</td>
+                    <td class="py-3 px-4 text-center text-gray-400 font-bold text-xs">${row.d}</td>
+                    <td class="py-3 px-4 text-center text-efootball-pink font-bold text-xs">${row.l}</td>
+                    <td class="py-3 px-4 text-center text-xs text-gray-400 font-bold">${row.gf}:${row.ga}</td>
+                    <td class="py-3 px-4 text-center font-black font-orbitron text-base text-efootball-green">${row.pts}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            renderPodium(sorted);
+        }
+
+        function renderPodium(sorted) {
+            const container = document.getElementById('podium-container');
+            container.innerHTML = '';
+
+            const second = sorted[1];
+            const first = sorted[0];
+            const third = sorted[2];
+
+            if (second) {
+                container.appendChild(createPodiumPillar(second.name, '2', 'h-20 bg-gradient-to-t from-gray-700/50 to-gray-500/50', 'text-gray-300'));
+            }
+            if (first) {
+                container.appendChild(createPodiumPillar(first.name, '1', 'h-32 bg-gradient-to-t from-yellow-600/50 to-efootball-yellow/50 shadow-neon-violet', 'text-efootball-yellow'));
+            }
+            if (third) {
+                container.appendChild(createPodiumPillar(third.name, '3', 'h-14 bg-gradient-to-t from-amber-800/50 to-amber-600/50', 'text-amber-500'));
+            }
+        }
+
+        function createPodiumPillar(name, rank, heightClass, textColorClass) {
+            const div = document.createElement('div');
+            div.className = "flex flex-col items-center flex-1";
+            div.innerHTML = `
+                <div class="text-xs font-black font-orbitron text-white text-center truncate w-20 mb-2">${name}</div>
+                <div class="w-full ${heightClass} rounded-t-xl flex flex-col items-center justify-center relative border border-white/10">
+                    <span class="absolute -top-5 text-sm ${textColorClass}"><i class="fas fa-crown"></i></span>
+                    <span class="font-orbitron font-black text-xl text-white">${rank}</span>
+                </div>
+            `;
+            return div;
+        }
+
+        // Рендер олимпийской сетки
+        function renderPlayoffBracket() {
+            const container = document.getElementById('bracket-stages');
+            container.innerHTML = '';
+
+            const stagesOrder = ['1/8', '1/4', '1/2', '1/1'];
+            const stagesNames = { '1/8': '1/8 финала', '1/4': 'Четвертьфиналы', '1/2': 'Полуфиналы', '1/1': 'Финал' };
+
+            stagesOrder.forEach(stage => {
+                const stageMatches = state.matches.filter(m => m.stage === stage);
+                if (stageMatches.length === 0) return;
+
+                const col = document.createElement('div');
+                col.className = "flex flex-col justify-around items-center gap-4 flex-1 bg-white/5 border border-white/5 rounded-2xl p-3";
+                col.innerHTML = `<h4 class="font-orbitron font-black text-xs text-efootball-yellow border-b border-white/5 pb-2 w-full text-center uppercase tracking-wider">${stagesNames[stage]}</h4>`;
+
+                stageMatches.forEach(m => {
+                    const matchCard = document.createElement('div');
+                    matchCard.className = `w-full bg-black/60 border ${m.completed ? 'border-efootball-green/30' : 'border-white/5'} rounded-xl p-3 flex flex-col gap-2 relative`;
+                    
+                    matchCard.innerHTML = `
+                        <div class="flex justify-between items-center text-[9px] text-gray-500 font-bold font-orbitron">
+                            <span>MATCH #${m.id}</span>
+                            ${m.isBye ? '<span class="text-efootball-green uppercase">Пропуск</span>' : ''}
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold font-orbitron truncate max-w-[85px] ${m.completed && m.score1 > m.score2 ? 'text-efootball-green' : 'text-white'}">${m.p1 || 'Ожидание'}</span>
+                                <span class="font-black font-orbitron text-white">${m.completed ? m.score1 : '-'}</span>
+                            </div>
+                            <div class="h-px bg-white/5"></div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold font-orbitron truncate max-w-[85px] ${m.completed && m.score2 > m.score1 ? 'text-efootball-pink' : 'text-white'}">${m.p2 || 'Ожидание'}</span>
+                                <span class="font-black font-orbitron text-white">${m.completed ? m.score2 : '-'}</span>
+                            </div>
+                        </div>
+                    `;
+                    col.appendChild(matchCard);
+                });
+
+                container.appendChild(col);
+            });
+        }
+
+        // Инициализация при загрузке
+        window.onload = function() {
+            loadSavedState();
+            renderSetupPlayers();
+            renderMatches();
+            updateTablesAndSchedules();
+        }
+    </script>
+</body>
+</html>
+
+```
