@@ -35,31 +35,28 @@
     if(!m){box.innerHTML='<div class="board rounded-[30px] p-5 mb-5 border-ef-gold/35 relative overflow-hidden"><div class="relative z-10 flex items-center justify-between gap-4"><div><div class="title-font text-[11px] text-ef-gold uppercase tracking-[.18em] mb-2">Calendar</div><h2 class="title-font text-2xl">Все матчи сыграны</h2><p class="text-white/45 text-sm mt-1">Турнир завершён. Смотри итоговую таблицу и вкладку Итоги.</p></div><div class="text-5xl">🏁</div></div></div>';return;}
     var p=prediction(m.p1,m.p2);
     box.innerHTML='<section class="board rounded-[32px] p-5 mb-5 relative overflow-hidden border-ef-blue/35">'+
-      '<div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,183,255,.16),transparent_46%),radial-gradient(circle_at_80%_30%,rgba(0,255,136,.12),transparent_32%)] pointer-events-none"></div>'+
-      '<div class="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5"><div><div class="title-font text-[11px] text-ef-blue uppercase tracking-[.18em] mb-2 flex items-center gap-2"><i data-lucide="calendar-clock"></i> Следующий матч</div><h2 class="title-font text-2xl sm:text-3xl">Match #'+esc(m.id)+'</h2><p class="text-white/45 text-sm mt-1">Один ближайший несыгранный матч с прогнозом, графиками и аналитикой.</p></div><div class="tile rounded-2xl px-4 py-3 text-center"><div class="title-font text-ef-pitch text-xl">'+left+'</div><div class="text-[9px] text-white/40 font-black uppercase">матчей осталось</div></div></div>'+
+      '<div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,183,255,.16),transparent_46%),radial-gradient(circle_at_80%_30%,rgba(0,255,136,.12),transparent_32%)] pointer-events-none"></div>'+ 
+      '<div class="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5"><div><div class="title-font text-[11px] text-ef-blue uppercase tracking-[.18em] mb-2 flex items-center gap-2"><i data-lucide="calendar-clock"></i> Следующий матч</div><h2 class="title-font text-2xl sm:text-3xl">Match #'+esc(m.id)+'</h2><p class="text-white/45 text-sm mt-1">Один ближайший несыгранный матч с прогнозом, графиками и аналитикой.</p></div><div class="tile rounded-2xl px-4 py-3 text-center"><div class="title-font text-ef-pitch text-xl">'+left+'</div><div class="text-[9px] text-white/40 font-black uppercase">матчей осталось</div></div></div>'+ 
       '<div class="relative z-10 grid grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-6 mb-5">'+
-      '<div class="tile rounded-[26px] p-4 text-center">'+avatar(m.p1,'w-20 h-20 rounded-[24px] mx-auto mb-3')+'<div class="title-font text-lg sm:text-xl truncate">'+esc(m.p1)+'</div><div class="text-[10px] text-ef-pitch font-black uppercase mt-1">'+p.aChance+'% шанс</div></div>'+
-      '<div class="flex flex-col items-center"><div class="w-14 h-14 rounded-full border border-ef-pitch/40 bg-black/55 flex items-center justify-center title-font text-ef-pitch shadow-pitch">VS</div><div class="mt-3 text-[10px] text-white/40 font-black uppercase">'+esc(p.level)+'</div></div>'+
-      '<div class="tile rounded-[26px] p-4 text-center">'+avatar(m.p2,'w-20 h-20 rounded-[24px] mx-auto mb-3')+'<div class="title-font text-lg sm:text-xl truncate">'+esc(m.p2)+'</div><div class="text-[10px] text-ef-danger font-black uppercase mt-1">'+p.bChance+'% шанс</div></div>'+
-      '</div>'+
-      '<div class="relative z-10 mb-5"><div class="flex justify-between text-xs font-black mb-2"><span class="text-ef-pitch">'+esc(m.p1)+' '+p.aChance+'%</span><span class="text-ef-danger">'+p.bChance+'% '+esc(m.p2)+'</span></div><div class="h-4 rounded-full overflow-hidden bg-white/10 border border-white/10"><div style="width:'+p.aChance+'%;height:100%;background:linear-gradient(90deg,#00ff88,#00b7ff)"></div></div></div>'+
+      '<div class="tile rounded-[26px] p-4 text-center">'+avatar(m.p1,'w-20 h-20 rounded-[24px] mx-auto mb-3')+'<div class="title-font text-lg sm:text-xl truncate">'+esc(m.p1)+'</div><div class="text-[10px] text-ef-pitch font-black uppercase mt-1">'+p.aChance+'% шанс</div></div>'+ 
+      '<div class="flex flex-col items-center"><div class="w-14 h-14 rounded-full border border-ef-pitch/40 bg-black/55 flex items-center justify-center title-font text-ef-pitch shadow-pitch">VS</div><div class="mt-3 text-[10px] text-white/40 font-black uppercase">'+esc(p.level)+'</div></div>'+ 
+      '<div class="tile rounded-[26px] p-4 text-center">'+avatar(m.p2,'w-20 h-20 rounded-[24px] mx-auto mb-3')+'<div class="title-font text-lg sm:text-xl truncate">'+esc(m.p2)+'</div><div class="text-[10px] text-ef-danger font-black uppercase mt-1">'+p.bChance+'% шанс</div></div>'+ 
+      '</div>'+ 
+      '<div class="relative z-10 mb-5"><div class="flex justify-between text-xs font-black mb-2"><span class="text-ef-pitch">'+esc(m.p1)+' '+p.aChance+'%</span><span class="text-ef-danger">'+p.bChance+'% '+esc(m.p2)+'</span></div><div class="h-4 rounded-full overflow-hidden bg-white/10 border border-white/10"><div style="width:'+p.aChance+'%;height:100%;background:linear-gradient(90deg,#00ff88,#00b7ff)"></div></div></div>'+ 
       '<div class="relative z-10 grid grid-cols-1 sm:grid-cols-4 gap-3 mb-5">'+
       mini('Рейтинг',p.ra+' / '+p.rb,'меньше число = сильнее','text-ef-gold')+
       mini('Форма',p.sa.w+'-'+p.sa.d+'-'+p.sa.l+' / '+p.sb.w+'-'+p.sb.d+'-'+p.sb.l,'В-Н-П по сыгранным матчам','text-ef-pitch')+
       mini('Голы',p.sa.gf+':'+p.sa.ga+' / '+p.sb.gf+':'+p.sb.ga,'забито / пропущено','text-ef-blue')+
       mini('Очные',p.hh.aw+'-'+p.hh.d+'-'+p.hh.bw,p.hh.played?'личные встречи':'ещё не играли','text-white')+
-      '</div>'+
-      '<div class="relative z-10 tile rounded-[24px] p-5"><div class="title-font text-[11px] text-ef-gold uppercase tracking-[.16em] mb-2 flex items-center gap-2"><i data-lucide="activity"></i> Короткая аналитика</div><p class="text-white/75 text-sm leading-relaxed">'+esc(p.text)+' Фактор матча — дисциплина в обороне и реализация первых моментов. После внесения результата эта карточка автоматически переключится на следующий матч календаря.</p></div>'+
+      '</div>'+ 
+      '<div class="relative z-10 tile rounded-[24px] p-5"><div class="title-font text-[11px] text-ef-gold uppercase tracking-[.16em] mb-2 flex items-center gap-2"><i data-lucide="activity"></i> Короткая аналитика</div><p class="text-white/75 text-sm leading-relaxed">'+esc(p.text)+' Фактор матча — дисциплина в обороне и реализация первых моментов. После внесения результата эта карточка автоматически переключится на следующий матч календаря.</p></div>'+ 
       '</section>';
     if(window.lucide)lucide.createIcons();
   }
+  window.renderNextMatch=renderNextMatch;
   function ensureNextMatchBlock(){
-    if(byId('next-match-box'))return;
-    var anchor=byId('champion-panel'); if(!anchor)return;
-    anchor.insertAdjacentHTML('afterend','<div id="next-match-box"></div>');
-    var oldRenderAll=window.renderAll; if(typeof oldRenderAll==='function'){window.renderAll=function(){oldRenderAll(); renderNextMatch();}}
-    var oldRenderMatches=window.renderMatches; if(typeof oldRenderMatches==='function'){window.renderMatches=function(){oldRenderMatches(); renderNextMatch();}}
-    var oldUpdate=window.updateTablesAndSchedules; if(typeof oldUpdate==='function'){window.updateTablesAndSchedules=function(){oldUpdate(); renderNextMatch();}}
+    var box=byId('next-match-box');
+    if(!box){var anchor=byId('champion-panel'); if(!anchor)return; anchor.insertAdjacentHTML('afterend','<div id="next-match-box"></div>')}
     renderNextMatch();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ensureNextMatchBlock);else ensureNextMatchBlock();
