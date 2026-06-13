@@ -6,6 +6,7 @@
     {title:'BEST MOMENTS #3',label:'Gameplay highlight',src:'https://res.cloudinary.com/dc1ybvaxd/video/upload/v1781348036/SHARE_20260613_1052080_ebmk71.mp4'}
   ];
   let index=0;
+  let switching=false;
   function setup(){
     const video=document.querySelector('.hero-video');
     if(!video)return;
@@ -23,6 +24,8 @@
       dots.forEach((d,i)=>{d.className='hero-dot h-2 rounded-full transition-all '+(i===index?'w-8 bg-ef-pitch shadow-pitch':'w-2 bg-white/30')});
     }
     function playCurrent(){
+      if(switching)return;
+      switching=true;
       video.style.opacity='.18';
       video.style.filter='blur(4px) saturate(1.35)';
       setTimeout(()=>{
@@ -30,11 +33,15 @@
         video.load();
         video.play().catch(()=>{});
         renderMeta();
-        setTimeout(()=>{video.style.opacity='.96';video.style.filter='blur(0) saturate(1.05)'},180);
+        setTimeout(()=>{video.style.opacity='.96';video.style.filter='blur(0) saturate(1.05)';switching=false},220);
       },520);
     }
-    video.addEventListener('ended',()=>{index=(index+1)%videos.length;playCurrent()});
-    setInterval(()=>{index=(index+1)%videos.length;playCurrent()},18000);
+    function nextVideo(){
+      index=(index+1)%videos.length;
+      playCurrent();
+    }
+    video.addEventListener('ended',nextVideo);
+    video.addEventListener('error',nextVideo);
     renderMeta();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
