@@ -3,7 +3,7 @@
   function loadControls(){
     if(document.querySelector('script[data-technical-fixes]'))return;
     var script=document.createElement('script');
-    script.src='./technical-fixes.js?v=4';
+    script.src='./technical-fixes.js?v=5';
     script.async=false;
     script.setAttribute('data-technical-fixes','1');
     document.body.appendChild(script);
