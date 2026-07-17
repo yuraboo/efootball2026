@@ -1,7 +1,6 @@
 (function(){
   'use strict';
 
-  var selectedMatchId=null;
   var writeQueue=Promise.resolve();
   var stateDocument=null;
   var authReadyPromise=null;
@@ -18,11 +17,15 @@
   }
 
   function renderEverything(){
-    if(typeof window.renderAll==='function')window.renderAll();
-    else{
+    try{
       if(typeof window.renderMatches==='function')window.renderMatches();
       if(typeof window.calculateLeagueTable==='function')window.calculateLeagueTable();
       if(typeof window.renderProfiles==='function')window.renderProfiles();
+      if(typeof window.renderNextMatch==='function')window.renderNextMatch();
+      if(typeof window.refreshIcons==='function')window.refreshIcons();
+      if(typeof window.renderAll==='function')window.renderAll();
+    }catch(error){
+      console.error('Ошибка обновления интерфейса',error);
     }
   }
 
@@ -30,7 +33,12 @@
     if(firebase.auth)return Promise.resolve();
     return new Promise(function(resolve,reject){
       var existing=document.querySelector('script[data-firebase-auth]');
-      if(existing){existing.addEventListener('load',resolve,{once:true});existing.addEventListener('error',reject,{once:true});return}
+      if(existing){
+        if(firebase.auth){resolve();return}
+        existing.addEventListener('load',resolve,{once:true});
+        existing.addEventListener('error',reject,{once:true});
+        return;
+      }
       var script=document.createElement('script');
       script.src='https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js';
       script.async=false;
@@ -46,21 +54,14 @@
     authReadyPromise=loadAuthSdk().then(async function(){
       var auth=firebase.auth();
       if(auth.currentUser)return auth.currentUser;
-      try{
-        var result=await auth.signInAnonymously();
-        return result.user;
-      }catch(error){
-        console.error('Ошибка анонимной авторизации Firebase',error);
-        throw error;
-      }
+      var result=await auth.signInAnonymously();
+      return result.user;
     });
     return authReadyPromise;
   }
 
   function saveLocal(snapshot){
     localStorage.setItem('ef_tournament_state',JSON.stringify(snapshot));
-    window.state=clone(snapshot);
-    renderEverything();
   }
 
   function readableFirebaseError(error){
@@ -71,21 +72,13 @@
     return (error&&error.message)||'Неизвестная ошибка Firebase';
   }
 
-  function saveAndVerify(message){
-    if(!isAdmin()||!window.state)return Promise.resolve(false);
-    var snapshot=clone(window.state);
-    saveLocal(snapshot);
+  function saveRemote(snapshot,message){
     writeQueue=writeQueue.then(async function(){
       try{
-        setStatus('Firebase: авторизация...');
+        setStatus('Firebase: сохранение...');
         await ensureAuthenticated();
-        setStatus('Firestore: сохранение...');
         await getDocument().set(snapshot,{merge:false});
-        var check=await getDocument().get();
-        if(!check.exists)throw new Error('Документ турнира не найден после сохранения');
-        var confirmed=check.data();
-        saveLocal(confirmed);
-        setStatus('Firestore: сохранено для всех');
+        setStatus('Firebase: сохранено для всех');
         if(message)toast(message);
         return true;
       }catch(error){
@@ -96,6 +89,13 @@
       }
     });
     return writeQueue;
+  }
+
+  function saveCurrent(message){
+    if(!isAdmin()||!window.state)return Promise.resolve(false);
+    var snapshot=clone(window.state);
+    saveLocal(snapshot);
+    return saveRemote(snapshot,message);
   }
 
   function paintRounds(){
@@ -112,23 +112,24 @@
     if(!isAdmin()||!window.state)return;
     window.state.leagueRounds=Number(rounds)||2;
     paintRounds();
-    saveAndVerify('Количество кругов сохранено: '+window.state.leagueRounds);
+    saveCurrent('Количество кругов сохранено: '+window.state.leagueRounds);
   };
 
   window.toggleModeSelect=function(mode){
     if(!isAdmin()||!window.state)return;
     window.state.mode=mode==='playoff'?'playoff':'league';
     document.querySelectorAll('input[name="tournament-mode"]').forEach(function(input){input.checked=input.value===window.state.mode});
-    saveAndVerify('Режим турнира сохранён');
+    saveCurrent('Режим турнира сохранён');
   };
 
   window.openScoreModal=function(id){
     if(!isAdmin()||!window.state)return;
     var match=(window.state.matches||[]).find(function(item){return Number(item.id)===Number(id)});
     if(!match){toast('Матч не найден',true);return}
-    selectedMatchId=Number(id);
-    var p1=byId('modal-p1-name'),p2=byId('modal-p2-name'),s1=byId('modal-p1-score'),s2=byId('modal-p2-score'),modal=byId('score-modal');
+    var modal=byId('score-modal');
+    var p1=byId('modal-p1-name'),p2=byId('modal-p2-name'),s1=byId('modal-p1-score'),s2=byId('modal-p2-score');
     if(!modal||!s1||!s2){toast('Окно ввода счёта не найдено',true);return}
+    modal.dataset.matchId=String(id);
     if(p1)p1.textContent=match.p1;
     if(p2)p2.textContent=match.p2;
     s1.value=match.completed?match.score1:'';
@@ -139,24 +140,30 @@
 
   window.closeScoreModal=function(){var modal=byId('score-modal');if(modal)modal.classList.add('hidden')};
 
-  window.saveMatchScore=async function(){
-    if(!isAdmin()||!window.state)return;
+  function applyScore(){
+    if(!isAdmin()||!window.state)return false;
+    var modal=byId('score-modal');
+    var id=Number(modal&&modal.dataset.matchId);
     var s1=parseInt((byId('modal-p1-score')||{}).value,10);
     var s2=parseInt((byId('modal-p2-score')||{}).value,10);
-    if(!Number.isInteger(s1)||!Number.isInteger(s2)||s1<0||s2<0){toast('Введите корректный счёт',true);return}
-    var match=(window.state.matches||[]).find(function(item){return Number(item.id)===Number(selectedMatchId)});
-    if(!match){toast('Не удалось определить выбранный матч',true);return}
+    if(!Number.isInteger(s1)||!Number.isInteger(s2)||s1<0||s2<0){toast('Введите корректный счёт',true);return false}
+    var match=(window.state.matches||[]).find(function(item){return Number(item.id)===id});
+    if(!match){toast('Не удалось определить выбранный матч',true);return false}
     match.score1=s1;
     match.score2=s2;
     match.completed=true;
+    saveLocal(clone(window.state));
     window.closeScoreModal();
     renderEverything();
-    await saveAndVerify('Результат сохранён, таблица обновлена');
-  };
+    toast('Результат внесён, таблица обновлена');
+    saveRemote(clone(window.state),'Результат сохранён для всех');
+    return true;
+  }
 
-  window.saveSharedState=async function(show){
-    var message=show===false?'':'Все данные турнира сохранены';
-    return saveAndVerify(message);
+  window.saveMatchScore=function(){applyScore()};
+
+  window.saveSharedState=function(show){
+    return saveCurrent(show===false?'':'Все данные турнира сохранены');
   };
 
   window.updateRating=function(encodedName,value){
@@ -164,7 +171,8 @@
     var name=decodeURIComponent(encodedName);
     if(!window.state.profiles[name])window.state.profiles[name]={rating:100,photo:'',photoUrl:''};
     window.state.profiles[name].rating=Number(value)||0;
-    saveAndVerify('Рейтинг игрока сохранён');
+    renderEverything();
+    saveCurrent('Рейтинг игрока сохранён');
   };
 
   window.updatePhotoUrl=function(encodedName,value){
@@ -172,18 +180,30 @@
     var name=decodeURIComponent(encodedName);
     if(!window.state.profiles[name])window.state.profiles[name]={rating:100,photo:'',photoUrl:''};
     window.state.profiles[name].photoUrl=String(value||'').trim();
-    saveAndVerify('Фото игрока сохранено');
+    renderEverything();
+    saveCurrent('Фото игрока сохранено');
   };
 
-  function restoreLocalState(){
-    try{
-      var saved=localStorage.getItem('ef_tournament_state');
-      if(saved&&!window.state.matches.length){window.state=JSON.parse(saved);renderEverything()}
-    }catch(error){console.warn('Не удалось восстановить локальные данные',error)}
+  function interceptModalButtons(event){
+    if(!isAdmin())return;
+    var modal=byId('score-modal');
+    if(!modal||modal.classList.contains('hidden'))return;
+    var button=event.target.closest&&event.target.closest('button');
+    if(!button||!modal.contains(button))return;
+    var action=button.getAttribute('onclick')||'';
+    if(action.indexOf('saveMatchScore')!==-1){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      applyScore();
+    }else if(action.indexOf('closeScoreModal')!==-1){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      window.closeScoreModal();
+    }
   }
 
   function setup(){
-    restoreLocalState();
+    document.addEventListener('click',interceptModalButtons,true);
     paintRounds();
     ensureAuthenticated().then(function(){setStatus('Firebase: администратор подключён')}).catch(function(error){setStatus('Firebase: '+readableFirebaseError(error))});
     var observer=new MutationObserver(paintRounds);
