@@ -4,18 +4,18 @@
   var selectedMatchId=null;
   var writeQueue=Promise.resolve();
   var stateDocument=null;
+  var authReadyPromise=null;
 
   function byId(id){return document.getElementById(id)}
   function isAdmin(){return window.IS_ADMIN===true}
   function toast(text,isError){if(typeof window.showToast==='function')window.showToast(text,!!isError)}
   function clone(value){return JSON.parse(JSON.stringify(value))}
+  function setStatus(text){var el=byId('sync-status');if(el)el.textContent=text}
 
   function getDocument(){
     if(!stateDocument)stateDocument=firebase.firestore().collection('tournament').doc('state');
     return stateDocument;
   }
-
-  function setStatus(text){var el=byId('sync-status');if(el)el.textContent=text}
 
   function renderEverything(){
     if(typeof window.renderAll==='function')window.renderAll();
@@ -26,26 +26,72 @@
     }
   }
 
+  function loadAuthSdk(){
+    if(firebase.auth)return Promise.resolve();
+    return new Promise(function(resolve,reject){
+      var existing=document.querySelector('script[data-firebase-auth]');
+      if(existing){existing.addEventListener('load',resolve,{once:true});existing.addEventListener('error',reject,{once:true});return}
+      var script=document.createElement('script');
+      script.src='https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js';
+      script.async=false;
+      script.setAttribute('data-firebase-auth','1');
+      script.onload=resolve;
+      script.onerror=function(){reject(new Error('Не удалось загрузить Firebase Auth'))};
+      document.head.appendChild(script);
+    });
+  }
+
+  function ensureAuthenticated(){
+    if(authReadyPromise)return authReadyPromise;
+    authReadyPromise=loadAuthSdk().then(async function(){
+      var auth=firebase.auth();
+      if(auth.currentUser)return auth.currentUser;
+      try{
+        var result=await auth.signInAnonymously();
+        return result.user;
+      }catch(error){
+        console.error('Ошибка анонимной авторизации Firebase',error);
+        throw error;
+      }
+    });
+    return authReadyPromise;
+  }
+
+  function saveLocal(snapshot){
+    localStorage.setItem('ef_tournament_state',JSON.stringify(snapshot));
+    window.state=clone(snapshot);
+    renderEverything();
+  }
+
+  function readableFirebaseError(error){
+    var code=(error&&error.code)||'';
+    if(code.indexOf('permission-denied')!==-1)return 'Firebase запретил запись. Проверьте правила Firestore.';
+    if(code.indexOf('operation-not-allowed')!==-1)return 'В Firebase не включена анонимная авторизация.';
+    if(code.indexOf('network')!==-1||code.indexOf('unavailable')!==-1)return 'Нет соединения с Firebase.';
+    return (error&&error.message)||'Неизвестная ошибка Firebase';
+  }
+
   function saveAndVerify(message){
     if(!isAdmin()||!window.state)return Promise.resolve(false);
     var snapshot=clone(window.state);
+    saveLocal(snapshot);
     writeQueue=writeQueue.then(async function(){
       try{
+        setStatus('Firebase: авторизация...');
+        await ensureAuthenticated();
         setStatus('Firestore: сохранение...');
-        await getDocument().set(snapshot);
-        var check=await getDocument().get({source:'server'}).catch(function(){return getDocument().get()});
+        await getDocument().set(snapshot,{merge:false});
+        var check=await getDocument().get();
         if(!check.exists)throw new Error('Документ турнира не найден после сохранения');
         var confirmed=check.data();
-        window.state=confirmed;
-        localStorage.setItem('ef_tournament_state',JSON.stringify(confirmed));
-        renderEverything();
-        setStatus('Firestore: сохранено и проверено');
+        saveLocal(confirmed);
+        setStatus('Firestore: сохранено для всех');
         if(message)toast(message);
         return true;
       }catch(error){
         console.error('Ошибка сохранения турнира',error);
-        setStatus('Firestore: ошибка сохранения');
-        toast('Ошибка: данные не были сохранены',true);
+        setStatus('Локально сохранено • Firebase: ошибка');
+        toast(readableFirebaseError(error),true);
         return false;
       }
     });
@@ -103,8 +149,9 @@
     match.score1=s1;
     match.score2=s2;
     match.completed=true;
-    var saved=await saveAndVerify('Результат сохранён, таблица обновлена');
-    if(saved)window.closeScoreModal();
+    window.closeScoreModal();
+    renderEverything();
+    await saveAndVerify('Результат сохранён, таблица обновлена');
   };
 
   window.saveSharedState=async function(show){
@@ -128,8 +175,17 @@
     saveAndVerify('Фото игрока сохранено');
   };
 
+  function restoreLocalState(){
+    try{
+      var saved=localStorage.getItem('ef_tournament_state');
+      if(saved&&!window.state.matches.length){window.state=JSON.parse(saved);renderEverything()}
+    }catch(error){console.warn('Не удалось восстановить локальные данные',error)}
+  }
+
   function setup(){
+    restoreLocalState();
     paintRounds();
+    ensureAuthenticated().then(function(){setStatus('Firebase: администратор подключён')}).catch(function(error){setStatus('Firebase: '+readableFirebaseError(error))});
     var observer=new MutationObserver(paintRounds);
     observer.observe(document.body,{childList:true,subtree:true});
   }
