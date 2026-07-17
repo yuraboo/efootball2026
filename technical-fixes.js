@@ -2,28 +2,33 @@
   'use strict';
 
   var selectedMatchId=null;
-  var saving=false;
+  var saveChain=Promise.resolve();
 
   function byId(id){return document.getElementById(id)}
   function toast(text,isError){if(typeof window.showToast==='function')window.showToast(text,!!isError)}
   function isAdmin(){return window.IS_ADMIN===true}
+  function cloneState(){return JSON.parse(JSON.stringify(window.state||{}))}
 
-  async function persist(message){
-    if(!isAdmin()||!window.state||saving)return;
-    try{
-      saving=true;
-      var clean=JSON.parse(JSON.stringify(window.state));
-      await firebase.firestore().collection('tournament').doc('state').set(clean);
-      localStorage.setItem('ef_tournament_state',JSON.stringify(clean));
+  function persist(message){
+    if(!isAdmin()||!window.state)return Promise.resolve(false);
+    var snapshot=cloneState();
+    saveChain=saveChain.then(async function(){
       var status=byId('sync-status');
-      if(status)status.textContent='Firestore: сохранено для всех';
-      if(message)toast(message);
-    }catch(error){
-      console.error('Ошибка сохранения',error);
-      toast('Не удалось сохранить изменения',true);
-    }finally{
-      saving=false;
-    }
+      try{
+        if(status)status.textContent='Firestore: сохранение...';
+        await firebase.firestore().collection('tournament').doc('state').set(snapshot);
+        localStorage.setItem('ef_tournament_state',JSON.stringify(snapshot));
+        if(status)status.textContent='Firestore: сохранено для всех';
+        if(message)toast(message);
+        return true;
+      }catch(error){
+        console.error('Ошибка сохранения',error);
+        if(status)status.textContent='Firestore: ошибка сохранения';
+        toast('Не удалось сохранить изменения',true);
+        return false;
+      }
+    });
+    return saveChain;
   }
 
   function refresh(){
@@ -71,11 +76,13 @@
   async function saveScore(){
     var s1=Number(byId('modal-p1-score').value),s2=Number(byId('modal-p2-score').value);
     if(!Number.isInteger(s1)||!Number.isInteger(s2)||s1<0||s2<0){toast('Введите корректный счёт',true);return}
-    var match=(window.state.matches||[]).find(function(m){return Number(m.id)===selectedMatchId});
+    var match=(window.state.matches||[]).find(function(m){return Number(m.id)===Number(selectedMatchId)});
     if(!match){toast('Матч не найден',true);return}
     match.score1=s1;match.score2=s2;match.completed=true;
-    closeScore();refresh();
-    await persist('Результат сохранён для всех');
+    localStorage.setItem('ef_tournament_state',JSON.stringify(window.state));
+    closeScore();
+    var saved=await persist('Результат сохранён для всех');
+    if(saved)refresh();
   }
 
   function updateProfile(input){
@@ -91,6 +98,10 @@
     persist('Профиль игрока сохранён');
   }
 
+  function isMainSaveButton(button){
+    return button&&((button.getAttribute('onclick')||'').indexOf('saveSharedState')!==-1);
+  }
+
   function handleClick(event){
     if(!isAdmin())return;
     var round=event.target.closest('[id^="btn-round-"]');
@@ -100,6 +111,13 @@
     if(score){
       var found=(score.getAttribute('onclick')||'').match(/openScoreModal\((\d+)\)/);
       if(found){event.preventDefault();event.stopImmediatePropagation();openScore(Number(found[1]));return}
+    }
+
+    var clickedButton=event.target.closest('button');
+    if(isMainSaveButton(clickedButton)){
+      event.preventDefault();event.stopImmediatePropagation();
+      persist('Все изменения сохранены для всех');
+      return;
     }
 
     var modal=byId('score-modal');
