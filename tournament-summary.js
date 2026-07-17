@@ -54,15 +54,15 @@
     }
     var sorted=leagueSorted(); var champ=sorted[0]; var second=sorted[1]; var bm=bestMatch(st); var attack=bestAttack(sorted); var defense=bestDefense(sorted); var article=makeArticle();
     box.innerHTML='<div class="board rounded-[30px] p-5 sm:p-7 relative overflow-hidden border-ef-gold/35">'+
-      '<div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,220,92,.18),transparent_45%)] pointer-events-none"></div>'+
-      '<div class="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"><div><div class="title-font text-[11px] text-ef-gold uppercase tracking-[.18em] mb-2">Final Report</div><h2 class="title-font text-2xl sm:text-4xl">Итоги турнира</h2><p class="text-white/45 text-sm mt-2">Журналистская статья создана автоматически по результатам матчей.</p></div><button onclick="copyTournamentArticle()" class="bg-ef-gold text-black hover:bg-white title-font text-xs py-3 px-5 rounded-2xl transition-all">📋 Скопировать статью</button></div>'+
+      '<div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,220,92,.18),transparent_45%)] pointer-events-none"></div>'+ 
+      '<div class="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"><div><div class="title-font text-[11px] text-ef-gold uppercase tracking-[.18em] mb-2">Final Report</div><h2 class="title-font text-2xl sm:text-4xl">Итоги турнира</h2><p class="text-white/45 text-sm mt-2">Журналистская статья создана автоматически по результатам матчей.</p></div><button onclick="copyTournamentArticle()" class="bg-ef-gold text-black hover:bg-white title-font text-xs py-3 px-5 rounded-2xl transition-all">📋 Скопировать статью</button></div>'+ 
       '<div class="relative z-10 grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">'+
-      '<div class="tile rounded-2xl p-4"><div class="text-[10px] text-white/40 font-black uppercase">Чемпион</div><div class="title-font text-ef-gold mt-1">'+esc(champ.name)+'</div></div>'+
-      '<div class="tile rounded-2xl p-4"><div class="text-[10px] text-white/40 font-black uppercase">Главный конкурент</div><div class="title-font text-white mt-1">'+esc(second?second.name:'—')+'</div></div>'+
-      '<div class="tile rounded-2xl p-4"><div class="text-[10px] text-white/40 font-black uppercase">Лучшая атака</div><div class="title-font text-ef-pitch mt-1">'+esc(attack?attack.name+' • '+attack.gf:'—')+'</div></div>'+
-      '<div class="tile rounded-2xl p-4"><div class="text-[10px] text-white/40 font-black uppercase">Лучшая оборона</div><div class="title-font text-ef-blue mt-1">'+esc(defense?defense.name+' • '+defense.ga:'—')+'</div></div>'+
-      '</div>'+
-      '<article class="relative z-10 bg-black/30 border border-white/10 rounded-[26px] p-5 sm:p-6 text-white/80 leading-relaxed text-sm sm:text-base whitespace-pre-line">'+esc(article)+'</article>'+
+      '<div class="tile rounded-2xl p-4"><div class="text-[10px] text-white/40 font-black uppercase">Чемпион</div><div class="title-font text-ef-gold mt-1">'+esc(champ.name)+'</div></div>'+ 
+      '<div class="tile rounded-2xl p-4"><div class="text-[10px] text-white/40 font-black uppercase">Главный конкурент</div><div class="title-font text-white mt-1">'+esc(second?second.name:'—')+'</div></div>'+ 
+      '<div class="tile rounded-2xl p-4"><div class="text-[10px] text-white/40 font-black uppercase">Лучшая атака</div><div class="title-font text-ef-pitch mt-1">'+esc(attack?attack.name+' • '+attack.gf:'—')+'</div></div>'+ 
+      '<div class="tile rounded-2xl p-4"><div class="text-[10px] text-white/40 font-black uppercase">Лучшая оборона</div><div class="title-font text-ef-blue mt-1">'+esc(defense?defense.name+' • '+defense.ga:'—')+'</div></div>'+ 
+      '</div>'+ 
+      '<article class="relative z-10 bg-black/30 border border-white/10 rounded-[26px] p-5 sm:p-6 text-white/80 leading-relaxed text-sm sm:text-base whitespace-pre-line">'+esc(article)+'</article>'+ 
       (bm?'<div class="relative z-10 mt-4 tile rounded-2xl p-4"><div class="text-[10px] text-white/40 font-black uppercase mb-1">Матч турнира</div><div class="title-font text-lg text-white">'+esc(bm.p1)+' '+bm.score1+':'+bm.score2+' '+esc(bm.p2)+'</div></div>':'')+
       '</div>';
   }
@@ -85,5 +85,13 @@
     var oldUpdate=window.updateTablesAndSchedules; if(typeof oldUpdate==='function'){window.updateTablesAndSchedules=function(){oldUpdate(); renderSummary();}}
     renderSummary(); if(window.lucide)lucide.createIcons();
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ensureSummaryTab);else ensureSummaryTab();
+  function loadTechnicalFixes(){
+    if(document.querySelector('script[data-technical-fixes]'))return;
+    var script=document.createElement('script');
+    script.src='./technical-fixes.js?v=1';
+    script.async=false;
+    script.setAttribute('data-technical-fixes','1');
+    document.body.appendChild(script);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){ensureSummaryTab();loadTechnicalFixes()});else{ensureSummaryTab();loadTechnicalFixes()}
 })();
