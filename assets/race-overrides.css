@@ -1,0 +1,132 @@
+.runner {
+  bottom: calc(56px + var(--lane-offset, 0px));
+  width: 56px;
+}
+
+.runner-sprite {
+  width: 40px;
+  height: 56px;
+}
+
+.runner-character {
+  width: 40px;
+}
+
+.runner-avatar-shell {
+  top: 3px;
+  width: 16px;
+  height: 16px;
+}
+
+.runner-head-avatar.fallback {
+  font-size: 7px;
+}
+
+.leader-crown {
+  top: -8px;
+  font-size: 11px;
+}
+
+.runner-label {
+  min-width: 56px;
+  max-width: 56px;
+  padding: 4px 4px;
+  border-radius: 10px;
+}
+
+.runner-name {
+  font-size: 6px;
+}
+
+.runner-points {
+  font-size: 6px;
+}
+
+.trophy-anchor {
+  right: -1%;
+  bottom: 44px;
+}
+
+.trophy-image {
+  width: 39px;
+}
+
+@media (max-width: 760px) {
+  .runner {
+    width: 50px;
+    bottom: calc(56px + var(--lane-offset, 0px));
+  }
+
+  .runner-sprite {
+    width: 36px;
+    height: 50px;
+  }
+
+  .runner-character {
+    width: 36px;
+  }
+
+  .runner-avatar-shell {
+    top: 3px;
+    width: 14px;
+    height: 14px;
+  }
+
+  .runner-label {
+    min-width: 50px;
+    max-width: 50px;
+    padding: 3px 4px;
+  }
+
+  .runner-name,
+  .runner-points {
+    font-size: 6px;
+  }
+
+  .trophy-image {
+    width: 32px;
+  }
+}
+
+@media (max-width: 640px) {
+  .runner {
+    width: 44px;
+    bottom: calc(52px + var(--lane-offset, 0px));
+  }
+
+  .runner-sprite {
+    width: 30px;
+    height: 42px;
+  }
+
+  .runner-character {
+    width: 30px;
+  }
+
+  .runner-avatar-shell {
+    top: 2px;
+    width: 12px;
+    height: 12px;
+  }
+
+  .runner-label {
+    min-width: 44px;
+    max-width: 44px;
+    padding: 3px 4px;
+    border-radius: 9px;
+  }
+
+  .runner-name,
+  .runner-points {
+    font-size: 5px;
+  }
+
+  .trophy-anchor {
+    right: -1%;
+    bottom: 32px;
+  }
+
+  .trophy-image {
+    width: 28px;
+  }
+}
