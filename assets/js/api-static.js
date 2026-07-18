@@ -8,6 +8,7 @@ const firebaseConfig = {
 };
 
 const STORAGE_KEY = "ef2026_admin_session_v1";
+const LOCAL_STATE_KEY = "ef2026_state_local_v1";
 const PASSWORD = "1111";
 const SESSION_TTL_MS = 12 * 60 * 60 * 1000;
 const STATE_COLLECTION = "league_room_v2";
@@ -113,9 +114,16 @@ const DEFAULT_STATE = {
 };
 
 let firestoreDb = null;
+let storageMode = "cloud";
+let storageMessage = "";
 
 function clone(data) {
   return JSON.parse(JSON.stringify(data));
+}
+
+function setStorageStatus(mode, message = "") {
+  storageMode = mode;
+  storageMessage = message;
 }
 
 function ensureFirebase() {
@@ -178,7 +186,35 @@ function requireAdminSession() {
 }
 
 async function loadFallbackState() {
-  return normalizeTournamentState(clone(DEFAULT_STATE));
+  const localState = readLocalState();
+  if (localState) {
+    return localState;
+  }
+  return writeLocalState(clone(DEFAULT_STATE));
+}
+
+function readLocalState() {
+  try {
+    const raw = window.localStorage.getItem(LOCAL_STATE_KEY);
+    if (!raw) {
+      return null;
+    }
+    return normalizeTournamentState(JSON.parse(raw));
+  } catch {
+    return null;
+  }
+}
+
+function writeLocalState(nextState) {
+  const normalized = normalizeTournamentState(nextState);
+
+  try {
+    window.localStorage.setItem(LOCAL_STATE_KEY, JSON.stringify(clone(normalized)));
+  } catch {
+    return normalized;
+  }
+
+  return normalized;
 }
 
 async function ensureRemoteState() {
@@ -187,14 +223,27 @@ async function ensureRemoteState() {
     const snapshot = await ref.get();
 
     if (snapshot.exists) {
-      return normalizeTournamentState(snapshot.data());
+      const normalized = normalizeTournamentState(snapshot.data());
+      writeLocalState(normalized);
+      setStorageStatus("cloud");
+      return normalized;
     }
 
     const fallbackState = await loadFallbackState();
     await ref.set(clone(fallbackState));
+    writeLocalState(fallbackState);
+    setStorageStatus("cloud");
     return fallbackState;
   } catch (error) {
-    throw new Error("Нет связи с общим хранилищем турнира. Попробуйте обновить страницу.");
+    const fallbackState = await loadFallbackState();
+    const hasLocalState = Boolean(readLocalState());
+    setStorageStatus(
+      "local",
+      hasLocalState
+        ? "Облако турнира сейчас недоступно. Панель работает в локальном режиме этого браузера."
+        : "Облако турнира сейчас недоступно. Загружен резервный шаблон в локальном режиме браузера."
+    );
+    return writeLocalState(fallbackState);
   }
 }
 
@@ -203,14 +252,28 @@ async function writeRemoteState(nextState) {
 
   try {
     await stateRef().set(clone(normalized));
+    writeLocalState(normalized);
+    setStorageStatus("cloud");
     return normalized;
   } catch {
-    throw new Error("Не удалось сохранить изменения в облаке турнира.");
+    setStorageStatus(
+      "local",
+      "Облако турнира сейчас недоступно. Изменения сохранены локально только в этом браузере."
+    );
+    return writeLocalState(normalized);
   }
 }
 
 function toViewModel(state) {
-  return buildPublicViewModel(state);
+  const model = buildPublicViewModel(state);
+  return {
+    ...model,
+    meta: {
+      ...(model.meta || {}),
+      storageMode,
+      storageMessage
+    }
+  };
 }
 
 const api = {
@@ -254,6 +317,34 @@ const api = {
     let active = true;
     let unsubscribe = () => {};
 
+    if (storageMode === "local") {
+      const handleStorage = async (event) => {
+        if (!active || (event.key && event.key !== LOCAL_STATE_KEY)) {
+          return;
+        }
+
+        try {
+          onChange(toViewModel(await ensureRemoteState()));
+        } catch (error) {
+          onError(error.message);
+        }
+      };
+
+      window.addEventListener("storage", handleStorage);
+      Promise.resolve().then(async () => {
+        try {
+          onChange(toViewModel(await ensureRemoteState()));
+        } catch (error) {
+          onError(error.message);
+        }
+      });
+
+      return () => {
+        active = false;
+        window.removeEventListener("storage", handleStorage);
+      };
+    }
+
     try {
       unsubscribe = stateRef().onSnapshot(
         async (snapshot) => {
@@ -271,9 +362,13 @@ const api = {
             }
           }
         },
-        () => {
+        async () => {
           if (active) {
-            onError("Не удалось синхронизировать страницу с облаком турнира.");
+            try {
+              onChange(toViewModel(await ensureRemoteState()));
+            } catch (error) {
+              onError(error.message);
+            }
           }
         }
       );
