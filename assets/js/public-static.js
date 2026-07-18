@@ -119,7 +119,8 @@ const TROPHY_RACE_DEFAULT_VISUAL = {
 
 const TROPHY_RACE_START = 3;
 const TROPHY_RACE_FINISH = 84;
-const TROPHY_RACE_LANE_OFFSETS = [-12, 0, 12, -22, 22];
+const TROPHY_RACE_LANE_OFFSETS = [-18, 0, 18, -30, 30];
+const TROPHY_RACE_HORIZONTAL_OFFSETS = [-5, 0, 5, -8, 8];
 let trophyRaceBootstrapped = false;
 let trophyRaceBootTimer = null;
 
@@ -179,9 +180,15 @@ function buildRaceRows(model) {
         0,
         Math.min(targetPoints ? row.points / targetPoints : 0, 1)
       );
-      const position =
+      const basePosition =
         TROPHY_RACE_START +
         normalizedProgress * (TROPHY_RACE_FINISH - TROPHY_RACE_START);
+      const horizontalOffset = TROPHY_RACE_HORIZONTAL_OFFSETS[index] ?? 0;
+      const position = clamp(
+        basePosition + horizontalOffset,
+        TROPHY_RACE_START,
+        TROPHY_RACE_FINISH
+      );
 
       return {
         ...row,
