@@ -6,7 +6,7 @@
     <title>Турнир eFootball 2026</title>
     <meta
       name="description"
-      content="Публичная витрина турнира eFootball 2026: таблица, ближайший матч, участники и календарь в открытом доступе."
+      content="Закрытая лига eFootball: таблица, форма игроков, главный матч, аналитика и хронология сезона в одном премиальном экране."
     />
     <link rel="canonical" href="https://yuraboo.github.io/efootball2026/" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -15,991 +15,179 @@
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <style>
-      :root {
-        --bg: #07101d;
-        --bg-soft: #0d1728;
-        --panel: rgba(10, 19, 35, 0.92);
-        --panel-soft: rgba(14, 26, 46, 0.84);
-        --line: rgba(130, 176, 255, 0.18);
-        --line-strong: rgba(130, 176, 255, 0.28);
-        --text: #f4f7ff;
-        --muted: #9aabc8;
-        --accent: #6dd0ff;
-        --accent-2: #79f0c3;
-        --gold: #f3c86d;
-        --danger: #ff8e90;
-        --shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
-        --radius: 28px;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0;
-        min-width: 320px;
-        font-family: "Manrope", sans-serif;
-        color: var(--text);
-        background:
-          radial-gradient(circle at top left, rgba(109, 208, 255, 0.16), transparent 28%),
-          radial-gradient(circle at top right, rgba(121, 240, 195, 0.12), transparent 24%),
-          linear-gradient(180deg, #08111f 0%, #050b14 100%);
-      }
-
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-
-      .shell {
-        width: min(1220px, calc(100% - 32px));
-        margin: 0 auto;
-      }
-
-      .hero {
-        padding: 28px 0 20px;
-      }
-
-      .hero-card,
-      .panel {
-        background: var(--panel);
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        backdrop-filter: blur(18px);
-      }
-
-      .hero-card {
-        padding: 32px;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .hero-card::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background:
-          radial-gradient(circle at 20% 10%, rgba(109, 208, 255, 0.16), transparent 26%),
-          radial-gradient(circle at 90% 20%, rgba(121, 240, 195, 0.14), transparent 22%);
-        pointer-events: none;
-      }
-
-      .hero-topline,
-      .panel-topline {
-        display: flex;
-        justify-content: space-between;
-        gap: 16px;
-        align-items: center;
-        position: relative;
-        z-index: 1;
-      }
-
-      .eyebrow,
-      .chip,
-      .utility-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        border-radius: 999px;
-        padding: 10px 16px;
-        border: 1px solid var(--line-strong);
-        background: rgba(255, 255, 255, 0.03);
-        color: var(--accent);
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-      }
-
-      .utility-link {
-        color: var(--text);
-      }
-
-      .hero-grid {
-        margin-top: 24px;
-        display: grid;
-        grid-template-columns: 1.25fr 0.95fr;
-        gap: 24px;
-        position: relative;
-        z-index: 1;
-      }
-
-      .hero-title,
-      .panel-title,
-      .match-title {
-        margin: 0;
-        font-family: "Unbounded", sans-serif;
-        line-height: 1.02;
-      }
-
-      .hero-title {
-        font-size: clamp(36px, 5vw, 72px);
-        max-width: 760px;
-      }
-
-      .hero-title span {
-        display: block;
-        margin-top: 10px;
-        color: #8bb4ff;
-      }
-
-      .hero-description,
-      .panel-subtitle,
-      .note,
-      .metric-note {
-        color: var(--muted);
-        line-height: 1.65;
-      }
-
-      .hero-description {
-        margin: 18px 0 24px;
-        font-size: 20px;
-        max-width: 780px;
-      }
-
-      .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 14px;
-      }
-
-      .stat-card,
-      .player-card,
-      .schedule-card,
-      .insight-card,
-      .metric-card {
-        background: var(--panel-soft);
-        border: 1px solid var(--line);
-        border-radius: 22px;
-      }
-
-      .stat-card {
-        padding: 18px;
-      }
-
-      .stat-label,
-      .section-kicker,
-      .tiny-label {
-        color: var(--muted);
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-        font-size: 11px;
-        font-weight: 800;
-      }
-
-      .stat-value {
-        margin-top: 10px;
-        font-size: 24px;
-        font-weight: 800;
-      }
-
-      .stat-note {
-        margin-top: 8px;
-        color: var(--muted);
-        font-size: 14px;
-        line-height: 1.55;
-      }
-
-      .race-card {
-        height: 100%;
-        padding: 22px;
-        background: linear-gradient(180deg, rgba(16, 30, 53, 0.92), rgba(10, 18, 32, 0.95));
-        border: 1px solid var(--line);
-        border-radius: 28px;
-      }
-
-      .race-track {
-        position: relative;
-        margin-top: 28px;
-        min-height: 210px;
-      }
-
-      .race-line {
-        position: absolute;
-        left: 18px;
-        right: 108px;
-        top: 118px;
-        height: 10px;
-        border-radius: 999px;
-        background: linear-gradient(90deg, rgba(121, 240, 195, 0.2), rgba(109, 208, 255, 0.4));
-        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-      }
-
-      .race-line::after {
-        content: "🏆";
-        position: absolute;
-        right: -74px;
-        top: -31px;
-        width: 58px;
-        height: 58px;
-        display: grid;
-        place-items: center;
-        font-size: 28px;
-        border-radius: 20px;
-        background: rgba(243, 200, 109, 0.12);
-        border: 1px solid rgba(243, 200, 109, 0.28);
-      }
-
-      .runner {
-        position: absolute;
-        top: 0;
-        transform: translateX(-50%);
-        text-align: center;
-        width: 108px;
-      }
-
-      .runner-figure {
-        position: relative;
-        width: 52px;
-        margin: 0 auto;
-      }
-
-      .runner-head {
-        width: 52px;
-        height: 52px;
-        border-radius: 50%;
-        overflow: hidden;
-        border: 3px solid rgba(255, 255, 255, 0.18);
-        background: linear-gradient(135deg, rgba(121, 240, 195, 0.25), rgba(109, 208, 255, 0.25));
-      }
-
-      .runner-head img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      .runner-body {
-        width: 18px;
-        height: 32px;
-        margin: 2px auto 0;
-        border-radius: 999px;
-        background: currentColor;
-      }
-
-      .runner-limbs {
-        position: relative;
-        width: 52px;
-        height: 34px;
-        margin: -2px auto 0;
-      }
-
-      .runner-limbs::before,
-      .runner-limbs::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        width: 3px;
-        height: 28px;
-        border-radius: 999px;
-        background: currentColor;
-      }
-
-      .runner-limbs::before {
-        left: 16px;
-        transform: rotate(18deg);
-      }
-
-      .runner-limbs::after {
-        right: 16px;
-        transform: rotate(-18deg);
-      }
-
-      .runner-name {
-        margin-top: 12px;
-        font-weight: 800;
-      }
-
-      .runner-meta {
-        margin-top: 4px;
-        color: var(--muted);
-        font-size: 13px;
-      }
-
-      .layout {
-        display: grid;
-        grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.9fr);
-        gap: 20px;
-        padding-bottom: 40px;
-      }
-
-      .stack {
-        display: grid;
-        gap: 20px;
-      }
-
-      .panel {
-        padding: 24px;
-      }
-
-      .panel-title {
-        font-size: clamp(24px, 2vw, 34px);
-      }
-
-      .panel-subtitle {
-        margin-top: 8px;
-        font-size: 15px;
-      }
-
-      .match-wrap {
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        gap: 16px;
-        align-items: center;
-        margin-top: 24px;
-      }
-
-      .duel-card {
-        padding: 18px;
-        text-align: center;
-        background: var(--panel-soft);
-        border: 1px solid var(--line);
-        border-radius: 24px;
-      }
-
-      .duel-card img,
-      .player-avatar {
-        width: 92px;
-        height: 92px;
-        border-radius: 24px;
-        object-fit: cover;
-        display: block;
-        margin: 0 auto 14px;
-        border: 1px solid rgba(255, 255, 255, 0.18);
-      }
-
-      .duel-name {
-        font-family: "Unbounded", sans-serif;
-        font-size: 20px;
-        line-height: 1.2;
-      }
-
-      .duel-meta {
-        margin-top: 8px;
-        color: var(--muted);
-      }
-
-      .chance {
-        margin-top: 14px;
-        color: var(--accent-2);
-        font-weight: 800;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-      }
-
-      .vs-circle {
-        width: 88px;
-        height: 88px;
-        border-radius: 50%;
-        display: grid;
-        place-items: center;
-        border: 1px solid var(--line-strong);
-        background: radial-gradient(circle at center, rgba(109, 208, 255, 0.16), rgba(7, 16, 29, 0.2));
-        font-family: "Unbounded", sans-serif;
-        font-size: 26px;
-        color: #8bb4ff;
-      }
-
-      .article {
-        margin-top: 22px;
-        padding: 18px;
-        border-radius: 22px;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid var(--line);
-      }
-
-      .article p {
-        margin: 0 0 12px;
-        line-height: 1.7;
-        color: #d8e4ff;
-      }
-
-      .article p:last-child {
-        margin-bottom: 0;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 18px;
-      }
-
-      th,
-      td {
-        padding: 14px 12px;
-        text-align: left;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-      }
-
-      th {
-        color: var(--muted);
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-      }
-
-      tbody tr:first-child {
-        background: rgba(243, 200, 109, 0.08);
-      }
-
-      .players-grid,
-      .schedule-grid,
-      .insights-grid {
-        display: grid;
-        gap: 14px;
-        margin-top: 18px;
-      }
-
-      .players-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .schedule-grid,
-      .insights-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .player-card,
-      .schedule-card,
-      .insight-card {
-        padding: 18px;
-      }
-
-      .player-card-head,
-      .schedule-head {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        align-items: flex-start;
-      }
-
-      .player-card-head {
-        align-items: center;
-      }
-
-      .player-main {
-        display: flex;
-        gap: 14px;
-        align-items: center;
-      }
-
-      .player-avatar {
-        width: 72px;
-        height: 72px;
-        margin: 0;
-        border-radius: 20px;
-      }
-
-      .player-name {
-        font-weight: 800;
-        font-size: 18px;
-      }
-
-      .badge {
-        display: inline-flex;
-        padding: 8px 12px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 800;
-        border: 1px solid var(--line-strong);
-        color: var(--accent);
-        background: rgba(109, 208, 255, 0.07);
-      }
-
-      .badge.scheduled {
-        color: var(--gold);
-        border-color: rgba(243, 200, 109, 0.24);
-        background: rgba(243, 200, 109, 0.08);
-      }
-
-      .badge.played {
-        color: var(--accent-2);
-        border-color: rgba(121, 240, 195, 0.26);
-        background: rgba(121, 240, 195, 0.08);
-      }
-
-      .empty {
-        margin-top: 18px;
-        padding: 18px;
-        border-radius: 20px;
-        border: 1px dashed var(--line-strong);
-        color: var(--muted);
-      }
-
-      .footer-note {
-        padding: 0 0 32px;
-        color: var(--muted);
-        text-align: center;
-      }
-
-      @media (max-width: 1024px) {
-        .hero-grid,
-        .layout {
-          grid-template-columns: 1fr;
-        }
-
-        .stats-grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-      }
-
-      @media (max-width: 720px) {
-        .shell {
-          width: min(100% - 20px, 1220px);
-        }
-
-        .hero-card,
-        .panel {
-          padding: 20px;
-        }
-
-        .stats-grid,
-        .players-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .hero-topline,
-        .panel-topline,
-        .match-wrap,
-        .player-card-head,
-        .schedule-head {
-          grid-template-columns: 1fr;
-          display: grid;
-        }
-
-        .match-wrap {
-          gap: 12px;
-        }
-
-        .vs-circle {
-          margin: 0 auto;
-        }
-
-        .race-line {
-          right: 82px;
-        }
-
-        .runner {
-          width: 94px;
-        }
-      }
-    </style>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="./styles.css?v=23" />
   </head>
-  <body>
-    <header class="hero">
-      <div class="shell">
-        <section class="hero-card">
-          <div class="hero-topline">
-            <div class="eyebrow">Публичная версия GitHub Pages</div>
-            <a class="utility-link" href="./admin.html">О редактировании</a>
+  <body class="site-body">
+    <header class="hero shell">
+      <div class="hero-card hero-card-spotlight">
+        <div class="hero-topline">
+          <div class="eyebrow">Турнир под контролем</div>
+          <a class="utility-link" href="./admin.html">Открыть админку</a>
+        </div>
+
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <div class="hero-kicker" id="status-badge">Регулярный сезон</div>
+            <h1 class="hero-title" id="hero-title">
+              Турнир eFootball 2026
+              <span>Лига друзей</span>
+            </h1>
+            <p class="hero-description" id="hero-description">
+              Единая публичная панель турнира: таблица, главный матч, аналитика и движение к титулу.
+            </p>
+            <div class="hero-stats hero-stats-tight" id="hero-stats"></div>
           </div>
-          <div class="hero-grid">
-            <div>
-              <h1 class="hero-title" id="hero-title"></h1>
-              <p class="hero-description" id="hero-description"></p>
-              <div class="stats-grid" id="hero-stats"></div>
-            </div>
-            <aside class="race-card">
-              <div class="panel-topline">
-                <div>
-                  <div class="section-kicker">Гонка за кубком</div>
-                  <h2 class="panel-title" style="font-size: 24px; margin-top: 8px">Одна дистанция до титула</h2>
-                </div>
-                <div class="chip">Кубок справа</div>
-              </div>
-              <p class="panel-subtitle">
-                Позиции идут по очкам и текущему месту. Чем правее участник, тем ближе он к трофею.
-              </p>
-              <div class="race-track">
-                <div class="race-line"></div>
-                <div id="race-runners"></div>
-              </div>
-            </aside>
+
+          <div class="hero-side">
+            <div id="hero-race"></div>
           </div>
-        </section>
+        </div>
       </div>
     </header>
 
-    <main class="shell layout">
-      <section class="stack">
-        <article class="panel">
-          <div class="panel-topline">
-            <div>
-              <div class="section-kicker">Главная афиша</div>
-              <h2 class="panel-title">Следующий матч</h2>
-              <div class="panel-subtitle">Главное превью только для ближайшей игры.</div>
-            </div>
-            <div class="chip" id="status-chip"></div>
-          </div>
-          <div id="next-match"></div>
-        </article>
+    <main class="shell public-layout">
+      <section class="main-column">
+        <article class="panel panel-feature" id="next-match-panel"></article>
 
-        <article class="panel">
-          <div class="panel-topline">
+        <article class="panel panel-anchor">
+          <div class="panel-header panel-header-anchor">
             <div>
-              <div class="section-kicker">Ядро турнира</div>
+              <div class="panel-kicker">Ядро турнира</div>
               <h2 class="panel-title">Турнирная таблица</h2>
-              <div class="panel-subtitle">Очки, разница мячей и текущее место каждого участника.</div>
+              <div class="panel-subtitle">
+                Очки, разница мячей, турнирный темп и текущий порядок участников.
+              </div>
             </div>
+            <div class="table-context" id="table-context"></div>
           </div>
-          <div id="standings"></div>
+
+          <div class="table-wrap">
+            <table class="standings-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Игрок</th>
+                  <th>И</th>
+                  <th>В</th>
+                  <th>Н</th>
+                  <th>П</th>
+                  <th>ЗМ</th>
+                  <th>ПМ</th>
+                  <th>РМ</th>
+                  <th>О</th>
+                </tr>
+              </thead>
+              <tbody id="standings-body"></tbody>
+            </table>
+          </div>
+
+          <div class="standings-cards" id="standings-cards"></div>
         </article>
 
         <article class="panel">
-          <div class="panel-topline">
+          <div class="panel-header">
             <div>
-              <div class="section-kicker">Профили сезона</div>
-              <h2 class="panel-title">Игроки</h2>
-              <div class="panel-subtitle">Рейтинг, текущее место и короткий контекст по каждому участнику.</div>
+              <div class="panel-kicker">Портреты сезона</div>
+              <h2 class="panel-title">Профили игроков</h2>
+              <div class="panel-subtitle">
+                Главное сверху, расширенная аналитика внутри карточки по раскрытию.
+              </div>
             </div>
           </div>
-          <div class="players-grid" id="players"></div>
+          <div class="players-grid" id="players-grid"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-kicker">Сетка сезона</div>
+              <h2 class="panel-title">Календарь и результаты</h2>
+              <div class="panel-subtitle">
+                Полный список матчей сезона с ясным разделением сыгранных и будущих игр.
+              </div>
+            </div>
+          </div>
+          <div class="matches-list" id="matches-list"></div>
         </article>
       </section>
 
-      <aside class="stack">
-        <article class="panel">
-          <div class="panel-topline">
+      <aside class="side-column">
+        <article class="panel panel-soft analytics-hub">
+          <div class="panel-header">
             <div>
-              <div class="section-kicker">Контекст</div>
-              <h2 class="panel-title">Срез сезона</h2>
-              <div class="panel-subtitle">Сводка по текущему состоянию лиги.</div>
+              <div class="panel-kicker">Данные и вероятность</div>
+              <h2 class="panel-title">Аналитический центр</h2>
+              <div class="panel-subtitle">
+                Ключевые метрики сезона собраны в одном компактном блоке.
+              </div>
             </div>
           </div>
-          <div class="insights-grid" id="insights"></div>
+
+          <div class="segmented" data-tabs="analytics">
+            <button class="segmented-btn is-active" data-tab-target="forecast" type="button">
+              Монте-Карло
+            </button>
+            <button class="segmented-btn" data-tab-target="power" type="button">
+              Power
+            </button>
+            <button class="segmented-btn" data-tab-target="importance" type="button">
+              Вес матчей
+            </button>
+          </div>
+
+          <div class="tab-pane is-active" data-tab-pane="forecast">
+            <div class="side-list" id="season-forecast"></div>
+          </div>
+          <div class="tab-pane" data-tab-pane="power" hidden>
+            <div class="side-list" id="power-ranking"></div>
+          </div>
+          <div class="tab-pane" data-tab-pane="importance" hidden>
+            <div class="side-list" id="importance-board"></div>
+          </div>
         </article>
 
-        <article class="panel">
-          <div class="panel-topline">
+        <article class="panel panel-soft">
+          <div class="panel-header">
             <div>
-              <div class="section-kicker">Полный календарь</div>
-              <h2 class="panel-title">Матчи и результаты</h2>
-              <div class="panel-subtitle">Все игры текущего сезона в одном месте.</div>
+              <div class="panel-kicker">Контекст и история</div>
+              <h2 class="panel-title">Пульс сезона</h2>
+              <div class="panel-subtitle">
+                Быстрые выводы, последний результат и ход сезона без лишней перегрузки.
+              </div>
             </div>
           </div>
-          <div class="schedule-grid" id="schedule"></div>
+
+          <div class="segmented segmented-wide" data-tabs="story">
+            <button class="segmented-btn is-active" data-tab-target="insights" type="button">
+              Сводка
+            </button>
+            <button class="segmented-btn" data-tab-target="last" type="button">
+              Последний матч
+            </button>
+            <button class="segmented-btn" data-tab-target="timeline" type="button">
+              Хронология
+            </button>
+          </div>
+
+          <div class="tab-pane is-active" data-tab-pane="insights">
+            <div class="grid-2 compact-grid" id="insights-grid"></div>
+          </div>
+          <div class="tab-pane" data-tab-pane="last" hidden>
+            <div id="last-match"></div>
+          </div>
+          <div class="tab-pane" data-tab-pane="timeline" hidden>
+            <div class="timeline" id="season-timeline"></div>
+          </div>
         </article>
       </aside>
     </main>
 
-    <div class="shell footer-note">
-      Открытая ссылка для просмотра. Для безопасного редактирования будет нужна отдельная защищённая админка.
-    </div>
-
-    <script>
-      const state = {
-        tournament: {
-          title: "Турнир eFootball 2026",
-          subtitle: "Лига друзей",
-          description: "Единая публичная панель турнира: таблица, ближайший матч, игроки и полный календарь без закрытого хостинга.",
-          roundsCount: 2,
-          statusLabel: "Регулярный сезон",
-          updatedAt: "2026-07-17T13:09:44.939Z"
-        },
-        players: [
-          {
-            id: "vernigora-a",
-            name: "Вернигора А.",
-            rating: 80,
-            photoUrl: "https://res.cloudinary.com/dc1ybvaxd/image/upload/v1780957565/IMG_9519_d803p2.jpg",
-            notes: ""
-          },
-          {
-            id: "lyakhovich-e",
-            name: "Ляхович Е.",
-            rating: 80,
-            photoUrl: "https://res.cloudinary.com/dc1ybvaxd/image/upload/v1780957960/IMG_9520_bkppyj.jpg",
-            notes: ""
-          },
-          {
-            id: "usik-y",
-            name: "Усик Ю.",
-            rating: 80,
-            photoUrl: "https://res.cloudinary.com/dc1ybvaxd/image/upload/v1780958123/IMG_8454_bdi0ur.jpg",
-            notes: ""
-          }
-        ],
-        matches: [
-          { id: "match-1", round: 1, homePlayerId: "lyakhovich-e", awayPlayerId: "usik-y", status: "scheduled", homeScore: null, awayScore: null, playedAt: null },
-          { id: "match-2", round: 2, homePlayerId: "vernigora-a", awayPlayerId: "usik-y", status: "scheduled", homeScore: null, awayScore: null, playedAt: null },
-          { id: "match-3", round: 3, homePlayerId: "vernigora-a", awayPlayerId: "lyakhovich-e", status: "scheduled", homeScore: null, awayScore: null, playedAt: null },
-          { id: "match-4", round: 4, homePlayerId: "usik-y", awayPlayerId: "lyakhovich-e", status: "scheduled", homeScore: null, awayScore: null, playedAt: null },
-          { id: "match-5", round: 5, homePlayerId: "usik-y", awayPlayerId: "vernigora-a", status: "scheduled", homeScore: null, awayScore: null, playedAt: null },
-          { id: "match-6", round: 6, homePlayerId: "lyakhovich-e", awayPlayerId: "vernigora-a", status: "scheduled", homeScore: null, awayScore: null, playedAt: null }
-        ]
-      };
-
-      const playerMap = Object.fromEntries(state.players.map((player) => [player.id, player]));
-
-      function standings() {
-        const rows = Object.fromEntries(
-          state.players.map((player) => [
-            player.id,
-            {
-              ...player,
-              played: 0,
-              wins: 0,
-              draws: 0,
-              losses: 0,
-              goalsFor: 0,
-              goalsAgainst: 0,
-              goalDiff: 0,
-              points: 0
-            }
-          ])
-        );
-
-        state.matches.forEach((match) => {
-          if (match.status !== "played") {
-            return;
-          }
-          const home = rows[match.homePlayerId];
-          const away = rows[match.awayPlayerId];
-          home.played += 1;
-          away.played += 1;
-          home.goalsFor += match.homeScore;
-          home.goalsAgainst += match.awayScore;
-          away.goalsFor += match.awayScore;
-          away.goalsAgainst += match.homeScore;
-          if (match.homeScore > match.awayScore) {
-            home.wins += 1;
-            away.losses += 1;
-            home.points += 3;
-          } else if (match.homeScore < match.awayScore) {
-            away.wins += 1;
-            home.losses += 1;
-            away.points += 3;
-          } else {
-            home.draws += 1;
-            away.draws += 1;
-            home.points += 1;
-            away.points += 1;
-          }
-        });
-
-        return Object.values(rows)
-          .map((row) => ({ ...row, goalDiff: row.goalsFor - row.goalsAgainst }))
-          .sort((a, b) => b.points - a.points || b.goalDiff - a.goalDiff || b.goalsFor - a.goalsFor || a.rating - b.rating);
-      }
-
-      function nextMatch() {
-        return state.matches.find((match) => match.status !== "played") || null;
-      }
-
-      function chance(home, away, order) {
-        const homeRow = order.find((row) => row.id === home.id);
-        const awayRow = order.find((row) => row.id === away.id);
-        const formEdge = (homeRow.points - awayRow.points) * 3;
-        const ratingEdge = Math.max(-12, Math.min(12, (away.rating - home.rating) * 0.03));
-        const rankEdge = ((awayRow ? awayRow.played : 0) - (homeRow ? homeRow.played : 0)) * 0.5;
-        const totalEdge = formEdge + ratingEdge + rankEdge;
-        const homeChance = Math.max(34, Math.min(66, Math.round(50 + totalEdge)));
-        return {
-          homeChance,
-          awayChance: 100 - homeChance,
-          confidence: 100 - Math.abs(50 - homeChance),
-          leader: homeChance >= 50 ? home.name : away.name
-        };
-      }
-
-      function shortName(name) {
-        const word = name.split(" ")[0];
-        return word.length > 12 ? `${word.slice(0, 11)}…` : word;
-      }
-
-      function raceProgress(row, index, total) {
-        const seasonCap = Math.max((state.players.length - 1) * state.tournament.roundsCount * 3, 6);
-        const pointsShare = row.points / seasonCap;
-        const rankShare = total <= 1 ? 1 : 1 - index / (total - 1);
-        return Math.max(10, Math.min(78, Math.round(10 + (pointsShare * 0.82 + rankShare * 0.18) * 68)));
-      }
-
-      function render() {
-        const board = standings();
-        const match = nextMatch();
-        const totalMatches = state.matches.length;
-        const playedMatches = state.matches.filter((item) => item.status === "played").length;
-        const totalGoals = state.matches
-          .filter((item) => item.status === "played")
-          .reduce((sum, item) => sum + item.homeScore + item.awayScore, 0);
-        const leader = board[0];
-        const updated = new Date(state.tournament.updatedAt);
-
-        document.getElementById("hero-title").innerHTML = `${state.tournament.title}<span>${state.tournament.subtitle}</span>`;
-        document.getElementById("hero-description").textContent = state.tournament.description;
-        document.getElementById("status-chip").textContent = state.tournament.statusLabel;
-
-        document.getElementById("hero-stats").innerHTML = [
-          {
-            label: "Лидер",
-            value: leader ? leader.name : "—",
-            note: leader ? `${leader.points} очк. и РМ ${leader.goalDiff > 0 ? "+" : ""}${leader.goalDiff}` : "Ждём первые результаты"
-          },
-          {
-            label: "Матчи",
-            value: `${playedMatches} / ${totalMatches}`,
-            note: playedMatches ? `Сыграно ${Math.round((playedMatches / totalMatches) * 100)}% календаря` : "Календарь уже опубликован"
-          },
-          {
-            label: "Голов",
-            value: String(totalGoals),
-            note: playedMatches ? `Средняя результативность ${(totalGoals / playedMatches).toFixed(1)}` : "Появится после первых игр"
-          },
-          {
-            label: "Обновлено",
-            value: Number.isNaN(updated.getTime()) ? "—" : updated.toLocaleDateString("ru-RU"),
-            note: Number.isNaN(updated.getTime()) ? "Дата не указана" : updated.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })
-          }
-        ].map((item) => `
-          <div class="stat-card">
-            <div class="stat-label">${item.label}</div>
-            <div class="stat-value">${item.value}</div>
-            <div class="stat-note">${item.note}</div>
-          </div>
-        `).join("");
-
-        document.getElementById("race-runners").innerHTML = board.map((row, index) => {
-          const color = ["#79f0c3", "#f3c86d", "#6dd0ff", "#ff9e8d"][index % 4];
-          return `
-            <div class="runner" style="left:${raceProgress(row, index, board.length)}%; color:${color}">
-              <div class="runner-figure">
-                <div class="runner-head"><img src="${row.photoUrl}" alt="${row.name}" /></div>
-                <div class="runner-body"></div>
-                <div class="runner-limbs"></div>
-              </div>
-              <div class="runner-name">${shortName(row.name)}</div>
-              <div class="runner-meta">#${index + 1} · ${row.points} очк.</div>
-            </div>
-          `;
-        }).join("");
-
-        if (!match) {
-          document.getElementById("next-match").innerHTML = `<div class="empty">Все матчи текущего календаря уже сыграны. Турнирный сезон закрыт.</div>`;
-        } else {
-          const home = playerMap[match.homePlayerId];
-          const away = playerMap[match.awayPlayerId];
-          const prediction = chance(home, away, board);
-          document.getElementById("next-match").innerHTML = `
-            <div class="match-wrap">
-              <div class="duel-card">
-                <img src="${home.photoUrl}" alt="${home.name}" />
-                <div class="duel-name">${home.name}</div>
-                <div class="duel-meta">Рейтинг ${home.rating}</div>
-                <div class="chance">${prediction.homeChance}% на победу</div>
-              </div>
-              <div class="vs-circle">VS</div>
-              <div class="duel-card">
-                <img src="${away.photoUrl}" alt="${away.name}" />
-                <div class="duel-name">${away.name}</div>
-                <div class="duel-meta">Рейтинг ${away.rating}</div>
-                <div class="chance">${prediction.awayChance}% на победу</div>
-              </div>
-            </div>
-            <div class="article">
-              <p><strong>Раунд ${match.round}.</strong> Модель сейчас слегка выделяет <strong>${prediction.leader}</strong>, но решающий вес всё равно остаётся за текущим турниром, а не за рейтингом.</p>
-              <p>У этой пары пока нет свежей очной истории в зафиксированных результатах, поэтому расклад остаётся мягким: разница в шансах не выглядит критичной, и матч воспринимается как живая точка разворота сезона.</p>
-              <p>Если победитель заберёт эту игру, он первым получит реальное турнирное преимущество и сдвинется ближе к кубку на общей дистанции.</p>
-            </div>
-          `;
-        }
-
-        document.getElementById("standings").innerHTML = `
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Игрок</th>
-                <th>И</th>
-                <th>В</th>
-                <th>Н</th>
-                <th>П</th>
-                <th>ЗМ</th>
-                <th>ПМ</th>
-                <th>РМ</th>
-                <th>О</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${board.map((row, index) => `
-                <tr>
-                  <td>${index + 1}</td>
-                  <td>${row.name}</td>
-                  <td>${row.played}</td>
-                  <td>${row.wins}</td>
-                  <td>${row.draws}</td>
-                  <td>${row.losses}</td>
-                  <td>${row.goalsFor}</td>
-                  <td>${row.goalsAgainst}</td>
-                  <td>${row.goalDiff > 0 ? "+" : ""}${row.goalDiff}</td>
-                  <td><strong>${row.points}</strong></td>
-                </tr>
-              `).join("")}
-            </tbody>
-          </table>
-        `;
-
-        document.getElementById("players").innerHTML = board.map((row, index) => `
-          <div class="player-card">
-            <div class="player-card-head">
-              <div class="player-main">
-                <img class="player-avatar" src="${row.photoUrl}" alt="${row.name}" />
-                <div>
-                  <div class="player-name">${row.name}</div>
-                  <div class="note">Место #${index + 1} · рейтинг ${row.rating}</div>
-                </div>
-              </div>
-              <div class="badge">${row.points} очк.</div>
-            </div>
-            <div class="stat-note" style="margin-top: 14px">
-              ${row.played ? `Баланс ${row.wins}-${row.draws}-${row.losses}, мячи ${row.goalsFor}:${row.goalsAgainst}.` : "Сезон только начинается: ждём первые результаты, чтобы профиль стал глубже."}
-            </div>
-          </div>
-        `).join("");
-
-        document.getElementById("insights").innerHTML = [
-          {
-            title: "Текущий расклад",
-            note: leader ? `${leader.name} формально впереди по дополнительному порядку, но таблица пока полностью открыта.` : "Таблица пока пустая."
-          },
-          {
-            title: "Стадия сезона",
-            note: playedMatches ? `Сыграно ${playedMatches} из ${totalMatches} матчей.` : `Все ${totalMatches} матчей стоят в расписании и ждут первых результатов.`
-          },
-          {
-            title: "Главная интрига",
-            note: match ? `${playerMap[match.homePlayerId].name} против ${playerMap[match.awayPlayerId].name} открывает борьбу за реальное лидерство.` : "Турнир завершён." 
-          }
-        ].map((item) => `
-          <div class="insight-card">
-            <div class="tiny-label">Короткий итог</div>
-            <h3 style="margin: 10px 0 8px; font-size: 18px">${item.title}</h3>
-            <div class="note">${item.note}</div>
-          </div>
-        `).join("");
-
-        document.getElementById("schedule").innerHTML = state.matches.map((match) => {
-          const home = playerMap[match.homePlayerId];
-          const away = playerMap[match.awayPlayerId];
-          const played = match.status === "played";
-          return `
-            <div class="schedule-card">
-              <div class="schedule-head">
-                <div>
-                  <div class="tiny-label">Раунд ${match.round}</div>
-                  <h3 style="margin: 8px 0 6px; font-size: 18px">${home.name} vs ${away.name}</h3>
-                  <div class="note">${played ? `${match.homeScore}:${match.awayScore}` : "Матч ещё не сыгран"}</div>
-                </div>
-                <div class="badge ${played ? "played" : "scheduled"}">${played ? "Сыгран" : "В расписании"}</div>
-              </div>
-            </div>
-          `;
-        }).join("");
-      }
-
-      render();
-    </script>
+    <script src="./assets/js/shared/league-core-a.js?v=24"></script>
+    <script src="./assets/js/shared/league-core-b.js?v=24"></script>
+    <script src="./assets/js/shared/league-core-c.js?v=24"></script>
+    <script src="./assets/js/api-static.js?v=24"></script>
+    <script src="./assets/js/public-static.js?v=24"></script>
   </body>
 </html>
