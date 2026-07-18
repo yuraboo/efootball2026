@@ -1029,60 +1029,71 @@ img {
 .table-wrap {
   overflow-x: auto;
   border-radius: var(--radius-md);
+  padding: 6px 0 2px;
 }
 
 .standings-table {
   width: 100%;
   min-width: 720px;
   border-collapse: separate;
-  border-spacing: 0 10px;
+  border-spacing: 0 12px;
 }
 
 .standings-table th {
-  padding: 0 14px 10px;
+  padding: 0 12px 12px;
   text-align: left;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
 }
 
 .standings-table td {
-  padding: 16px 14px;
-  background: rgba(255, 255, 255, 0.04);
-  font-size: 14px;
-  line-height: 1.4;
+  padding: 14px 12px;
+  background: rgba(18, 29, 50, 0.78);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 15px;
+  line-height: 1.25;
 }
 
 .standings-table tbody tr td:first-child {
   border-top-left-radius: 16px;
   border-bottom-left-radius: 16px;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
   font-family: var(--font-title);
-  font-size: 18px;
+  font-size: 17px;
+  text-align: center;
 }
 
 .standings-table tbody tr td:last-child {
   border-top-right-radius: 16px;
   border-bottom-right-radius: 16px;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
   text-align: right;
 }
 
 .standings-table td:nth-child(n + 3) {
   text-align: right;
   font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.standings-table td + td {
+  border-left: 1px solid rgba(255, 255, 255, 0.035);
 }
 
 .rank-top td {
-  background: linear-gradient(90deg, rgba(255, 207, 112, 0.2), rgba(255, 255, 255, 0.04));
+  background: linear-gradient(90deg, rgba(255, 207, 112, 0.12), rgba(18, 29, 50, 0.78) 28%);
 }
 
 .rank-second td {
-  background: linear-gradient(90deg, rgba(128, 167, 255, 0.18), rgba(255, 255, 255, 0.04));
+  background: linear-gradient(90deg, rgba(128, 167, 255, 0.12), rgba(18, 29, 50, 0.78) 28%);
 }
 
 .rank-third td {
-  background: linear-gradient(90deg, rgba(87, 216, 162, 0.18), rgba(255, 255, 255, 0.04));
+  background: linear-gradient(90deg, rgba(87, 216, 162, 0.11), rgba(18, 29, 50, 0.78) 28%);
 }
 
 .player-row,
@@ -1102,6 +1113,7 @@ img {
   object-fit: cover;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.08);
+  flex: 0 0 42px;
 }
 
 .avatar {
@@ -1116,6 +1128,38 @@ img {
 
 .standings-cards {
   display: none;
+}
+
+.row-avatar.avatar.fallback {
+  width: 42px;
+  height: 42px;
+  margin: 0;
+  border-radius: 14px;
+  font-size: 18px;
+}
+
+.standings-player-copy {
+  min-width: 0;
+}
+
+.standings-player-name {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.standings-player-meta {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.standings-rank,
+.standings-points {
+  font-weight: 800;
 }
 
 .next-match-stage,
