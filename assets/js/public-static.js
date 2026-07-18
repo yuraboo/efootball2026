@@ -71,6 +71,58 @@ function renderPreviewArticle(prediction) {
   `;
 }
 
+const TROPHY_RACE_VISUALS = [
+  {
+    key: "red",
+    asset: "./assets/media/trophy-race/runner-red.svg",
+    primary: "#ff635d",
+    secondary: "#c92a39",
+    glow: "rgba(255, 99, 93, 0.34)"
+  },
+  {
+    key: "blue",
+    asset: "./assets/media/trophy-race/runner-blue.svg",
+    primary: "#57a8ff",
+    secondary: "#0f5fca",
+    glow: "rgba(87, 168, 255, 0.34)"
+  },
+  {
+    key: "green",
+    asset: "./assets/media/trophy-race/runner-green.svg",
+    primary: "#61dc7a",
+    secondary: "#28974a",
+    glow: "rgba(97, 220, 122, 0.34)"
+  },
+  {
+    key: "purple",
+    asset: "./assets/media/trophy-race/runner-purple.svg",
+    primary: "#ae82ff",
+    secondary: "#7142d6",
+    glow: "rgba(174, 130, 255, 0.32)"
+  },
+  {
+    key: "orange",
+    asset: "./assets/media/trophy-race/runner-orange.svg",
+    primary: "#ffad54",
+    secondary: "#d96a1d",
+    glow: "rgba(255, 173, 84, 0.32)"
+  }
+];
+
+const TROPHY_RACE_DEFAULT_VISUAL = {
+  key: "default",
+  asset: "./assets/media/trophy-race/runner-default.svg",
+  primary: "#6fd7ff",
+  secondary: "#3d7df7",
+  glow: "rgba(111, 215, 255, 0.3)"
+};
+
+const TROPHY_RACE_START = 3;
+const TROPHY_RACE_FINISH = 84;
+const TROPHY_RACE_LANE_OFFSETS = [-12, 0, 12, -22, 22];
+let trophyRaceBootstrapped = false;
+let trophyRaceBootTimer = null;
+
 function shortPlayerName(name) {
   const clean = String(name || "").trim();
   if (!clean) {
@@ -80,120 +132,271 @@ function shortPlayerName(name) {
   return firstWord.length <= 12 ? firstWord : `${firstWord.slice(0, 11)}…`;
 }
 
-function buildRaceRows(model) {
-  const { state } = model;
-  const standings = model.derived.standings.slice();
-  const count = standings.length;
-  const leaderPoints = standings[0]?.points ?? 0;
-  const maxSeasonPoints = Math.max((state.players.length - 1) * state.tournament.roundsCount * 3, 3);
-  const forecastMap = new Map(
-    model.derived.forecast.rows.map((row) => [row.playerId, row])
+function formatRacePoints(value) {
+  const points = Number(value) || 0;
+  const mod100 = points % 100;
+  const mod10 = points % 10;
+  if (mod100 >= 11 && mod100 <= 14) {
+    return `${points} очков`;
+  }
+  if (mod10 === 1) {
+    return `${points} очко`;
+  }
+  if (mod10 >= 2 && mod10 <= 4) {
+    return `${points} очка`;
+  }
+  return `${points} очков`;
+}
+
+function prefersReducedMotion() {
+  return (
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
-  const runnerPalette = ["#71d8ff", "#ffcf6f", "#54e0a1", "#ff8c78", "#b399ff"];
+}
 
-  return standings.map((row, index) => {
-    const rankFactor = count > 1 ? 1 - index / (count - 1) : 1;
-    const seasonFactor = Math.max(0, Math.min(1, row.points / maxSeasonPoints));
-    const composite = seasonFactor * 0.88 + rankFactor * 0.12;
-    const progress = Math.max(8, Math.min(78, Math.round(8 + composite * 68)));
-    const forecastRow = forecastMap.get(row.playerId);
+function raceVisual(index) {
+  return TROPHY_RACE_VISUALS[index % TROPHY_RACE_VISUALS.length] || TROPHY_RACE_DEFAULT_VISUAL;
+}
 
-    return {
-      ...row,
-      progress,
-      gap: leaderPoints - row.points,
-      titleChance: forecastRow?.titleChance ?? 0,
-      averagePlace: forecastRow?.averagePlace ?? row.rank,
-      shortName: shortPlayerName(row.name),
-      color: runnerPalette[index % runnerPalette.length],
-      animationDelay: `${(index * 0.16).toFixed(2)}s`,
-      seasonPointsCap: maxSeasonPoints,
-      captionLevel: index % 3,
-      figureLift: [-3, 5, -7][index % 3]
-    };
+function calculateRaceTargetPoints(model) {
+  const playerCount = model.state.players.length;
+  const roundsCount = Number(model.state.tournament.roundsCount) || 1;
+  return Math.max((playerCount - 1) * roundsCount * 3, 3);
+}
+
+function buildRaceRows(model) {
+  const standings = model.derived.standings.slice();
+  const targetPoints = calculateRaceTargetPoints(model);
+  const maxPoints = Math.max(...standings.map((row) => row.points), 0);
+
+  return {
+    targetPoints,
+    rows: standings.map((row, index) => {
+      const visual = raceVisual(index);
+      const normalizedProgress = Math.max(
+        0,
+        Math.min(targetPoints ? row.points / targetPoints : 0, 1)
+      );
+      const position =
+        TROPHY_RACE_START +
+        normalizedProgress * (TROPHY_RACE_FINISH - TROPHY_RACE_START);
+
+      return {
+        ...row,
+        visual,
+        position: Number(position.toFixed(2)),
+        laneOffset: TROPHY_RACE_LANE_OFFSETS[index] ?? 0,
+        shortName: shortPlayerName(row.name).toUpperCase(),
+        fullName: String(row.name || "Игрок").toUpperCase(),
+        pointsLabel: formatRacePoints(row.points).toUpperCase(),
+        isLeader: row.points === maxPoints,
+        progressPercent: Math.round(normalizedProgress * 100)
+      };
+    })
+  };
+}
+
+function createRaceRunner(row) {
+  const element = document.createElement("div");
+  element.className = `runner runner--${row.visual.key}`;
+  element.dataset.playerId = row.playerId;
+  element.innerHTML = `
+    <div class="leader-crown" aria-hidden="true">👑</div>
+    <div class="runner-sprite">
+      <img class="runner-character" src="${row.visual.asset}" alt="" aria-hidden="true" />
+      <div class="runner-avatar-shell"></div>
+    </div>
+    <div class="runner-label">
+      <span class="runner-name"></span>
+      <span class="runner-points"></span>
+    </div>
+  `;
+  return element;
+}
+
+function syncRaceRunner(element, row, options = {}) {
+  const { startFromStart = false } = options;
+  const previousPosition = Number(element.dataset.position);
+  const nextPosition = row.position;
+  const positionChanged =
+    Number.isFinite(previousPosition) && Math.abs(previousPosition - nextPosition) > 0.35;
+
+  element.className = `runner runner--${row.visual.key}${row.isLeader ? " is-leader" : ""}`;
+  element.style.setProperty(
+    "--runner-position",
+    `${startFromStart ? TROPHY_RACE_START : nextPosition}%`
+  );
+  element.style.setProperty("--lane-offset", `${row.laneOffset}px`);
+  element.style.setProperty("--runner-accent", row.visual.primary);
+  element.style.setProperty("--runner-accent-2", row.visual.secondary);
+  element.style.setProperty("--runner-glow", row.visual.glow);
+
+  const character = element.querySelector(".runner-character");
+  if (character.getAttribute("src") !== row.visual.asset) {
+    character.setAttribute("src", row.visual.asset);
+  }
+
+  const avatarShell = element.querySelector(".runner-avatar-shell");
+  avatarShell.innerHTML = avatar(row.photoUrl, row.name, "runner-head-avatar");
+
+  const nameElement = element.querySelector(".runner-name");
+  nameElement.textContent = row.fullName;
+  nameElement.title = row.name;
+
+  const pointsElement = element.querySelector(".runner-points");
+  pointsElement.textContent = row.pointsLabel;
+
+  if (
+    !startFromStart &&
+    positionChanged &&
+    !prefersReducedMotion()
+  ) {
+    element.classList.add("is-running");
+    window.clearTimeout(Number(element.dataset.runTimer || 0));
+    const timerId = window.setTimeout(() => {
+      element.classList.remove("is-running");
+      delete element.dataset.runTimer;
+    }, 960);
+    element.dataset.runTimer = String(timerId);
+  } else if (startFromStart) {
+    element.classList.add("is-running");
+  } else {
+    element.classList.remove("is-running");
+  }
+
+  element.dataset.position = String(nextPosition);
+}
+
+function mountRaceRows(container, rows) {
+  const existing = new Map(
+    Array.from(container.querySelectorAll(".runner")).map((node) => [
+      node.dataset.playerId,
+      node
+    ])
+  );
+
+  rows.forEach((row) => {
+    if (!existing.has(row.playerId)) {
+      container.append(createRaceRunner(row));
+    }
   });
+
+  Array.from(container.querySelectorAll(".runner")).forEach((node) => {
+    if (!rows.some((row) => row.playerId === node.dataset.playerId)) {
+      const timerId = Number(node.dataset.runTimer || 0);
+      if (timerId) {
+        window.clearTimeout(timerId);
+      }
+      node.remove();
+    }
+  });
+}
+
+function animateRaceRows(container, rows) {
+  const runnerMap = new Map(
+    Array.from(container.querySelectorAll(".runner")).map((node) => [
+      node.dataset.playerId,
+      node
+    ])
+  );
+
+  rows.forEach((row) => {
+    const node = runnerMap.get(row.playerId);
+    if (node) {
+      syncRaceRunner(node, row);
+    }
+  });
+}
+
+function renderRaceEmpty(holder) {
+  holder.innerHTML = `
+    <article class="race-card race-card--trophy">
+      <div class="race-header">
+        <div>
+          <div class="stat-label">Гонка за кубком</div>
+          <h3 class="race-title">Путь к титулу пока пуст</h3>
+          <p class="race-copy">Добавьте участников и первые матчи, чтобы на дорожке появились реальные позиции игроков.</p>
+        </div>
+        <div class="trophy-pill">Ждём старт сезона</div>
+      </div>
+    </article>
+  `;
+  trophyRaceBootstrapped = false;
+  window.clearTimeout(trophyRaceBootTimer);
 }
 
 function renderHeroRace(model) {
   const holder = document.getElementById("hero-race");
-  const rows = buildRaceRows(model);
+  if (!holder) {
+    return;
+  }
+  const { rows, targetPoints } = buildRaceRows(model);
 
   if (!rows.length) {
-    holder.innerHTML = `
-      <article class="race-card">
-        <div class="race-header">
-          <div>
-            <div class="stat-label">Гонка за кубком</div>
-            <h3 class="race-title">Путь к титулу пока пуст</h3>
-            <p class="race-copy">Добавьте участников и первые матчи, чтобы увидеть, кто ближе всего к финишу.</p>
-          </div>
-          <div class="trophy-pill">🏆 Кубок</div>
-        </div>
-      </article>
-    `;
+    renderRaceEmpty(holder);
     return;
   }
 
-  holder.innerHTML = `
-    <article class="race-card">
+  if (!holder.querySelector(".trophy-race")) {
+    holder.innerHTML = `
+    <article class="race-card race-card--trophy">
       <div class="race-header">
         <div>
           <div class="stat-label">Гонка за кубком</div>
-          <h3 class="race-title">Одна дистанция до титула</h3>
-          <p class="race-copy">
-            Позиции считаются по очкам с учетом текущего места. Чем правее игрок, тем он ближе к кубку.
-          </p>
+          <h3 class="race-title">Одна дорожка до титула</h3>
+          <p class="race-copy"></p>
         </div>
-        <div class="trophy-pill">🏆 Кубок</div>
+        <div class="trophy-pill">Финиш у кубка</div>
       </div>
-      <div class="race-scene">
-        <div class="race-start-label">Старт</div>
-        <div class="race-finish-zone">
-          <div class="race-finish-trophy">🏆</div>
-          <div class="race-finish-label">Финиш</div>
+      <section class="trophy-race" aria-label="Гонка участников турнира к кубку">
+        <div class="race-backdrop"></div>
+        <div class="race-track"></div>
+        <div class="race-start-badge">0</div>
+        <div class="race-goal-badge">Финиш</div>
+        <div class="runners-container"></div>
+        <div class="trophy-anchor">
+          <img class="trophy-image" src="./assets/media/trophy-race/trophy.svg" alt="Кубок турнира" />
         </div>
-        <div class="race-track-base"></div>
-        ${rows
-          .map(
-            (row) => `
-              <div class="race-runner" style="left: ${row.progress}%; --runner-color: ${row.color}; --runner-delay: ${row.animationDelay}; --caption-level: ${row.captionLevel}; --figure-lift: ${row.figureLift}px">
-                <div class="race-runner-figure">
-                  <div class="race-runner-head">
-                    ${avatar(row.photoUrl, row.name, "race-avatar")}
-                  </div>
-                  <div class="race-runner-torso"></div>
-                  <div class="race-runner-legs"></div>
-                </div>
-                <div class="race-runner-caption">
-                  <div class="race-runner-name">${row.shortName}</div>
-                  <div class="race-runner-meta">#${row.rank} · ${row.points} очк.</div>
-                </div>
-              </div>
-            `
-          )
-          .join("")}
-      </div>
-      <div class="race-summary-list">
-        ${rows
-          .map(
-            (row) => `
-              <div class="race-summary-item">
-                <span class="race-summary-dot" style="background: ${row.color}"></span>
-                <strong>${row.name}</strong>
-                <span>
-                  ${
-                    row.gap === 0
-                      ? `${row.points} из ${row.seasonPointsCap} очк. и лучший коридор к титулу`
-                      : `${row.points} из ${row.seasonPointsCap} очк., отставание ${row.gap} и среднее место ${row.averagePlace.toFixed(1)}`
-                  }
-                </span>
-              </div>
-            `
-          )
-          .join("")}
+      </section>
+      <div class="race-meta-row">
+        <span class="chip chip-accent race-target-points"></span>
+        <span class="chip race-player-count"></span>
       </div>
     </article>
   `;
+    trophyRaceBootstrapped = false;
+  }
+
+  holder.querySelector(".race-copy").textContent =
+    "Все участники бегут по одной линии. Чем больше очков у игрока, тем ближе он к кубку.";
+  holder.querySelector(".race-target-points").textContent =
+    `Максимум сезона: ${targetPoints} очк.`;
+  holder.querySelector(".race-player-count").textContent =
+    `${rows.length} участника(ов) на дистанции`;
+
+  const container = holder.querySelector(".runners-container");
+  mountRaceRows(container, rows);
+
+  if (!trophyRaceBootstrapped && !prefersReducedMotion()) {
+    Array.from(container.querySelectorAll(".runner")).forEach((node) => {
+      const row = rows.find((item) => item.playerId === node.dataset.playerId);
+      if (row) {
+        syncRaceRunner(node, row, { startFromStart: true });
+      }
+    });
+
+    window.clearTimeout(trophyRaceBootTimer);
+    trophyRaceBootTimer = window.setTimeout(() => {
+      animateRaceRows(container, rows);
+      trophyRaceBootstrapped = true;
+    }, 260);
+    return;
+  }
+
+  animateRaceRows(container, rows);
+  trophyRaceBootstrapped = true;
 }
 
 function renderHero(model) {
