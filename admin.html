@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Админка недоступна в публичной версии</title>
+    <title>Админка турнира eFootball 2026</title>
     <meta
       name="description"
-      content="Публичная версия турнира работает без открытой админки."
+      content="Закрытая админ-панель турнира для редактирования игроков, календаря, результатов и настроек витрины."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,26 +14,222 @@
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=28" />
+    <link rel="stylesheet" href="./styles.css?v=29" />
   </head>
   <body class="site-body">
-    <main class="shell" style="padding: 48px 0 64px">
-      <section class="panel" style="max-width: 780px; margin: 0 auto">
-        <div class="panel-kicker">Закрытый контур</div>
-        <h1 class="panel-title">Публичная версия открыта без админки</h1>
-        <p class="note" style="margin-top: 14px">
-          Эта страница на GitHub Pages работает только как открытая витрина турнира.
-          Редактирование результатов, игроков и календаря вынесено из публичного доступа.
+    <section class="login-shell" id="login-view">
+      <div class="login-card">
+        <div class="eyebrow">Вход в админку</div>
+        <h1 class="panel-title" style="margin-top: 18px">Редактирование турнира</h1>
+        <p class="note" style="margin-top: 12px">
+          Это рабочая панель организатора. Здесь сохраняются игроки, результаты,
+          календарь и тексты публичной витрины.
         </p>
-        <div class="chip-row" style="margin-top: 18px">
-          <span class="chip">Без публичного пароля в браузере</span>
-          <span class="chip">Без клиентской панели редактирования</span>
-          <span class="chip">Без открытой записи в данные</span>
+        <div class="chip-row" style="margin-top: 16px">
+          <span class="chip chip-accent">Пароль: 1111</span>
+          <span class="chip">Отдельная страница редактирования</span>
         </div>
-        <div class="btn-row" style="margin-top: 26px">
-          <a class="btn btn-primary" href="./index.html">Перейти на сайт турнира</a>
+        <form id="login-form" class="stack" style="margin-top: 20px">
+          <div class="field">
+            <label for="password">Пароль</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              placeholder="Введите пароль"
+            />
+          </div>
+          <button class="btn btn-primary" type="submit">Войти</button>
+        </form>
+        <div id="login-status" class="helper" hidden></div>
+      </div>
+    </section>
+
+    <section class="admin-shell shell" id="admin-view" hidden>
+      <div class="admin-topbar">
+        <div>
+          <div class="eyebrow">Панель управления</div>
+          <h1 class="admin-title">Операционный центр лиги</h1>
+          <p class="admin-lead">
+            Рабочая панель без лишнего шума: сначала турнир, затем игроки, потом календарь и результаты.
+          </p>
         </div>
-      </section>
-    </main>
+        <div class="btn-row">
+          <button class="btn btn-secondary" id="refresh-admin" type="button">Обновить данные</button>
+          <a class="btn btn-ghost" href="./index.html">Открыть сайт</a>
+          <button class="btn btn-danger" id="logout-admin" type="button">Выйти</button>
+        </div>
+      </div>
+
+      <div class="admin-workspace">
+        <aside class="admin-sidebar">
+          <div class="admin-card admin-sidebar-card">
+            <div class="panel-kicker">Навигация</div>
+            <nav class="admin-steps">
+              <a class="admin-step" href="#admin-tournament">1. Турнир</a>
+              <a class="admin-step" href="#admin-players">2. Игроки</a>
+              <a class="admin-step" href="#admin-schedule">3. Календарь</a>
+              <a class="admin-step" href="#admin-results">4. Результаты</a>
+            </nav>
+          </div>
+
+          <div class="admin-card admin-sidebar-card">
+            <div class="panel-kicker">Состояние лиги</div>
+            <div class="admin-summary admin-summary-stack" id="admin-summary"></div>
+          </div>
+
+          <div class="admin-card admin-sidebar-card">
+            <div class="panel-kicker">Порядок работы</div>
+            <div class="admin-tip-list">
+              <div class="admin-tip">Меняете состав игроков: затем пересобираете календарь.</div>
+              <div class="admin-tip">Меняете число кругов: затем пересобираете календарь.</div>
+              <div class="admin-tip">Вносите счета: витрина и аналитика обновляются сразу.</div>
+            </div>
+          </div>
+        </aside>
+
+        <main class="admin-main">
+          <section class="admin-notice" id="admin-notice" hidden></section>
+
+          <section class="admin-dirty-bar" id="admin-dirty-bar" hidden>
+            <div>
+              <strong>Есть несохранённые изменения</strong>
+              <div class="admin-dirty-text" id="admin-dirty-text"></div>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-secondary" id="discard-dirty" type="button">
+                Сбросить черновик
+              </button>
+            </div>
+          </section>
+
+          <section class="admin-card admin-section" id="admin-tournament" data-section="tournament">
+            <div class="section-head">
+              <div>
+                <div class="panel-kicker">Шаг 1</div>
+                <h2 class="panel-title">Турнир</h2>
+                <div class="panel-subtitle">Название, описание, статус и формат сезона.</div>
+              </div>
+              <div class="section-chip">Обновляет первый экран сайта</div>
+            </div>
+
+            <form id="tournament-form" class="stack">
+              <div class="field-grid">
+                <div class="field">
+                  <label for="title">Название</label>
+                  <input id="title" name="title" type="text" data-dirty="tournament" />
+                </div>
+                <div class="field">
+                  <label for="subtitle">Подзаголовок</label>
+                  <input id="subtitle" name="subtitle" type="text" data-dirty="tournament" />
+                </div>
+                <div class="field">
+                  <label for="statusLabel">Статус</label>
+                  <input id="statusLabel" name="statusLabel" type="text" data-dirty="tournament" />
+                </div>
+                <div class="field">
+                  <label for="roundsCount">Кругов в лиге</label>
+                  <input
+                    id="roundsCount"
+                    name="roundsCount"
+                    type="number"
+                    min="1"
+                    max="6"
+                    data-dirty="tournament"
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label for="description">Описание</label>
+                <textarea id="description" name="description" data-dirty="tournament"></textarea>
+              </div>
+              <div class="section-actions">
+                <button class="btn btn-primary" id="save-tournament" type="submit">
+                  Сохранить турнир
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <section class="admin-card admin-section" id="admin-players" data-section="players">
+            <div class="section-head">
+              <div>
+                <div class="panel-kicker">Шаг 2</div>
+                <h2 class="panel-title">Игроки</h2>
+                <div class="panel-subtitle">Состав, рейтинг, фото и короткие заметки для витрины.</div>
+              </div>
+              <div class="section-chip">Рейтинг влияет умеренно</div>
+            </div>
+
+            <div class="section-inline-note">
+              Чем меньше число, тем сильнее игрок. Фото сразу используются в таблице, матчах и аналитике.
+            </div>
+
+            <div class="players-editor" id="players-editor"></div>
+            <div class="section-actions">
+              <button class="btn btn-secondary" id="add-player" type="button">Добавить игрока</button>
+              <button class="btn btn-primary" id="save-players" type="button">Сохранить состав</button>
+            </div>
+          </section>
+
+          <section class="admin-card admin-section" id="admin-schedule" data-section="schedule">
+            <div class="section-head">
+              <div>
+                <div class="panel-kicker">Шаг 3</div>
+                <h2 class="panel-title">Календарь</h2>
+                <div class="panel-subtitle">Полная генерация или полный сброс матчей сезона.</div>
+              </div>
+              <div class="section-chip section-chip-warn">Влияет на весь сезон</div>
+            </div>
+
+            <div class="admin-action-grid">
+              <div class="admin-action-card">
+                <strong>Пересобрать расписание</strong>
+                <p>Используйте после смены состава игроков или количества кругов.</p>
+              </div>
+              <div class="admin-action-card">
+                <strong>Очистить все матчи</strong>
+                <p>Сбрасывает сезонную сетку и готовит панель к новому запуску.</p>
+              </div>
+            </div>
+
+            <div class="section-actions">
+              <button class="btn btn-primary" id="generate-schedule" type="button">
+                Сгенерировать календарь
+              </button>
+              <button class="btn btn-danger" id="reset-schedule" type="button">
+                Очистить календарь
+              </button>
+            </div>
+          </section>
+
+          <section class="admin-card admin-section" id="admin-results" data-section="results">
+            <div class="section-head">
+              <div>
+                <div class="panel-kicker">Шаг 4</div>
+                <h2 class="panel-title">Результаты</h2>
+                <div class="panel-subtitle">Счета матчей, дата и заметка к игре.</div>
+              </div>
+              <div class="section-chip">Обновляет витрину мгновенно</div>
+            </div>
+
+            <div class="section-inline-note">
+              После сохранения счета обновляются таблица, превью матчей, шансы и хронология сезона.
+            </div>
+
+            <div class="results-editor" id="results-editor"></div>
+          </section>
+        </main>
+      </div>
+    </section>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script src="./assets/js/shared/league-core-a.js?v=24"></script>
+    <script src="./assets/js/shared/league-core-b.js?v=24"></script>
+    <script src="./assets/js/shared/league-core-c.js?v=24"></script>
+    <script src="./assets/js/api-static.js?v=2"></script>
+    <script src="./assets/js/admin-static.js?v=2"></script>
   </body>
 </html>
