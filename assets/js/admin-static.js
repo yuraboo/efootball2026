@@ -114,9 +114,11 @@ function showLogin(show) {
   const adminView = document.getElementById("admin-view");
   if (loginView) {
     loginView.hidden = !show;
+    loginView.style.display = show ? "" : "none";
   }
   if (adminView) {
     adminView.hidden = show;
+    adminView.style.display = show ? "none" : "block";
   }
 }
 
