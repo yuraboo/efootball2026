@@ -86,6 +86,22 @@ function clearDirty(section) {
   updateDirtyBar();
 }
 
+function storageNotice(model, fallbackMessage) {
+  if (model?.meta?.storageMode === "local") {
+    return {
+      tone: "info",
+      message:
+        model.meta.storageMessage ||
+        "Облако турнира недоступно. Панель работает в локальном режиме этого браузера."
+    };
+  }
+
+  return {
+    tone: "success",
+    message: fallbackMessage
+  };
+}
+
 function avatar(url, alt) {
   if (url) {
     return `<img class="row-avatar" src="${url}" alt="${alt}" />`;
@@ -301,7 +317,8 @@ async function handleAction(type, payload, successMessage) {
     clearDirty("results");
   }
   if (successMessage) {
-    setNotice(successMessage, "success");
+    const notice = storageNotice(currentModel, successMessage);
+    setNotice(notice.message, notice.tone);
   }
 }
 
@@ -309,7 +326,11 @@ async function enterAdmin() {
   showLogin(false);
   await refreshAdminState();
   startRealtimeSync();
-  setNotice("Админка подключена. Изменения ниже сохраняются по отдельным блокам.", "info");
+  const notice = storageNotice(
+    currentModel,
+    "Админка подключена. Изменения ниже сохраняются по отдельным блокам."
+  );
+  setNotice(notice.message, currentModel?.meta?.storageMode === "local" ? "info" : "success");
 }
 
 async function init() {
@@ -358,7 +379,8 @@ document.getElementById("refresh-admin").addEventListener("click", async () => {
   setBusy(button, true, "Обновляем...");
   try {
     await refreshAdminState();
-    setNotice("Данные админки обновлены.", "success");
+    const notice = storageNotice(currentModel, "Данные админки обновлены.");
+    setNotice(notice.message, notice.tone);
   } catch (error) {
     setNotice(error.message, "error");
   } finally {
