@@ -8,7 +8,8 @@
 .stack,
 .next-match-stage,
 .next-match-footer {
-  grid-template-columns: minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
 }
 
 .main-column > *,
