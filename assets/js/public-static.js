@@ -552,13 +552,13 @@ function renderStandings(model) {
         row.rank === 1 ? "rank-top" : row.rank === 2 ? "rank-second" : row.rank === 3 ? "rank-third" : "";
       return `
         <tr class="${rowClass}">
-          <td>${row.rank}</td>
+          <td><span class="standings-rank">${row.rank}</span></td>
           <td>
             <div class="player-row">
               ${avatar(row.photoUrl, row.name, "row-avatar")}
-              <div>
-                <strong>${row.name}</strong>
-                <div class="panel-subtitle">Рейтинг ${formatRating(row.rating)} · меньше лучше</div>
+              <div class="standings-player-copy">
+                <span class="standings-player-name">${row.name}</span>
+                <div class="standings-player-meta">Рейтинг ${formatRating(row.rating)} · меньше лучше</div>
               </div>
             </div>
           </td>
@@ -569,7 +569,7 @@ function renderStandings(model) {
           <td>${row.goalsFor}</td>
           <td>${row.goalsAgainst}</td>
           <td>${row.goalDiff > 0 ? "+" : ""}${row.goalDiff}</td>
-          <td><strong>${row.points}</strong></td>
+          <td><strong class="standings-points">${row.points}</strong></td>
         </tr>
       `;
     })
