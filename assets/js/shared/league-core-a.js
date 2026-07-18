@@ -165,7 +165,7 @@ function idMap(players) {
 }
 
 function basePlayerStrength(state, row) {
-  const player = state.players.find((item) => item.id === row.playerId);
+  const player = state.players.find((item) => item.playerId === row.playerId);
   const form = getPlayerForm(state, row.playerId);
   return (
     48 +
@@ -465,7 +465,7 @@ function normalizeTournamentState(state) {
         )
     : [];
 
-  tournament.roundsCount = clamp(toNumber(tournament.roundsCount, 2), 1, 6);
+  tournament.roundsCount = clamp(toNumber(tournament.roundsCount, 2), 1, 15);
   tournament.updatedAt =
     safeDate(tournament.updatedAt) || new Date().toISOString();
 
