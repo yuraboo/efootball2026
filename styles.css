@@ -65,6 +65,10 @@ img {
   max-width: 100%;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 .site-body::before {
   content: "";
   position: fixed;
@@ -244,12 +248,12 @@ img {
 
 .hero-stats {
   display: grid;
-  gap: 12px;
+  gap: 14px;
   margin-top: 24px;
 }
 
 .hero-stats-tight {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
 }
 
 .stat-card,
@@ -266,7 +270,11 @@ img {
 }
 
 .stat-card {
-  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 176px;
+  padding: 18px 18px 20px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.025));
 }
 
@@ -281,14 +289,17 @@ img {
 
 .stat-value {
   font-family: var(--font-title);
-  font-size: clamp(18px, 1.8vw, 30px);
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  font-size: clamp(16px, 1.45vw, 24px);
   font-weight: 600;
-  line-height: 1.16;
-  letter-spacing: -0.025em;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
 }
 
 .stat-note {
-  margin-top: 8px;
+  margin-top: auto;
   color: var(--muted);
   font-size: 12px;
   line-height: 1.45;
