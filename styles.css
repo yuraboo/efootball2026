@@ -290,12 +290,13 @@ img {
 .stat-value {
   font-family: var(--font-title);
   max-width: 100%;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  font-size: clamp(16px, 1.45vw, 24px);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: clamp(14px, 1.2vw, 22px);
   font-weight: 600;
   line-height: 1.08;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.045em;
 }
 
 .stat-note {
