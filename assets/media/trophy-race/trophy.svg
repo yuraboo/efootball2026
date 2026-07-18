@@ -1,0 +1,38 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="60" cy="109" rx="28" ry="7" fill="#0A1120" opacity="0.28"/>
+  <path d="M40 16H80V25C80 42.6731 71.6731 56 60 56C48.3269 56 40 42.6731 40 25V16Z" fill="url(#cupBody)"/>
+  <path d="M35 22H18C18 39.1208 25.9967 50 39 50" stroke="url(#cupSide)" stroke-width="7" stroke-linecap="round"/>
+  <path d="M85 22H102C102 39.1208 94.0033 50 81 50" stroke="url(#cupSide)" stroke-width="7" stroke-linecap="round"/>
+  <path d="M55 55H65V72H55V55Z" fill="url(#stem)"/>
+  <path d="M43 72H77V82C77 84.7614 74.7614 87 72 87H48C45.2386 87 43 84.7614 43 82V72Z" fill="url(#baseTop)"/>
+  <path d="M35 87H85V94C85 97.3137 82.3137 100 79 100H41C37.6863 100 35 97.3137 35 94V87Z" fill="url(#baseBottom)"/>
+  <path d="M60 27L64.3262 35.7676L74 37.2361L67 44.1468L68.6525 53.7639L60 49.2L51.3475 53.7639L53 44.1468L46 37.2361L55.6738 35.7676L60 27Z" fill="#FFF4B2"/>
+  <circle cx="60" cy="60" r="40" fill="url(#glow)" opacity="0.34"/>
+  <defs>
+    <linearGradient id="cupBody" x1="40" y1="16" x2="80" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF0A8"/>
+      <stop offset="0.46" stop-color="#FFD65E"/>
+      <stop offset="1" stop-color="#D68A0E"/>
+    </linearGradient>
+    <linearGradient id="cupSide" x1="18" y1="22" x2="102" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8C64C"/>
+      <stop offset="1" stop-color="#E8A110"/>
+    </linearGradient>
+    <linearGradient id="stem" x1="55" y1="55" x2="65" y2="72" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7D878"/>
+      <stop offset="1" stop-color="#C97709"/>
+    </linearGradient>
+    <linearGradient id="baseTop" x1="43" y1="72" x2="77" y2="87" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7D269"/>
+      <stop offset="1" stop-color="#D0840A"/>
+    </linearGradient>
+    <linearGradient id="baseBottom" x1="35" y1="87" x2="85" y2="100" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B86E06"/>
+      <stop offset="1" stop-color="#8C4F05"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(60 60) rotate(90) scale(40)">
+      <stop stop-color="#FFE67A"/>
+      <stop offset="1" stop-color="#FFE67A" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>
