@@ -17,6 +17,7 @@
     />
     <link rel="stylesheet" href="./styles.css?v=31" />
     <link rel="stylesheet" href="./assets/race-overrides.css?v=2" />
+    <link rel="stylesheet" href="./assets/standings-overrides.css?v=1" />
   </head>
   <body class="site-body">
     <header class="hero shell">
@@ -69,16 +70,17 @@
             <table class="standings-table">
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Игрок</th>
-                  <th>И</th>
-                  <th>В</th>
-                  <th>Н</th>
-                  <th>П</th>
-                  <th>ЗМ</th>
-                  <th>ПМ</th>
-                  <th>РМ</th>
-                  <th>О</th>
+                  <th scope="col">#</th>
+                  <th scope="col">Игрок</th>
+                  <th scope="col"><span class="standings-head-hint" tabindex="0" data-tooltip="Сыграно матчей">И</span></th>
+                  <th scope="col"><span class="standings-head-hint" tabindex="0" data-tooltip="Победы">В</span></th>
+                  <th scope="col"><span class="standings-head-hint" tabindex="0" data-tooltip="Ничьи">Н</span></th>
+                  <th scope="col"><span class="standings-head-hint" tabindex="0" data-tooltip="Поражения">П</span></th>
+                  <th scope="col"><span class="standings-head-hint" tabindex="0" data-tooltip="Забито мячей">ЗМ</span></th>
+                  <th scope="col"><span class="standings-head-hint" tabindex="0" data-tooltip="Пропущено мячей">ПМ</span></th>
+                  <th scope="col"><span class="standings-head-hint" tabindex="0" data-tooltip="Разница мячей">РМ</span></th>
+                  <th scope="col"><span class="standings-head-hint" tabindex="0" data-tooltip="Последние пять матчей">Форма</span></th>
+                  <th scope="col"><span class="standings-head-hint" tabindex="0" data-tooltip="Очки">О</span></th>
                 </tr>
               </thead>
               <tbody id="standings-body"></tbody>
@@ -193,5 +195,6 @@
     <script src="./assets/js/shared/league-core-c.js?v=25"></script>
     <script src="./assets/js/api-static.js?v=2"></script>
     <script src="./assets/js/public-static.js?v=29"></script>
+    <script src="./assets/js/standings-overrides.js?v=1"></script>
   </body>
 </html>
