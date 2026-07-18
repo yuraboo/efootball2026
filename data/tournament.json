@@ -1,0 +1,95 @@
+{
+  "tournament": {
+    "title": "Турнир eFootball 2026",
+    "subtitle": "Лига друзей",
+    "description": "Закрытый турнир с общей таблицей, календарем, формой игроков и прогнозами на ближайшие матчи.",
+    "roundsCount": 2,
+    "statusLabel": "Регулярный сезон",
+    "updatedAt": "2026-07-17T13:09:44.939Z"
+  },
+  "players": [
+    {
+      "id": "vernigora-a",
+      "name": "Вернигора А.",
+      "rating": 80,
+      "photoUrl": "https://res.cloudinary.com/dc1ybvaxd/image/upload/v1780957565/IMG_9519_d803p2.jpg",
+      "notes": ""
+    },
+    {
+      "id": "lyakhovich-e",
+      "name": "Ляхович Е.",
+      "rating": 80,
+      "photoUrl": "https://res.cloudinary.com/dc1ybvaxd/image/upload/v1780957960/IMG_9520_bkppyj.jpg",
+      "notes": ""
+    },
+    {
+      "id": "usik-y",
+      "name": "Усик Ю.",
+      "rating": 80,
+      "photoUrl": "https://res.cloudinary.com/dc1ybvaxd/image/upload/v1780958123/IMG_8454_bdi0ur.jpg",
+      "notes": ""
+    }
+  ],
+  "matches": [
+    {
+      "id": "match-1",
+      "round": 1,
+      "homePlayerId": "lyakhovich-e",
+      "awayPlayerId": "usik-y",
+      "status": "scheduled",
+      "homeScore": null,
+      "awayScore": null,
+      "playedAt": null
+    },
+    {
+      "id": "match-2",
+      "round": 2,
+      "homePlayerId": "vernigora-a",
+      "awayPlayerId": "usik-y",
+      "status": "scheduled",
+      "homeScore": null,
+      "awayScore": null,
+      "playedAt": null
+    },
+    {
+      "id": "match-3",
+      "round": 3,
+      "homePlayerId": "vernigora-a",
+      "awayPlayerId": "lyakhovich-e",
+      "status": "scheduled",
+      "homeScore": null,
+      "awayScore": null,
+      "playedAt": null
+    },
+    {
+      "id": "match-4",
+      "round": 4,
+      "homePlayerId": "usik-y",
+      "awayPlayerId": "lyakhovich-e",
+      "status": "scheduled",
+      "homeScore": null,
+      "awayScore": null,
+      "playedAt": null
+    },
+    {
+      "id": "match-5",
+      "round": 5,
+      "homePlayerId": "usik-y",
+      "awayPlayerId": "vernigora-a",
+      "status": "scheduled",
+      "homeScore": null,
+      "awayScore": null,
+      "playedAt": null
+    },
+    {
+      "id": "match-6",
+      "round": 6,
+      "homePlayerId": "lyakhovich-e",
+      "awayPlayerId": "vernigora-a",
+      "status": "scheduled",
+      "homeScore": null,
+      "awayScore": null,
+      "playedAt": null
+    }
+  ]
+}
