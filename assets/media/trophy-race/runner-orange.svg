@@ -1,0 +1,19 @@
+<svg width="96" height="128" viewBox="0 0 96 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g opacity="0.2">
+    <ellipse cx="48" cy="122" rx="22" ry="5" fill="#08111F"/>
+  </g>
+  <path d="M48 31C57.3888 31 65 23.3888 65 14C65 4.61116 57.3888 -3 48 -3C38.6112 -3 31 4.61116 31 14C31 23.3888 38.6112 31 48 31Z" fill="#FFD9BF"/>
+  <path d="M35 11C38 4 45 0 53 1L61 3L57 16H35V11Z" fill="#D96A1D"/>
+  <path d="M43 31H52L55 42H40L43 31Z" fill="#FFD0B0"/>
+  <path d="M34 43C34 38.5817 37.5817 35 42 35H56C60.4183 35 64 38.5817 64 43V69H34V43Z" fill="#FFAD54"/>
+  <path d="M36 46L24 58L29 64L41 52L36 46Z" fill="#FFD9BF"/>
+  <path d="M62 46L74 57L69 63L56 52L62 46Z" fill="#FFD9BF"/>
+  <rect x="38" y="69" width="11" height="25" rx="5.5" fill="#283341"/>
+  <rect x="49" y="69" width="11" height="25" rx="5.5" fill="#1F2938"/>
+  <path d="M42 94L37 117H42L48 99L42 94Z" fill="#FFD9BF"/>
+  <path d="M56 94L61 117H56L50 99L56 94Z" fill="#FFD9BF"/>
+  <path d="M34 116H45L44 122H31L34 116Z" fill="#FFF4E6"/>
+  <path d="M53 116H65L66 122H52L53 116Z" fill="#FFF4E6"/>
+  <path d="M31 120H45L45 124H29L31 120Z" fill="#D96A1D"/>
+  <path d="M52 120H67L67 124H50L52 120Z" fill="#D96A1D"/>
+</svg>
