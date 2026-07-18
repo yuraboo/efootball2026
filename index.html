@@ -1,102 +1,1005 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>eFootball 2026 Tournament Hub</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Russo+One&display=swap" rel="stylesheet" />
-  <script>
-    tailwind.config={theme:{extend:{colors:{ef:{bg:'#05020d',pitch:'#00e5ff',violet:'#8b5cff',blue:'#00b7ff',danger:'#ff2d6f',gold:'#ffdc5c'}},boxShadow:{pitch:'0 0 34px rgba(0,229,255,.34)',violet:'0 0 34px rgba(139,92,255,.38)',board:'0 26px 90px rgba(0,0,0,.78)'},fontFamily:{title:['Russo One','sans-serif'],body:['Inter','sans-serif']}}}}
-  </script>
-  <style>
-    *{-webkit-tap-highlight-color:transparent}body{font-family:'Inter',sans-serif;background:#05020d;overflow-x:hidden;color:#fff}::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:#070311}::-webkit-scrollbar-thumb{background:linear-gradient(#00e5ff,#8b5cff,#ff2d6f);border-radius:999px}.title-font{font-family:'Russo One',sans-serif;letter-spacing:.02em}.board{background:linear-gradient(180deg,rgba(12,6,28,.86),rgba(4,7,18,.70));border:1px solid rgba(0,229,255,.18);backdrop-filter:blur(14px);box-shadow:0 26px 90px rgba(0,0,0,.78),inset 0 0 0 1px rgba(139,92,255,.08)}.tile{background:linear-gradient(145deg,rgba(0,229,255,.09),rgba(139,92,255,.07),rgba(255,255,255,.025));border:1px solid rgba(255,255,255,.13)}.tab-btn svg,h2 svg,h3 svg,button svg{width:18px;height:18px;stroke-width:2.35}.avatar{background:linear-gradient(145deg,rgba(0,229,255,.28),rgba(139,92,255,.22));object-fit:cover}.preview-bar{height:8px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.09)}#tournament-wrapper{min-height:100vh;background-image:radial-gradient(circle at 18% 8%,rgba(0,229,255,.18),transparent 28%),radial-gradient(circle at 84% 18%,rgba(139,92,255,.20),transparent 34%),radial-gradient(circle at 50% 58%,rgba(255,45,111,.08),transparent 38%),linear-gradient(rgba(0,229,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,255,.07) 1px,transparent 1px);background-size:auto,auto,auto,32px 32px,32px 32px}.hero-video{position:absolute;top:0;left:0;width:100%;height:82vh;object-fit:cover;object-position:center top;z-index:0;opacity:.96}.hero-video-overlay{position:absolute;top:0;left:0;width:100%;height:94vh;z-index:1;background:radial-gradient(circle at 50% 12%,rgba(0,229,255,.14),transparent 30%),radial-gradient(circle at 78% 38%,rgba(139,92,255,.26),transparent 34%),radial-gradient(circle at 24% 45%,rgba(255,45,111,.12),transparent 32%),linear-gradient(to bottom,rgba(5,2,13,.02) 0%,rgba(5,2,13,.16) 42%,rgba(5,2,13,.62) 74%,rgba(5,2,13,.92) 92%,#05020d 100%);pointer-events:none}.scanline:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(0,229,255,.055),rgba(0,229,255,.055) 1px,transparent 1px,transparent 7px);opacity:.18;pointer-events:none;border-radius:inherit}.table-row{background:linear-gradient(90deg,rgba(0,229,255,.075),rgba(139,92,255,.035));border-bottom:1px solid rgba(255,255,255,.075)}.rank-1-row{background:linear-gradient(90deg,rgba(255,220,92,.22),rgba(139,92,255,.08),rgba(255,255,255,.025));box-shadow:inset 4px 0 0 #ffdc5c}.rank-2-row{background:linear-gradient(90deg,rgba(0,229,255,.16),rgba(255,255,255,.045));box-shadow:inset 4px 0 0 #00e5ff}.rank-3-row{background:linear-gradient(90deg,rgba(255,45,111,.16),rgba(255,255,255,.04));box-shadow:inset 4px 0 0 #ff2d6f}.champion-glow{background:radial-gradient(circle at center,rgba(255,220,92,.16),rgba(139,92,255,.14),transparent 68%)}@media(max-width:640px){#hero-spacer{height:68vh}.hero-video{height:78vh}.hero-video-overlay{height:88vh}.mobile-hide{display:none}.tab-btn span{font-size:10px}}
-  </style>
-</head>
-<body class="text-white antialiased font-body">
-  <div id="tournament-wrapper" class="relative pb-24 overflow-hidden">
-    <video class="hero-video" autoplay muted loop playsinline preload="auto"><source src="https://res.cloudinary.com/dc1ybvaxd/video/upload/v1781081277/Esports_intro_reveal_tournament___202606101147_do0n1i.mp4" type="video/mp4"></video>
-    <div class="hero-video-overlay"></div>
-    <header class="w-full max-w-7xl mx-auto px-4 pt-4 relative z-50"><div class="flex items-center justify-between gap-3"><div class="inline-flex items-center gap-2 rounded-full border border-ef-pitch/30 bg-black/45 px-3 py-2 backdrop-blur-md shadow-pitch"><span class="h-2.5 w-2.5 rounded-full bg-ef-pitch animate-pulse"></span><span class="title-font text-[10px] text-ef-pitch uppercase">LIVE TOURNAMENT</span></div><div class="mobile-hide rounded-full border border-white/10 bg-black/35 px-3 py-2 text-[10px] font-black uppercase tracking-[.18em] text-white/70" id="access-badge">PUBLIC VIEW</div></div></header>
-    <div id="hero-spacer" class="w-full h-[72vh] md:h-[74vh] pointer-events-none"></div>
-    <main class="w-full max-w-7xl mx-auto px-4 relative z-20">
-      <section class="board scanline rounded-[30px] p-4 sm:p-5 mb-5 relative overflow-hidden"><div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4"><div><div class="text-[10px] font-black uppercase tracking-[.28em] text-ef-pitch mb-2">Tournament Control Room</div><h1 class="title-font text-2xl sm:text-4xl leading-tight">eFootball 2026<br><span class="text-ef-pitch">League Room</span></h1></div><div class="grid grid-cols-3 gap-2 min-w-[230px]"><div class="tile rounded-2xl p-3 text-center"><div class="title-font text-lg text-ef-pitch" id="stat-players">0</div><div class="text-[9px] text-white/45 font-black uppercase">Players</div></div><div class="tile rounded-2xl p-3 text-center"><div class="title-font text-lg text-ef-blue" id="stat-matches">0</div><div class="text-[9px] text-white/45 font-black uppercase">Matches</div></div><div class="tile rounded-2xl p-3 text-center"><div class="title-font text-lg text-ef-gold" id="stat-mode">LG</div><div class="text-[9px] text-white/45 font-black uppercase">Mode</div></div></div></div></section>
-      <section id="champion-panel" class="hidden board champion-glow rounded-[30px] p-5 mb-5 relative overflow-hidden border-ef-gold/40"><div class="flex flex-col sm:flex-row items-center justify-between gap-5"><div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left"><div id="champion-photo-wrap"></div><div><div class="inline-flex items-center gap-2 text-ef-gold title-font text-[11px] uppercase mb-2"><i data-lucide="crown"></i> Tournament Champion</div><h2 class="title-font text-3xl sm:text-5xl text-white" id="champion-name">—</h2><p class="text-white/50 text-sm mt-2" id="champion-subtitle">eFootball 2026 Winner</p></div></div><div class="tile rounded-[26px] px-6 py-5 text-center border-ef-gold/35"><div class="text-5xl mb-2">🏆</div><div class="title-font text-ef-gold text-sm">CHAMPION</div></div></div></section>
-      <div id="next-match-box"></div>
-      <div class="board rounded-[24px] p-2 mb-7"><div class="grid grid-cols-4 gap-2" id="tabs-grid"><button onclick="switchTab('tab-setup')" id="btn-tab-setup" data-admin-only="1" class="tab-btn px-2 py-3 rounded-2xl title-font text-[10px] sm:text-xs transition-all text-black bg-ef-pitch shadow-pitch flex items-center justify-center gap-2"><i data-lucide="settings-2"></i><span>Состав</span></button><button onclick="switchTab('tab-profiles')" id="btn-tab-profiles" class="tab-btn px-2 py-3 rounded-2xl title-font text-[10px] sm:text-xs transition-all text-white/80 hover:bg-white/8 flex items-center justify-center gap-2"><i data-lucide="id-card"></i><span>Игроки</span></button><button onclick="switchTab('tab-matches')" id="btn-tab-matches" class="tab-btn px-2 py-3 rounded-2xl title-font text-[10px] sm:text-xs transition-all text-white/80 hover:bg-white/8 flex items-center justify-center gap-2"><i data-lucide="gamepad-2"></i><span>Матчи</span></button><button onclick="switchTab('tab-tables')" id="btn-tab-tables" class="tab-btn px-2 py-3 rounded-2xl title-font text-[10px] sm:text-xs transition-all text-white/80 hover:bg-white/8 flex items-center justify-center gap-2"><i data-lucide="trophy"></i><span>Таблица</span></button></div></div>
-      <section id="tab-setup" class="tab-content block"><div class="grid grid-cols-1 lg:grid-cols-3 gap-6"><div class="lg:col-span-1 board rounded-[28px] p-5"><h2 class="title-font text-base mb-5 flex items-center gap-2"><i data-lucide="users" class="text-ef-pitch"></i> Игроки турнира</h2><div class="flex gap-2 mb-5"><input type="text" id="player-name-input" placeholder="Ник игрока..." class="flex-1 bg-black/55 border border-white/12 rounded-2xl px-4 py-3 text-white focus:outline-none focus:border-ef-pitch transition-all font-bold placeholder-white/30 text-sm"><button onclick="addPlayer()" class="bg-ef-pitch text-black hover:bg-white px-5 rounded-2xl font-black transition-all shadow-pitch flex items-center justify-center"><i data-lucide="plus"></i></button></div><div class="space-y-2 max-h-[310px] overflow-y-auto pr-1" id="players-list"></div></div><div class="lg:col-span-2 board rounded-[28px] p-5 flex flex-col justify-between"><div><h2 class="title-font text-base mb-5 flex items-center gap-2"><i data-lucide="goal" class="text-ef-blue"></i> Формат соревнования</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"><label class="relative flex flex-col justify-between p-5 rounded-[24px] cursor-pointer transition-all duration-300 tile border-ef-pitch/45 shadow-pitch"><input type="radio" name="tournament-mode" value="league" checked onchange="toggleModeSelect('league')" class="absolute top-4 right-4 accent-ef-pitch w-4 h-4"><div><span class="block title-font text-sm text-white">LEAGUE MODE</span><span class="block text-xs text-white/50 mt-2 leading-relaxed">Круговая лига: каждый играет с каждым.</span></div><div class="mt-5"><span class="block text-[10px] uppercase tracking-[.18em] font-black text-ef-pitch mb-2">Круги:</span><div class="grid grid-cols-5 gap-2"><button onclick="setLeagueRounds(2,event)" id="btn-round-2" class="px-3 py-2 bg-ef-pitch text-black font-black text-[10px] rounded-full transition-all">2</button><button onclick="setLeagueRounds(3,event)" id="btn-round-3" class="px-3 py-2 bg-white/10 hover:bg-white/20 text-white font-black text-[10px] rounded-full transition-all">3</button><button onclick="setLeagueRounds(4,event)" id="btn-round-4" class="px-3 py-2 bg-white/10 hover:bg-white/20 text-white font-black text-[10px] rounded-full transition-all">4</button><button onclick="setLeagueRounds(5,event)" id="btn-round-5" class="px-3 py-2 bg-white/10 hover:bg-white/20 text-white font-black text-[10px] rounded-full transition-all">5</button><button onclick="setLeagueRounds(6,event)" id="btn-round-6" class="px-3 py-2 bg-white/10 hover:bg-white/20 text-white font-black text-[10px] rounded-full transition-all">6</button></div></div></label><label class="relative flex flex-col justify-between p-5 rounded-[24px] cursor-pointer transition-all duration-300 tile hover:border-ef-violet/55"><input type="radio" name="tournament-mode" value="playoff" onchange="toggleModeSelect('playoff')" class="absolute top-4 right-4 accent-ef-violet w-4 h-4"><div><span class="block title-font text-sm text-white">KNOCKOUT MODE</span><span class="block text-xs text-white/50 mt-2 leading-relaxed">Плей-офф на вылет.</span></div><span class="block mt-5 text-[10px] font-black text-ef-violet uppercase tracking-[.18em]">Auto bracket</span></label></div></div><div class="pt-5 border-t border-white/10 flex flex-col sm:flex-row gap-3 items-center justify-between"><p class="text-xs text-white/45 max-w-sm leading-relaxed" id="sync-status">Firestore: подключение...</p><div class="flex w-full sm:w-auto gap-2"><button onclick="resetTournament()" class="flex-1 sm:flex-none bg-white/5 hover:bg-ef-danger/20 border border-white/10 text-white title-font text-xs py-4 px-5 rounded-2xl transition-all flex items-center justify-center gap-2"><i data-lucide="rotate-ccw"></i> RESET</button><button onclick="saveSharedState()" class="flex-1 sm:flex-none bg-ef-blue hover:bg-white text-black title-font text-xs py-4 px-5 rounded-2xl transition-all flex items-center justify-center gap-2"><i data-lucide="cloud-upload"></i> SAVE</button><button onclick="generateTournament()" class="flex-1 sm:flex-none bg-ef-pitch hover:bg-white text-black title-font text-xs py-4 px-6 rounded-2xl shadow-pitch active:scale-95 transition-all flex items-center justify-center gap-2">СТАРТ <i data-lucide="play"></i></button></div></div></div></div></section>
-      <section id="tab-profiles" class="tab-content hidden"><div class="board rounded-[28px] p-5"><div class="flex items-center justify-between gap-3 mb-5"><h2 class="title-font text-lg flex items-center gap-2"><i data-lucide="id-card" class="text-ef-pitch"></i> Player Profiles</h2><span class="text-[10px] text-white/40 font-black uppercase" id="profiles-mode-label">View Only</span></div><div id="profiles-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div></section>
-      <section id="tab-matches" class="tab-content hidden"><div class="max-w-4xl mx-auto space-y-4"><div class="board rounded-[24px] p-4 flex justify-between items-center"><h3 class="title-font text-base flex items-center gap-2"><i data-lucide="calendar-days" class="text-ef-blue"></i> Match Center</h3><span id="completed-count" class="bg-ef-blue/15 border border-ef-blue/35 text-ef-blue px-3 py-1.5 rounded-full text-xs font-black">Сыграно: 0 / 0</span></div><div class="space-y-3 max-h-[560px] overflow-y-auto pr-1" id="matches-container"></div></div></section>
-      <section id="tab-tables" class="tab-content hidden"><div id="league-view" class="space-y-6"><div class="board rounded-[28px] p-5 overflow-x-auto"><h3 class="title-font text-lg flex items-center gap-2 mb-6"><i data-lucide="list-ordered" class="text-ef-pitch"></i> League Table</h3><table class="w-full text-left border-separate border-spacing-y-2 min-w-[640px]"><thead><tr class="text-[10px] uppercase tracking-[.16em] font-black text-white/55"><th>#</th><th>Player</th><th>И</th><th>В</th><th>Н</th><th>П</th><th>GF</th><th>GA</th><th>GD</th><th>PTS</th></tr></thead><tbody id="league-table-body"></tbody></table></div><div class="board rounded-[32px] p-5"><h3 class="title-font text-sm mb-4 text-ef-gold uppercase tracking-[.14em] flex items-center gap-2"><i data-lucide="crown"></i> Tournament Podium</h3><div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-5xl items-end" id="podium-container"></div></div></div><div id="playoff-view" class="hidden space-y-6"><div class="board rounded-[28px] p-5 overflow-x-auto"><h3 class="title-font text-lg mb-6 flex items-center gap-2"><i data-lucide="git-branch" class="text-ef-violet"></i> Knockout Bracket</h3><div class="flex justify-around items-stretch gap-6 min-w-[700px] py-4" id="bracket-stages"></div></div></div></section>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Турнир eFootball 2026</title>
+    <meta
+      name="description"
+      content="Публичная витрина турнира eFootball 2026: таблица, ближайший матч, участники и календарь в открытом доступе."
+    />
+    <link rel="canonical" href="https://yuraboo.github.io/efootball2026/" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #07101d;
+        --bg-soft: #0d1728;
+        --panel: rgba(10, 19, 35, 0.92);
+        --panel-soft: rgba(14, 26, 46, 0.84);
+        --line: rgba(130, 176, 255, 0.18);
+        --line-strong: rgba(130, 176, 255, 0.28);
+        --text: #f4f7ff;
+        --muted: #9aabc8;
+        --accent: #6dd0ff;
+        --accent-2: #79f0c3;
+        --gold: #f3c86d;
+        --danger: #ff8e90;
+        --shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+        --radius: 28px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-width: 320px;
+        font-family: "Manrope", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(109, 208, 255, 0.16), transparent 28%),
+          radial-gradient(circle at top right, rgba(121, 240, 195, 0.12), transparent 24%),
+          linear-gradient(180deg, #08111f 0%, #050b14 100%);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .shell {
+        width: min(1220px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .hero {
+        padding: 28px 0 20px;
+      }
+
+      .hero-card,
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px);
+      }
+
+      .hero-card {
+        padding: 32px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 20% 10%, rgba(109, 208, 255, 0.16), transparent 26%),
+          radial-gradient(circle at 90% 20%, rgba(121, 240, 195, 0.14), transparent 22%);
+        pointer-events: none;
+      }
+
+      .hero-topline,
+      .panel-topline {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+      }
+
+      .eyebrow,
+      .chip,
+      .utility-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        padding: 10px 16px;
+        border: 1px solid var(--line-strong);
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .utility-link {
+        color: var(--text);
+      }
+
+      .hero-grid {
+        margin-top: 24px;
+        display: grid;
+        grid-template-columns: 1.25fr 0.95fr;
+        gap: 24px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .hero-title,
+      .panel-title,
+      .match-title {
+        margin: 0;
+        font-family: "Unbounded", sans-serif;
+        line-height: 1.02;
+      }
+
+      .hero-title {
+        font-size: clamp(36px, 5vw, 72px);
+        max-width: 760px;
+      }
+
+      .hero-title span {
+        display: block;
+        margin-top: 10px;
+        color: #8bb4ff;
+      }
+
+      .hero-description,
+      .panel-subtitle,
+      .note,
+      .metric-note {
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .hero-description {
+        margin: 18px 0 24px;
+        font-size: 20px;
+        max-width: 780px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .stat-card,
+      .player-card,
+      .schedule-card,
+      .insight-card,
+      .metric-card {
+        background: var(--panel-soft);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+      }
+
+      .stat-card {
+        padding: 18px;
+      }
+
+      .stat-label,
+      .section-kicker,
+      .tiny-label {
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .stat-value {
+        margin-top: 10px;
+        font-size: 24px;
+        font-weight: 800;
+      }
+
+      .stat-note {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.55;
+      }
+
+      .race-card {
+        height: 100%;
+        padding: 22px;
+        background: linear-gradient(180deg, rgba(16, 30, 53, 0.92), rgba(10, 18, 32, 0.95));
+        border: 1px solid var(--line);
+        border-radius: 28px;
+      }
+
+      .race-track {
+        position: relative;
+        margin-top: 28px;
+        min-height: 210px;
+      }
+
+      .race-line {
+        position: absolute;
+        left: 18px;
+        right: 108px;
+        top: 118px;
+        height: 10px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(121, 240, 195, 0.2), rgba(109, 208, 255, 0.4));
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+      }
+
+      .race-line::after {
+        content: "🏆";
+        position: absolute;
+        right: -74px;
+        top: -31px;
+        width: 58px;
+        height: 58px;
+        display: grid;
+        place-items: center;
+        font-size: 28px;
+        border-radius: 20px;
+        background: rgba(243, 200, 109, 0.12);
+        border: 1px solid rgba(243, 200, 109, 0.28);
+      }
+
+      .runner {
+        position: absolute;
+        top: 0;
+        transform: translateX(-50%);
+        text-align: center;
+        width: 108px;
+      }
+
+      .runner-figure {
+        position: relative;
+        width: 52px;
+        margin: 0 auto;
+      }
+
+      .runner-head {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid rgba(255, 255, 255, 0.18);
+        background: linear-gradient(135deg, rgba(121, 240, 195, 0.25), rgba(109, 208, 255, 0.25));
+      }
+
+      .runner-head img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .runner-body {
+        width: 18px;
+        height: 32px;
+        margin: 2px auto 0;
+        border-radius: 999px;
+        background: currentColor;
+      }
+
+      .runner-limbs {
+        position: relative;
+        width: 52px;
+        height: 34px;
+        margin: -2px auto 0;
+      }
+
+      .runner-limbs::before,
+      .runner-limbs::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        width: 3px;
+        height: 28px;
+        border-radius: 999px;
+        background: currentColor;
+      }
+
+      .runner-limbs::before {
+        left: 16px;
+        transform: rotate(18deg);
+      }
+
+      .runner-limbs::after {
+        right: 16px;
+        transform: rotate(-18deg);
+      }
+
+      .runner-name {
+        margin-top: 12px;
+        font-weight: 800;
+      }
+
+      .runner-meta {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.9fr);
+        gap: 20px;
+        padding-bottom: 40px;
+      }
+
+      .stack {
+        display: grid;
+        gap: 20px;
+      }
+
+      .panel {
+        padding: 24px;
+      }
+
+      .panel-title {
+        font-size: clamp(24px, 2vw, 34px);
+      }
+
+      .panel-subtitle {
+        margin-top: 8px;
+        font-size: 15px;
+      }
+
+      .match-wrap {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 16px;
+        align-items: center;
+        margin-top: 24px;
+      }
+
+      .duel-card {
+        padding: 18px;
+        text-align: center;
+        background: var(--panel-soft);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+      }
+
+      .duel-card img,
+      .player-avatar {
+        width: 92px;
+        height: 92px;
+        border-radius: 24px;
+        object-fit: cover;
+        display: block;
+        margin: 0 auto 14px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+      }
+
+      .duel-name {
+        font-family: "Unbounded", sans-serif;
+        font-size: 20px;
+        line-height: 1.2;
+      }
+
+      .duel-meta {
+        margin-top: 8px;
+        color: var(--muted);
+      }
+
+      .chance {
+        margin-top: 14px;
+        color: var(--accent-2);
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .vs-circle {
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--line-strong);
+        background: radial-gradient(circle at center, rgba(109, 208, 255, 0.16), rgba(7, 16, 29, 0.2));
+        font-family: "Unbounded", sans-serif;
+        font-size: 26px;
+        color: #8bb4ff;
+      }
+
+      .article {
+        margin-top: 22px;
+        padding: 18px;
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--line);
+      }
+
+      .article p {
+        margin: 0 0 12px;
+        line-height: 1.7;
+        color: #d8e4ff;
+      }
+
+      .article p:last-child {
+        margin-bottom: 0;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 18px;
+      }
+
+      th,
+      td {
+        padding: 14px 12px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      }
+
+      th {
+        color: var(--muted);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+
+      tbody tr:first-child {
+        background: rgba(243, 200, 109, 0.08);
+      }
+
+      .players-grid,
+      .schedule-grid,
+      .insights-grid {
+        display: grid;
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .players-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .schedule-grid,
+      .insights-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .player-card,
+      .schedule-card,
+      .insight-card {
+        padding: 18px;
+      }
+
+      .player-card-head,
+      .schedule-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .player-card-head {
+        align-items: center;
+      }
+
+      .player-main {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+      }
+
+      .player-avatar {
+        width: 72px;
+        height: 72px;
+        margin: 0;
+        border-radius: 20px;
+      }
+
+      .player-name {
+        font-weight: 800;
+        font-size: 18px;
+      }
+
+      .badge {
+        display: inline-flex;
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        border: 1px solid var(--line-strong);
+        color: var(--accent);
+        background: rgba(109, 208, 255, 0.07);
+      }
+
+      .badge.scheduled {
+        color: var(--gold);
+        border-color: rgba(243, 200, 109, 0.24);
+        background: rgba(243, 200, 109, 0.08);
+      }
+
+      .badge.played {
+        color: var(--accent-2);
+        border-color: rgba(121, 240, 195, 0.26);
+        background: rgba(121, 240, 195, 0.08);
+      }
+
+      .empty {
+        margin-top: 18px;
+        padding: 18px;
+        border-radius: 20px;
+        border: 1px dashed var(--line-strong);
+        color: var(--muted);
+      }
+
+      .footer-note {
+        padding: 0 0 32px;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      @media (max-width: 1024px) {
+        .hero-grid,
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 720px) {
+        .shell {
+          width: min(100% - 20px, 1220px);
+        }
+
+        .hero-card,
+        .panel {
+          padding: 20px;
+        }
+
+        .stats-grid,
+        .players-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-topline,
+        .panel-topline,
+        .match-wrap,
+        .player-card-head,
+        .schedule-head {
+          grid-template-columns: 1fr;
+          display: grid;
+        }
+
+        .match-wrap {
+          gap: 12px;
+        }
+
+        .vs-circle {
+          margin: 0 auto;
+        }
+
+        .race-line {
+          right: 82px;
+        }
+
+        .runner {
+          width: 94px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="shell">
+        <section class="hero-card">
+          <div class="hero-topline">
+            <div class="eyebrow">Публичная версия GitHub Pages</div>
+            <a class="utility-link" href="./admin.html">О редактировании</a>
+          </div>
+          <div class="hero-grid">
+            <div>
+              <h1 class="hero-title" id="hero-title"></h1>
+              <p class="hero-description" id="hero-description"></p>
+              <div class="stats-grid" id="hero-stats"></div>
+            </div>
+            <aside class="race-card">
+              <div class="panel-topline">
+                <div>
+                  <div class="section-kicker">Гонка за кубком</div>
+                  <h2 class="panel-title" style="font-size: 24px; margin-top: 8px">Одна дистанция до титула</h2>
+                </div>
+                <div class="chip">Кубок справа</div>
+              </div>
+              <p class="panel-subtitle">
+                Позиции идут по очкам и текущему месту. Чем правее участник, тем ближе он к трофею.
+              </p>
+              <div class="race-track">
+                <div class="race-line"></div>
+                <div id="race-runners"></div>
+              </div>
+            </aside>
+          </div>
+        </section>
+      </div>
+    </header>
+
+    <main class="shell layout">
+      <section class="stack">
+        <article class="panel">
+          <div class="panel-topline">
+            <div>
+              <div class="section-kicker">Главная афиша</div>
+              <h2 class="panel-title">Следующий матч</h2>
+              <div class="panel-subtitle">Главное превью только для ближайшей игры.</div>
+            </div>
+            <div class="chip" id="status-chip"></div>
+          </div>
+          <div id="next-match"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-topline">
+            <div>
+              <div class="section-kicker">Ядро турнира</div>
+              <h2 class="panel-title">Турнирная таблица</h2>
+              <div class="panel-subtitle">Очки, разница мячей и текущее место каждого участника.</div>
+            </div>
+          </div>
+          <div id="standings"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-topline">
+            <div>
+              <div class="section-kicker">Профили сезона</div>
+              <h2 class="panel-title">Игроки</h2>
+              <div class="panel-subtitle">Рейтинг, текущее место и короткий контекст по каждому участнику.</div>
+            </div>
+          </div>
+          <div class="players-grid" id="players"></div>
+        </article>
+      </section>
+
+      <aside class="stack">
+        <article class="panel">
+          <div class="panel-topline">
+            <div>
+              <div class="section-kicker">Контекст</div>
+              <h2 class="panel-title">Срез сезона</h2>
+              <div class="panel-subtitle">Сводка по текущему состоянию лиги.</div>
+            </div>
+          </div>
+          <div class="insights-grid" id="insights"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-topline">
+            <div>
+              <div class="section-kicker">Полный календарь</div>
+              <h2 class="panel-title">Матчи и результаты</h2>
+              <div class="panel-subtitle">Все игры текущего сезона в одном месте.</div>
+            </div>
+          </div>
+          <div class="schedule-grid" id="schedule"></div>
+        </article>
+      </aside>
     </main>
-  </div>
-  <div id="score-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden p-4"><div class="bg-[#07101c] border border-ef-pitch/35 rounded-[28px] max-w-sm w-full p-6 shadow-board relative"><button onclick="closeScoreModal()" class="absolute top-4 right-4 text-white/45 hover:text-white"><i data-lucide="x"></i></button><h3 class="title-font text-sm text-center mb-6 uppercase text-white">Score Input</h3><div class="flex items-center justify-between gap-4 mb-6"><div class="flex-1 text-center"><div class="title-font text-xs text-white mb-2 truncate" id="modal-p1-name">Игрок 1</div><input type="number" id="modal-p1-score" min="0" placeholder="0" class="w-16 bg-black/55 border border-white/15 rounded-2xl py-2 text-center title-font text-2xl text-ef-pitch"></div><div class="title-font text-base text-white/35">VS</div><div class="flex-1 text-center"><div class="title-font text-xs text-white mb-2 truncate" id="modal-p2-name">Игрок 2</div><input type="number" id="modal-p2-score" min="0" placeholder="0" class="w-16 bg-black/55 border border-white/15 rounded-2xl py-2 text-center title-font text-2xl text-ef-danger"></div></div><div class="flex gap-2"><button onclick="closeScoreModal()" class="flex-1 bg-white/5 border border-white/10 hover:bg-white/10 text-white title-font py-3 rounded-xl text-xs">Отмена</button><button onclick="saveMatchScore()" class="flex-1 bg-ef-pitch hover:bg-white text-black title-font py-3 rounded-xl shadow-pitch text-xs">Сохранить</button></div></div></div>
-  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-[#07101c] border border-ef-pitch text-white font-bold px-5 py-3 rounded-2xl shadow-board transform translate-y-12 opacity-0 transition-all duration-300 flex items-center gap-2 text-xs"><i data-lucide="check-circle" class="text-ef-pitch"></i> <span id="toast-text">Изменения сохранены</span></div>
-  <script>
-    window.IS_ADMIN=new URLSearchParams(location.search).get('admin')==='1';
-    const firebaseConfig={apiKey:"AIzaSyAmMgRjn1E7pR2FE3QTxOiaglugLfZhUQ0",authDomain:"efootball2026-tournament.firebaseapp.com",projectId:"efootball2026-tournament",storageBucket:"efootball2026-tournament.firebasestorage.app",messagingSenderId:"823860626457",appId:"1:823860626457:web:2bf250323af29dbe229688"};
-    firebase.initializeApp(firebaseConfig);const db=firebase.firestore();const stateRef=db.collection('tournament').doc('state');
-    const DEFAULT_PLAYERS=[{name:'Вернигора А.',photo:'https://res.cloudinary.com/dc1ybvaxd/image/upload/v1780957565/IMG_9519_d803p2.jpg',rating:100},{name:'Ляхович Е.',photo:'https://res.cloudinary.com/dc1ybvaxd/image/upload/v1780957960/IMG_9520_bkppyj.jpg',rating:100},{name:'Усик Ю.',photo:'https://res.cloudinary.com/dc1ybvaxd/image/upload/v1780958123/IMG_8454_bdi0ur.jpg',rating:100}];
-    window.state={players:[],matches:[],mode:'league',leagueRounds:2,profiles:{}};let syncing=false;let activeMatchId=null;
-    function setupAccessMode(){const badge=document.getElementById('access-badge');if(badge)badge.innerText=IS_ADMIN?'ADMIN VIEW':'PUBLIC VIEW';document.querySelectorAll('[data-admin-only="1"]').forEach(el=>{if(!IS_ADMIN)el.classList.add('hidden')});const grid=document.getElementById('tabs-grid');if(grid)grid.className=IS_ADMIN?'grid grid-cols-4 gap-2':'grid grid-cols-3 gap-2';const label=document.getElementById('profiles-mode-label');if(label)label.innerText=IS_ADMIN?'Editable':'View Only'}
-    function setSyncStatus(t){const el=document.getElementById('sync-status');if(el)el.innerText=t}
-    function findDefaultPlayer(name){return DEFAULT_PLAYERS.find(x=>x.name===name)}
-    function normalizeState(){if(!state.players)state.players=[];if(!state.matches)state.matches=[];if(!state.profiles)state.profiles={};if(!state.leagueRounds)state.leagueRounds=2;DEFAULT_PLAYERS.slice().reverse().forEach(dp=>{if(!state.players.includes(dp.name))state.players.unshift(dp.name)});state.players.forEach(p=>{const dp=findDefaultPlayer(p);if(!state.profiles[p])state.profiles[p]={rating:dp?dp.rating:85,photo:'',photoUrl:dp?dp.photo:''};if(dp)state.profiles[p].photoUrl=dp.photo})}
-    function refreshIcons(){if(window.lucide)lucide.createIcons();updateHeaderStats();updateChampionPanel();updateRoundButtons()}
-    function updateHeaderStats(){document.getElementById('stat-players').innerText=state.players.length;document.getElementById('stat-matches').innerText=state.matches.length;document.getElementById('stat-mode').innerText=state.mode==='league'?'LG':'KO'}
-    function updateRoundButtons(){[2,3,4,5,6].forEach(r=>{const b=document.getElementById('btn-round-'+r);if(!b)return;b.className=r===state.leagueRounds?'px-3 py-2 bg-ef-pitch text-black font-black text-[10px] rounded-full transition-all':'px-3 py-2 bg-white/10 hover:bg-white/20 text-white font-black text-[10px] rounded-full transition-all'})}
-    function getProfile(name){if(!state.profiles[name])state.profiles[name]={rating:85,photo:'',photoUrl:''};return state.profiles[name]}
-    function getPhoto(name){const dp=findDefaultPlayer(name);const p=getProfile(name);return dp?dp.photo:(p.photoUrl||p.photo||'')}
-    function avatarHtml(name,cls='w-12 h-12 rounded-2xl'){const src=getPhoto(name);return src?`<img src="${src}" class="avatar ${cls} border border-white/15" alt="${name}">`:`<div class="avatar ${cls} border border-white/15 flex items-center justify-center title-font text-black">${(name||'?').slice(0,1).toUpperCase()}</div>`}
-    function getCleanMatches(){return (state.matches||[]).filter(m=>!m.isBye)}
-    function getNextMatch(){return getCleanMatches().filter(m=>!m.completed).sort((a,b)=>a.id-b.id)[0]||null}
-    function getLastMatch(){return getCleanMatches().filter(m=>m.completed).sort((a,b)=>b.id-a.id)[0]||null}
-    function clamp(n,min,max){return Math.max(min,Math.min(max,n))}
-    function getRecentMatches(name){return getCleanMatches().filter(m=>m.completed&&(m.p1===name||m.p2===name)).sort((a,b)=>a.id-b.id).slice(-5)}
-    function getFormDots(name){const recent=getRecentMatches(name);if(!recent.length)return '<span class="text-white/35 text-xs font-black">нет матчей</span>';return recent.map(m=>{const f=m.p1===name?m.score1:m.score2;const a=m.p1===name?m.score2:m.score1;const label=f>a?'В':f===a?'Н':'П';const cls=f>a?'bg-ef-pitch text-black':f===a?'bg-ef-gold text-black':'bg-ef-danger text-white';return `<span class="inline-flex w-7 h-7 items-center justify-center rounded-full ${cls} title-font text-[10px]">${label}</span>`}).join(' ')}
-    function getFormScore(name){const recent=getRecentMatches(name);if(!recent.length)return 0;let score=0;recent.forEach((m,i)=>{const f=m.p1===name?m.score1:m.score2;const a=m.p1===name?m.score2:m.score1;const weight=(i+1)/recent.length;if(f>a)score+=3*weight;else if(f===a)score+=1*weight});return score/recent.length}
-    function getH2H(a,b){const list=getCleanMatches().filter(m=>m.completed&&((m.p1===a&&m.p2===b)||(m.p1===b&&m.p2===a)));let aw=0,bw=0,d=0;list.forEach(m=>{const ag=m.p1===a?m.score1:m.score2;const bg=m.p1===a?m.score2:m.score1;if(ag>bg)aw++;else if(bg>ag)bw++;else d++});return{played:list.length,aw,bw,d}}
-    function buildPrediction(a,b){const pa=getProfile(a),pb=getProfile(b),sa=getPlayerStats(a),sb=getPlayerStats(b),hh=getH2H(a,b);const ra=Number(pa.rating)||100,rb=Number(pb.rating)||100;const ratingEdge=clamp((rb-ra)*0.55,-28,28);const formEdge=clamp((getFormScore(a)-getFormScore(b))*8,-12,12);const goalEdge=clamp(((sa.gd/(sa.played||1))-(sb.gd/(sb.played||1)))*4,-10,10);const hEdge=hh.played?clamp((hh.aw-hh.bw)*7,-12,12):0;const edge=ratingEdge+formEdge+goalEdge+hEdge;const aChance=Math.round(clamp(50+edge,22,78));const bChance=100-aChance;const fav=aChance>=bChance?a:b;const outsider=aChance>=bChance?b:a;const favChance=Math.max(aChance,bChance);const outChance=Math.min(aChance,bChance);const diff=Math.abs(aChance-bChance);const level=diff<=8?'равный матч':diff<=18?'небольшой перевес':diff<=32?'заметный фаворит':'явный фаворит';const favStats=fav===a?sa:sb,outStats=fav===a?sb:sa;const favRating=fav===a?ra:rb,outRating=fav===a?rb:ra;const playedTotal=sa.played+sb.played;const tempo=diff<=8?'плотный и нервный':diff<=18?'с осторожным перевесом фаворита':diff<=32?'с давлением на андердога':'с большим давлением на фаворита';const mainQuestion=diff<=8?`Кто первым заберёт темп и не отдаст инициативу после ошибки?`:`Сможет ли ${outsider} пережить стартовое давление и заставить ${fav} играть не по своему сценарию?`;const watchOne=hh.played?`личные встречи: ${hh.aw}-${hh.d}-${hh.bw}`:`первый очный матч этой пары в текущем календаре`;const watchTwo=playedTotal?`форма: ${a} ${sa.w}-${sa.d}-${sa.l}, ${b} ${sb.w}-${sb.d}-${sb.l}`:`стартовый отрезок без сыгранных матчей — важнее рейтинг и концентрация`;const watchThree=`рейтинг: ${a} ${ra}, ${b} ${rb}; ниже цифра — сильнее`;const risk=diff<=8?'ранний гол может полностью раскрыть матч и убрать осторожность':diff<=18?`${fav} нельзя играть слишком спокойно: один быстрый ответ ${outsider} вернёт матч в равное состояние`:diff<=32?`если ${fav} не забьёт первым, давление начнёт работать против него`:`главный риск для ${fav} — недооценка и нервная концовка после случайного пропущенного гола`;const keyFav=`${fav}: давить в первые минуты, быстро забирать подборы и не давать сопернику длинные отрезки владения.`;const keyOut=`${outsider}: не раскрываться после потери, выдержать старт и использовать быстрые атаки после ошибок.`;const text=playedTotal?`По текущим данным это матч ${tempo}. ${fav} идёт с шансом ${favChance}%, но преимущество не гарантирует лёгкую игру. У ${outsider} остаётся рабочий сценарий через дисциплину в обороне, терпение и реализацию первых моментов. Если игра быстро станет открытой, решающим может быть не рейтинг, а качество решений после потери мяча.`:`Это стартовый прогноз без сыгранных матчей, поэтому рейтинг влияет сильнее, но не решает всё. ${fav} выглядит предпочтительнее на бумаге (${favRating} против ${outRating}), однако первый матч часто ломает ожидания: важны спокойный старт, контроль мяча и отсутствие подарков у своих ворот.`;const intrigue=`<div class="space-y-3"><p><b>Главный вопрос:</b> ${mainQuestion}</p><div><b>На что смотреть:</b><ul class="list-disc list-inside mt-2 space-y-1 text-white/60"><li>${watchOne}</li><li>${watchTwo}</li><li>${watchThree}</li></ul></div><p><b>Риск матча:</b> ${risk}.</p></div>`;const keys=`<div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3"><div class="rounded-2xl bg-black/25 border border-ef-pitch/20 p-3"><div class="text-[10px] title-font text-ef-pitch uppercase mb-1">Ключ фаворита</div><p>${keyFav}</p></div><div class="rounded-2xl bg-black/25 border border-ef-danger/20 p-3"><div class="text-[10px] title-font text-ef-danger uppercase mb-1">Шанс андердога</div><p>${keyOut}</p></div></div>`;return{aChance,bChance,level,text,intrigue,keys,hh,sa,sb,ra,rb,fav}}
-    function miniBox(title,value,label,colorClass){return `<div class="tile rounded-2xl p-4"><div class="text-[10px] text-white/40 font-black uppercase mb-2">${title}</div><div class="title-font ${colorClass} text-xl">${value}</div><div class="text-[11px] text-white/45 mt-1">${label}</div></div>`}
-    function renderLastMatchBlock(){const lm=getLastMatch();if(!lm)return `<div class="tile rounded-[24px] p-5"><div class="title-font text-[11px] text-white/40 uppercase tracking-[.16em] mb-2">Последний матч</div><p class="text-white/45 text-sm">Пока нет сыгранных матчей. После первого результата здесь появится краткий итог.</p></div>`;const winner=lm.score1===lm.score2?'Ничья':(lm.score1>lm.score2?lm.p1:lm.p2);const line=lm.score1===lm.score2?'Матч закончился вничью — таблица получила важное перераспределение очков.':`${winner} забрал важную победу и усилил позицию в таблице.`;return `<div class="tile rounded-[24px] p-5"><div class="title-font text-[11px] text-ef-pitch uppercase tracking-[.16em] mb-3 flex items-center gap-2"><i data-lucide="history"></i> Последний матч</div><div class="flex items-center justify-between gap-3"><div class="font-black text-sm text-white/80">${lm.p1}</div><div class="title-font text-2xl text-white">${lm.score1} : ${lm.score2}</div><div class="font-black text-sm text-white/80 text-right">${lm.p2}</div></div><p class="text-white/55 text-sm leading-relaxed mt-3">${line}</p></div>`}
-    function renderTitleChances(){const players=state.players||[];if(!players.length)return '';const sorted=getLeagueSorted();const totalMatches=getCleanMatches().length;const done=getCleanMatches().filter(m=>m.completed).length;let rows=players.map(name=>{const s=getPlayerStats(name);const place=sorted.findIndex(x=>x.name===name);const placeBonus=place<0?0:(players.length-place)*0.55;const ptsPart=(s.pts||0)*1.15;const gdPart=Math.max(-3,Math.min(4,s.gd||0))*0.45;const formPart=getFormScore(name)*0.55;const rating=Number(getProfile(name).rating)||100;const ratingPart=Math.max(-1.2,Math.min(1.2,(100-rating)*0.025));const raw=18+ptsPart+placeBonus+gdPart+formPart+ratingPart;return{name,raw:clamp(raw,10,40)}});const sum=rows.reduce((a,b)=>a+b.raw,0)||1;rows=rows.map(x=>({name:x.name,p:Math.round(x.raw/sum*100)})).sort((a,b)=>b.p-a.p);let diff=100-rows.reduce((a,b)=>a+b.p,0);if(rows[0])rows[0].p+=diff;const note=done?`Расчёт мягкий: очки и место важнее рейтинга. Рейтинг даёт только небольшой бонус, чтобы не было искусственного большого перекоса.`:`До первых матчей шансы почти равные. После результатов сильнее будут влиять очки, форма и разница голов.`;return `<div class="board rounded-[30px] p-5 mb-5 border-ef-violet/30"><div class="title-font text-[11px] text-ef-violet uppercase tracking-[.18em] mb-2 flex items-center gap-2"><i data-lucide="trending-up"></i> Шансы на чемпионство</div><p class="text-white/45 text-xs leading-relaxed mb-4">${note}</p><div class="space-y-3">${rows.map(x=>`<div><div class="flex justify-between text-xs font-black mb-1"><span>${x.name}</span><span class="text-ef-pitch">${x.p}%</span></div><div class="h-2 rounded-full bg-white/10 overflow-hidden"><div style="width:${x.p}%;height:100%;background:linear-gradient(90deg,#6d4cff,#00ff88)"></div></div></div>`).join('')}</div></div>`}
-    function renderRoundSummary(){const clean=getCleanMatches();const doneMatches=clean.filter(m=>m.completed);const done=doneMatches.length;if(!done)return '';const total=clean.length;const sorted=getLeagueSorted();const leader=sorted[0];const bestAttack=sorted.slice().sort((a,b)=>b.gf-a.gf||b.pts-a.pts)[0];const bestDefense=sorted.slice().sort((a,b)=>a.ga-b.ga||b.pts-a.pts)[0];const biggest=doneMatches.slice().sort((a,b)=>Math.abs(b.score1-b.score2)-Math.abs(a.score1-a.score2))[0];const goals=doneMatches.reduce((sum,m)=>sum+m.score1+m.score2,0);const avg=(goals/done).toFixed(1);const biggestText=biggest?`${biggest.p1} ${biggest.score1}:${biggest.score2} ${biggest.p2}`:'—';const leaderText=leader?`${leader.name} — ${leader.pts} очк., GD ${leader.gd>0?'+':''}${leader.gd}`:'—';return `<div class="board rounded-[30px] p-5 mb-5 border-ef-gold/30"><div class="title-font text-[11px] text-ef-gold uppercase tracking-[.18em] mb-4 flex items-center gap-2"><i data-lucide="newspaper"></i> Итоги текущего отрезка</div><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">${miniBox('Сыграно',done+' / '+total,'матчи турнира','text-ef-blue')}${miniBox('Голы',goals,'в среднем '+avg+' за матч','text-ef-pitch')}${miniBox('Лидер',leader?leader.name:'—',leader?leader.pts+' очков':'нет данных','text-ef-gold')}${miniBox('Крупный матч',biggestText,biggest?'разница '+Math.abs(biggest.score1-biggest.score2):'нет данных','text-white')}</div><p class="text-white/65 text-sm leading-relaxed">Сейчас впереди: <b>${leaderText}</b>. Лучшая атака — <b>${bestAttack?bestAttack.name:'—'}</b> (${bestAttack?bestAttack.gf:0} голов). Самая надёжная оборона — <b>${bestDefense?bestDefense.name:'—'}</b> (${bestDefense?bestDefense.ga:0} пропущено). Следующий матч может заметно изменить таблицу и шансы на чемпионство.</p></div>`}
-    function renderNextMatch(){const box=document.getElementById('next-match-box');if(!box)return;const m=getNextMatch();const left=getCleanMatches().filter(x=>!x.completed).length;if(!m){box.innerHTML=`<div class="board rounded-[30px] p-5 mb-5 border-ef-gold/35 relative overflow-hidden"><div class="relative z-10 flex items-center justify-between gap-4"><div><div class="title-font text-[11px] text-ef-gold uppercase tracking-[.18em] mb-2">Calendar</div><h2 class="title-font text-2xl">Все матчи сыграны</h2><p class="text-white/45 text-sm mt-1">Турнир завершён. Смотри итоговую таблицу и вкладку Итоги.</p></div><div class="text-5xl">🏁</div></div></div>${renderLastMatchBlock()}${renderTitleChances()}${renderRoundSummary()}`;refreshIcons();return}const p=buildPrediction(m.p1,m.p2);box.innerHTML=`<section class="board rounded-[34px] p-5 mb-5 relative overflow-hidden border-ef-blue/35"><div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,183,255,.16),transparent_46%),radial-gradient(circle_at_80%_30%,rgba(0,255,136,.12),transparent_32%)] pointer-events-none"></div><div class="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5"><div><div class="title-font text-[11px] text-ef-gold uppercase tracking-[.18em] mb-2">⭐ Match of the Day</div><div class="title-font text-[11px] text-ef-blue uppercase tracking-[.18em] mb-2 flex items-center gap-2"><i data-lucide="calendar-clock"></i> Следующий матч</div><h2 class="title-font text-2xl sm:text-3xl">Match #${m.id}</h2><p class="text-white/45 text-sm mt-1">Ближайший матч с прогнозом, графиками, формой и аналитикой.</p></div><div class="tile rounded-2xl px-4 py-3 text-center"><div class="title-font text-ef-pitch text-xl">${left}</div><div class="text-[9px] text-white/40 font-black uppercase">матчей осталось</div></div></div><div class="relative z-10 grid grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-6 mb-5"><div class="tile rounded-[30px] p-5 text-center">${avatarHtml(m.p1,'w-28 h-28 rounded-[30px] mx-auto mb-3')}<div class="title-font text-xl sm:text-2xl truncate">${m.p1}</div><div class="mt-3">${getFormDots(m.p1)}</div><div class="text-[10px] text-ef-pitch font-black uppercase mt-3">${p.aChance}% шанс</div></div><div class="flex flex-col items-center"><div class="w-20 h-20 rounded-full border border-ef-pitch/40 bg-black/60 flex items-center justify-center title-font text-ef-pitch shadow-pitch text-xl">VS</div><div class="mt-3 text-[10px] text-white/40 font-black uppercase text-center">${p.level}</div></div><div class="tile rounded-[30px] p-5 text-center">${avatarHtml(m.p2,'w-28 h-28 rounded-[30px] mx-auto mb-3')}<div class="title-font text-xl sm:text-2xl truncate">${m.p2}</div><div class="mt-3">${getFormDots(m.p2)}</div><div class="text-[10px] text-ef-danger font-black uppercase mt-3">${p.bChance}% шанс</div></div></div><div class="relative z-10 mb-5"><div class="flex justify-between text-xs font-black mb-2"><span class="text-ef-pitch">${m.p1} ${p.aChance}%</span><span class="text-ef-danger">${p.bChance}% ${m.p2}</span></div><div class="h-5 rounded-full overflow-hidden bg-white/10 border border-white/10"><div style="width:${p.aChance}%;height:100%;background:linear-gradient(90deg,#00ff88,#00b7ff)"></div></div><div class="grid grid-cols-4 gap-2 mt-3 text-[10px] text-white/45 font-black uppercase"><div>Рейтинг 50%</div><div>Форма 20%</div><div>Очные 20%</div><div>Голы 10%</div></div></div><div class="relative z-10 grid grid-cols-1 sm:grid-cols-4 gap-3 mb-5">${miniBox('Рейтинг',p.ra+' / '+p.rb,'меньше число = сильнее','text-ef-gold')}${miniBox('Форма',p.sa.w+'-'+p.sa.d+'-'+p.sa.l+' / '+p.sb.w+'-'+p.sb.d+'-'+p.sb.l,'В-Н-П по сыгранным матчам','text-ef-pitch')}${miniBox('Голы',p.sa.gf+':'+p.sa.ga+' / '+p.sb.gf+':'+p.sb.ga,'забито / пропущено','text-ef-blue')}${miniBox('Очные',p.hh.aw+'-'+p.hh.d+'-'+p.hh.bw,p.hh.played?'личные встречи':'ещё не играли','text-white')}</div><div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-3"><div class="tile rounded-[24px] p-5"><div class="title-font text-[11px] text-ef-gold uppercase tracking-[.16em] mb-2 flex items-center gap-2"><i data-lucide="sparkles"></i> Интрига матча</div><div class="text-white/75 text-sm leading-relaxed">${p.intrigue}</div></div><div class="tile rounded-[24px] p-5"><div class="title-font text-[11px] text-ef-blue uppercase tracking-[.16em] mb-2 flex items-center gap-2"><i data-lucide="activity"></i> Короткая аналитика</div><p class="text-white/75 text-sm leading-relaxed">${p.text}</p>${p.keys}</div></div></section>${renderLastMatchBlock()}${renderTitleChances()}${renderRoundSummary()}`;refreshIcons()}
-    function renderAll(){normalizeState();renderSetupPlayers();renderProfiles();renderMatches();updateTablesAndSchedules();renderNextMatch();refreshIcons()}
-    async function loadSharedState(){try{setSyncStatus('Firestore: загрузка общего турнира...');const doc=await stateRef.get();if(doc.exists){window.state=doc.data();normalizeState();localStorage.setItem('ef_tournament_state',JSON.stringify(state));setSyncStatus('Firestore: общий турнир загружен')}else{resetLocalDefault(false);if(IS_ADMIN)await saveSharedState(false)}renderAll()}catch(e){console.error(e);setSyncStatus('Firestore: ошибка');resetLocalDefault(false);renderAll();showToast('Не удалось загрузить Firebase',true)}}
-    function listenSharedState(){stateRef.onSnapshot(snap=>{if(syncing)return;if(snap.exists){window.state=snap.data();normalizeState();localStorage.setItem('ef_tournament_state',JSON.stringify(state));renderAll();setSyncStatus('Firestore: синхронизировано')}},err=>{console.error(err);setSyncStatus('Firestore: нет доступа')})}
-    function resetLocalDefault(doRender=true){window.state={players:DEFAULT_PLAYERS.map(p=>p.name),matches:[],mode:'league',leagueRounds:2,profiles:{}};DEFAULT_PLAYERS.forEach(p=>state.profiles[p.name]={rating:p.rating,photo:'',photoUrl:p.photo});if(doRender)renderAll()}
-    async function saveSharedState(show=true){if(!IS_ADMIN){showToast('Сохранение доступно только админу',true);return}try{syncing=true;normalizeState();await stateRef.set(JSON.parse(JSON.stringify(state)));localStorage.setItem('ef_tournament_state',JSON.stringify(state));setSyncStatus('Firestore: сохранено для всех');if(show)showToast('Результаты сохранены для всех браузеров')}catch(e){console.error(e);showToast('Ошибка сохранения Firebase',true)}finally{setTimeout(()=>syncing=false,500)}}
-    function saveCurrentState(){localStorage.setItem('ef_tournament_state',JSON.stringify(state));updateHeaderStats();updateChampionPanel();updateRoundButtons();renderNextMatch()}
-    async function resetTournament(){if(!IS_ADMIN)return;if(!confirm('Сбросить турнир у всех?'))return;resetLocalDefault(false);await saveSharedState(false);renderAll();showToast('Турнир очищен у всех')}
-    function showToast(message,isError=false){const toast=document.getElementById('toast'),text=document.getElementById('toast-text');text.innerText=message;toast.classList.remove('translate-y-12','opacity-0');setTimeout(()=>toast.classList.add('translate-y-12','opacity-0'),2500)}
-    function switchTab(tabId){if(!IS_ADMIN&&tabId==='tab-setup')tabId='tab-matches';document.querySelectorAll('.tab-content').forEach(el=>el.classList.add('hidden'));const tab=document.getElementById(tabId);if(tab)tab.classList.remove('hidden');document.querySelectorAll('.tab-btn').forEach(btn=>btn.className='tab-btn px-2 py-3 rounded-2xl title-font text-[10px] sm:text-xs transition-all text-white/80 hover:bg-white/8 flex items-center justify-center gap-2');const active=document.getElementById('btn-'+tabId);if(active)active.className='tab-btn px-2 py-3 rounded-2xl title-font text-[10px] sm:text-xs transition-all bg-ef-violet/25 text-white border border-ef-violet/30 flex items-center justify-center gap-2';if(tabId==='tab-profiles')renderProfiles();if(tabId==='tab-tables')updateTablesAndSchedules();if(tabId==='tab-matches')renderMatches();refreshIcons()}
-    function renderSetupPlayers(){const list=document.getElementById('players-list');list.innerHTML='';state.players.forEach((player,idx)=>{const prof=getProfile(player);const div=document.createElement('div');div.className='flex justify-between items-center tile p-3 rounded-2xl';div.innerHTML=`<div class="flex items-center gap-3">${avatarHtml(player,'w-10 h-10 rounded-xl')}<div><div class="font-black text-white text-sm">${player}</div><div class="text-[10px] text-ef-gold font-black">RATING ${prof.rating}</div></div></div><button onclick="removePlayer(${idx})" class="text-white/35 hover:text-ef-danger p-1"><i data-lucide="trash-2"></i></button>`;list.appendChild(div)});refreshIcons()}
-    function addPlayer(){if(!IS_ADMIN)return;const input=document.getElementById('player-name-input'),name=input.value.trim();if(!name)return;if(state.players.includes(name)){showToast('Участник уже есть',true);return}state.players.push(name);getProfile(name);input.value='';saveCurrentState();renderAll();showToast('Добавлен участник')}
-    function removePlayer(idx){if(!IS_ADMIN)return;const removed=state.players.splice(idx,1)[0];delete state.profiles[removed];saveCurrentState();renderAll()}
-    function renderProfiles(){const box=document.getElementById('profiles-container');box.innerHTML='';state.players.forEach((name,idx)=>{const p=getProfile(name);const card=document.createElement('div');card.className='tile rounded-[26px] p-4';card.innerHTML=IS_ADMIN?`<div class="flex items-center gap-4 mb-4">${avatarHtml(name,'w-20 h-20 rounded-[24px]')}<div><div class="title-font text-lg">${name}</div><div class="text-[10px] text-white/40">Player #${idx+1}</div></div></div><label class="block text-[10px] uppercase font-black text-white/45 mb-2">Рейтинг</label><input type="number" value="${p.rating}" onchange="updateRating('${encodeURIComponent(name)}',this.value)" class="w-full bg-black/50 border border-white/12 rounded-2xl px-4 py-3 text-white title-font mb-3"><label class="block text-[10px] uppercase font-black text-white/45 mb-2">Photo URL</label><input type="url" value="${p.photoUrl||''}" onchange="updatePhotoUrl('${encodeURIComponent(name)}',this.value)" class="w-full bg-black/50 border border-white/12 rounded-2xl px-4 py-3 text-white text-xs">`:`<div class="flex flex-col items-center text-center gap-3">${avatarHtml(name,'w-28 h-28 rounded-[30px]')}<div class="title-font text-xl">${name}</div><div class="inline-flex px-4 py-2 rounded-full bg-ef-gold/15 border border-ef-gold/35 text-ef-gold title-font text-sm">Рейтинг ${p.rating}</div></div>`;box.appendChild(card)});refreshIcons()}
-    function updateRating(n,v){if(!IS_ADMIN)return;getProfile(decodeURIComponent(n)).rating=Number(v)||0;saveCurrentState();renderAll()}function updatePhotoUrl(n,v){if(!IS_ADMIN)return;getProfile(decodeURIComponent(n)).photoUrl=v.trim();saveCurrentState();renderAll()}
-    function setLeagueRounds(r,e){if(e)e.preventDefault();if(!IS_ADMIN)return;state.leagueRounds=Number(r)||2;saveCurrentState();updateRoundButtons()}
-    function toggleModeSelect(mode){if(!IS_ADMIN)return;state.mode=mode;saveCurrentState();refreshIcons()}
-    function generateTournament(){if(!IS_ADMIN)return;if(state.players.length<2){showToast('Добавьте хотя бы 2-х участников',true);return}state.matches=[];if(state.mode==='league'){let roster=[...state.players];if(roster.length%2!==0)roster.push('Пропуск');const roundsCount=roster.length-1,matchesPerRound=roster.length/2;let schedule=[];for(let r=0;r<roundsCount;r++){let round=[];for(let m=0;m<matchesPerRound;m++){const h=roster[m],a=roster[roster.length-1-m];if(h!=='Пропуск'&&a!=='Пропуск')round.push({p1:h,p2:a})}schedule.push(round);roster.splice(1,0,roster.pop())}let id=1;for(let r=0;r<state.leagueRounds;r++)schedule.forEach(round=>round.forEach(m=>state.matches.push({id:id++,p1:r%2===0?m.p1:m.p2,p2:r%2===0?m.p2:m.p1,score1:null,score2:null,completed:false,isBye:false})))}saveCurrentState();renderAll();showToast('Календарь сгенерирован. Нажми SAVE')}
-    function getPlayerCompletedMatches(name){return state.matches.filter(m=>m.completed&&!m.isBye&&(m.p1===name||m.p2===name)).sort((a,b)=>a.id-b.id)}
-    function getPlayerStats(name){const ms=getPlayerCompletedMatches(name);let w=0,d=0,l=0,gf=0,ga=0;ms.forEach(m=>{const f=m.p1===name?m.score1:m.score2,a=m.p1===name?m.score2:m.score1;gf+=f;ga+=a;if(f>a)w++;else if(f<a)l++;else d++});return{played:ms.length,w,d,l,gf,ga,gd:gf-ga,last:[]}}
-    function renderMatches(){const c=document.getElementById('matches-container');c.innerHTML='';let done=0;state.matches.forEach(match=>{if(match.completed)done++;const div=document.createElement('div');div.className='tile rounded-[24px] p-4';let score1Class='text-white/45',score2Class='text-white/45';if(match.completed){if(match.score1>match.score2){score1Class='text-ef-pitch';score2Class='text-ef-danger'}else if(match.score2>match.score1){score1Class='text-ef-danger';score2Class='text-ef-pitch'}else{score1Class='text-white/45';score2Class='text-white/45'}}div.innerHTML=`<div class="flex items-center justify-between gap-4"><div class="flex-1"><div class="text-[10px] text-white/40 font-black mb-3">MATCH #${match.id}</div><div class="flex justify-between items-center"><span class="font-black text-white text-sm truncate flex items-center gap-2">${avatarHtml(match.p1,'w-8 h-8 rounded-xl')} ${match.p1}</span><span class="title-font text-lg ${score1Class}">${match.completed?match.score1:'-'}</span></div><div class="h-px bg-white/7 my-1"></div><div class="flex justify-between items-center"><span class="font-black text-white text-sm truncate flex items-center gap-2">${avatarHtml(match.p2,'w-8 h-8 rounded-xl')} ${match.p2}</span><span class="title-font text-lg ${score2Class}">${match.completed?match.score2:'-'}</span></div></div><button onclick="openScoreModal(${match.id})" class="${IS_ADMIN?'':'hidden'} bg-ef-pitch text-black shadow-pitch title-font text-[10px] py-3 px-4 rounded-2xl">${match.completed?'EDIT':'SCORE'}</button></div>`;c.appendChild(div)});document.getElementById('completed-count').innerText=`Сыграно: ${done} / ${state.matches.length}`;refreshIcons();renderNextMatch()}
-    function openScoreModal(id){if(!IS_ADMIN)return;activeMatchId=id;const m=state.matches.find(x=>x.id===id);document.getElementById('modal-p1-name').innerText=m.p1;document.getElementById('modal-p2-name').innerText=m.p2;document.getElementById('modal-p1-score').value=m.completed?m.score1:'';document.getElementById('modal-p2-score').value=m.completed?m.score2:'';document.getElementById('score-modal').classList.remove('hidden')}
-    function closeScoreModal(){document.getElementById('score-modal').classList.add('hidden')}
-    function saveMatchScore(){const s1=parseInt(document.getElementById('modal-p1-score').value),s2=parseInt(document.getElementById('modal-p2-score').value);if(isNaN(s1)||isNaN(s2)){showToast('Заполните счёт',true);return}const m=state.matches.find(x=>x.id===activeMatchId);m.score1=s1;m.score2=s2;m.completed=true;saveCurrentState();renderAll();closeScoreModal();showToast('Результат внесён. Нажми SAVE')}
-    function getLeagueSorted(){let stats={};state.players.forEach(p=>stats[p]={name:p,played:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0});state.matches.forEach(m=>{if(m.completed&&!m.isBye&&stats[m.p1]&&stats[m.p2]){stats[m.p1].played++;stats[m.p2].played++;stats[m.p1].gf+=m.score1;stats[m.p1].ga+=m.score2;stats[m.p2].gf+=m.score2;stats[m.p2].ga+=m.score1;if(m.score1>m.score2){stats[m.p1].w++;stats[m.p2].l++;stats[m.p1].pts+=3}else if(m.score2>m.score1){stats[m.p2].w++;stats[m.p1].l++;stats[m.p2].pts+=3}else{stats[m.p1].d++;stats[m.p2].d++;stats[m.p1].pts++;stats[m.p2].pts++}}});Object.values(stats).forEach(s=>s.gd=s.gf-s.ga);return Object.values(stats).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf)}
-    function updateTablesAndSchedules(){document.getElementById('league-view').classList.remove('hidden');document.getElementById('playoff-view').classList.add('hidden');calculateLeagueTable();renderNextMatch();refreshIcons()}
-    function calculateLeagueTable(){const sorted=getLeagueSorted();const tbody=document.getElementById('league-table-body');tbody.innerHTML='';sorted.forEach((r,i)=>{const tr=document.createElement('tr');tr.className=(i===0?'rank-1-row':i===1?'rank-2-row':i===2?'rank-3-row':'table-row');tr.innerHTML=`<td class="py-4 px-4">${i+1}</td><td class="py-4 px-4 font-black"><div class="flex items-center gap-3">${avatarHtml(r.name,'w-10 h-10 rounded-xl')} ${r.name}</div></td><td>${r.played}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf}</td><td>${r.ga}</td><td>${r.gd>0?'+':''}${r.gd}</td><td class="title-font text-ef-pitch">${r.pts}</td>`;tbody.appendChild(tr)});renderPodium(sorted)}
-    function renderPodium(sorted){const c=document.getElementById('podium-container');c.innerHTML='';sorted.slice(0,3).forEach((r,i)=>{const d=document.createElement('div');d.className='tile rounded-[28px] p-5 text-center';d.innerHTML=`<div class="text-4xl mb-2">${i===0?'🥇':i===1?'🥈':'🥉'}</div>${avatarHtml(r.name,'w-24 h-24 rounded-[28px] mx-auto mb-3')}<div class="title-font text-xl">${r.name}</div><div class="text-ef-pitch title-font mt-2">${r.pts} PTS</div>`;c.appendChild(d)})}
-    function updateChampionPanel(){const p=document.getElementById('champion-panel');if(!p)return;if(!state.matches.length||!state.matches.every(m=>m.completed)){p.classList.add('hidden');return}const champ=getLeagueSorted()[0];if(!champ)return;p.classList.remove('hidden');document.getElementById('champion-name').innerText=champ.name;document.getElementById('champion-subtitle').innerText=`PTS ${champ.pts} • GD ${champ.gd>0?'+':''}${champ.gd}`;document.getElementById('champion-photo-wrap').innerHTML=avatarHtml(champ.name,'w-24 h-24 rounded-[28px]')}
-    function renderPlayoffBracket(){document.getElementById('bracket-stages').innerHTML='<div class="text-white/45">Плей-офф сетка будет отображаться после генерации.</div>'}
-    window.onload=async function(){setupAccessMode();await loadSharedState();listenSharedState();switchTab(IS_ADMIN?'tab-setup':'tab-matches');renderNextMatch();refreshIcons()};
-  </script>
-  <script src="./tournament-summary.js?v=3"></script>
-  <script src="./hero-playlist.js?v=1"></script>
-</body>
+
+    <div class="shell footer-note">
+      Открытая ссылка для просмотра. Для безопасного редактирования будет нужна отдельная защищённая админка.
+    </div>
+
+    <script>
+      const state = {
+        tournament: {
+          title: "Турнир eFootball 2026",
+          subtitle: "Лига друзей",
+          description: "Единая публичная панель турнира: таблица, ближайший матч, игроки и полный календарь без закрытого хостинга.",
+          roundsCount: 2,
+          statusLabel: "Регулярный сезон",
+          updatedAt: "2026-07-17T13:09:44.939Z"
+        },
+        players: [
+          {
+            id: "vernigora-a",
+            name: "Вернигора А.",
+            rating: 80,
+            photoUrl: "https://res.cloudinary.com/dc1ybvaxd/image/upload/v1780957565/IMG_9519_d803p2.jpg",
+            notes: ""
+          },
+          {
+            id: "lyakhovich-e",
+            name: "Ляхович Е.",
+            rating: 80,
+            photoUrl: "https://res.cloudinary.com/dc1ybvaxd/image/upload/v1780957960/IMG_9520_bkppyj.jpg",
+            notes: ""
+          },
+          {
+            id: "usik-y",
+            name: "Усик Ю.",
+            rating: 80,
+            photoUrl: "https://res.cloudinary.com/dc1ybvaxd/image/upload/v1780958123/IMG_8454_bdi0ur.jpg",
+            notes: ""
+          }
+        ],
+        matches: [
+          { id: "match-1", round: 1, homePlayerId: "lyakhovich-e", awayPlayerId: "usik-y", status: "scheduled", homeScore: null, awayScore: null, playedAt: null },
+          { id: "match-2", round: 2, homePlayerId: "vernigora-a", awayPlayerId: "usik-y", status: "scheduled", homeScore: null, awayScore: null, playedAt: null },
+          { id: "match-3", round: 3, homePlayerId: "vernigora-a", awayPlayerId: "lyakhovich-e", status: "scheduled", homeScore: null, awayScore: null, playedAt: null },
+          { id: "match-4", round: 4, homePlayerId: "usik-y", awayPlayerId: "lyakhovich-e", status: "scheduled", homeScore: null, awayScore: null, playedAt: null },
+          { id: "match-5", round: 5, homePlayerId: "usik-y", awayPlayerId: "vernigora-a", status: "scheduled", homeScore: null, awayScore: null, playedAt: null },
+          { id: "match-6", round: 6, homePlayerId: "lyakhovich-e", awayPlayerId: "vernigora-a", status: "scheduled", homeScore: null, awayScore: null, playedAt: null }
+        ]
+      };
+
+      const playerMap = Object.fromEntries(state.players.map((player) => [player.id, player]));
+
+      function standings() {
+        const rows = Object.fromEntries(
+          state.players.map((player) => [
+            player.id,
+            {
+              ...player,
+              played: 0,
+              wins: 0,
+              draws: 0,
+              losses: 0,
+              goalsFor: 0,
+              goalsAgainst: 0,
+              goalDiff: 0,
+              points: 0
+            }
+          ])
+        );
+
+        state.matches.forEach((match) => {
+          if (match.status !== "played") {
+            return;
+          }
+          const home = rows[match.homePlayerId];
+          const away = rows[match.awayPlayerId];
+          home.played += 1;
+          away.played += 1;
+          home.goalsFor += match.homeScore;
+          home.goalsAgainst += match.awayScore;
+          away.goalsFor += match.awayScore;
+          away.goalsAgainst += match.homeScore;
+          if (match.homeScore > match.awayScore) {
+            home.wins += 1;
+            away.losses += 1;
+            home.points += 3;
+          } else if (match.homeScore < match.awayScore) {
+            away.wins += 1;
+            home.losses += 1;
+            away.points += 3;
+          } else {
+            home.draws += 1;
+            away.draws += 1;
+            home.points += 1;
+            away.points += 1;
+          }
+        });
+
+        return Object.values(rows)
+          .map((row) => ({ ...row, goalDiff: row.goalsFor - row.goalsAgainst }))
+          .sort((a, b) => b.points - a.points || b.goalDiff - a.goalDiff || b.goalsFor - a.goalsFor || a.rating - b.rating);
+      }
+
+      function nextMatch() {
+        return state.matches.find((match) => match.status !== "played") || null;
+      }
+
+      function chance(home, away, order) {
+        const homeRow = order.find((row) => row.id === home.id);
+        const awayRow = order.find((row) => row.id === away.id);
+        const formEdge = (homeRow.points - awayRow.points) * 3;
+        const ratingEdge = Math.max(-12, Math.min(12, (away.rating - home.rating) * 0.03));
+        const rankEdge = ((awayRow ? awayRow.played : 0) - (homeRow ? homeRow.played : 0)) * 0.5;
+        const totalEdge = formEdge + ratingEdge + rankEdge;
+        const homeChance = Math.max(34, Math.min(66, Math.round(50 + totalEdge)));
+        return {
+          homeChance,
+          awayChance: 100 - homeChance,
+          confidence: 100 - Math.abs(50 - homeChance),
+          leader: homeChance >= 50 ? home.name : away.name
+        };
+      }
+
+      function shortName(name) {
+        const word = name.split(" ")[0];
+        return word.length > 12 ? `${word.slice(0, 11)}…` : word;
+      }
+
+      function raceProgress(row, index, total) {
+        const seasonCap = Math.max((state.players.length - 1) * state.tournament.roundsCount * 3, 6);
+        const pointsShare = row.points / seasonCap;
+        const rankShare = total <= 1 ? 1 : 1 - index / (total - 1);
+        return Math.max(10, Math.min(78, Math.round(10 + (pointsShare * 0.82 + rankShare * 0.18) * 68)));
+      }
+
+      function render() {
+        const board = standings();
+        const match = nextMatch();
+        const totalMatches = state.matches.length;
+        const playedMatches = state.matches.filter((item) => item.status === "played").length;
+        const totalGoals = state.matches
+          .filter((item) => item.status === "played")
+          .reduce((sum, item) => sum + item.homeScore + item.awayScore, 0);
+        const leader = board[0];
+        const updated = new Date(state.tournament.updatedAt);
+
+        document.getElementById("hero-title").innerHTML = `${state.tournament.title}<span>${state.tournament.subtitle}</span>`;
+        document.getElementById("hero-description").textContent = state.tournament.description;
+        document.getElementById("status-chip").textContent = state.tournament.statusLabel;
+
+        document.getElementById("hero-stats").innerHTML = [
+          {
+            label: "Лидер",
+            value: leader ? leader.name : "—",
+            note: leader ? `${leader.points} очк. и РМ ${leader.goalDiff > 0 ? "+" : ""}${leader.goalDiff}` : "Ждём первые результаты"
+          },
+          {
+            label: "Матчи",
+            value: `${playedMatches} / ${totalMatches}`,
+            note: playedMatches ? `Сыграно ${Math.round((playedMatches / totalMatches) * 100)}% календаря` : "Календарь уже опубликован"
+          },
+          {
+            label: "Голов",
+            value: String(totalGoals),
+            note: playedMatches ? `Средняя результативность ${(totalGoals / playedMatches).toFixed(1)}` : "Появится после первых игр"
+          },
+          {
+            label: "Обновлено",
+            value: Number.isNaN(updated.getTime()) ? "—" : updated.toLocaleDateString("ru-RU"),
+            note: Number.isNaN(updated.getTime()) ? "Дата не указана" : updated.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })
+          }
+        ].map((item) => `
+          <div class="stat-card">
+            <div class="stat-label">${item.label}</div>
+            <div class="stat-value">${item.value}</div>
+            <div class="stat-note">${item.note}</div>
+          </div>
+        `).join("");
+
+        document.getElementById("race-runners").innerHTML = board.map((row, index) => {
+          const color = ["#79f0c3", "#f3c86d", "#6dd0ff", "#ff9e8d"][index % 4];
+          return `
+            <div class="runner" style="left:${raceProgress(row, index, board.length)}%; color:${color}">
+              <div class="runner-figure">
+                <div class="runner-head"><img src="${row.photoUrl}" alt="${row.name}" /></div>
+                <div class="runner-body"></div>
+                <div class="runner-limbs"></div>
+              </div>
+              <div class="runner-name">${shortName(row.name)}</div>
+              <div class="runner-meta">#${index + 1} · ${row.points} очк.</div>
+            </div>
+          `;
+        }).join("");
+
+        if (!match) {
+          document.getElementById("next-match").innerHTML = `<div class="empty">Все матчи текущего календаря уже сыграны. Турнирный сезон закрыт.</div>`;
+        } else {
+          const home = playerMap[match.homePlayerId];
+          const away = playerMap[match.awayPlayerId];
+          const prediction = chance(home, away, board);
+          document.getElementById("next-match").innerHTML = `
+            <div class="match-wrap">
+              <div class="duel-card">
+                <img src="${home.photoUrl}" alt="${home.name}" />
+                <div class="duel-name">${home.name}</div>
+                <div class="duel-meta">Рейтинг ${home.rating}</div>
+                <div class="chance">${prediction.homeChance}% на победу</div>
+              </div>
+              <div class="vs-circle">VS</div>
+              <div class="duel-card">
+                <img src="${away.photoUrl}" alt="${away.name}" />
+                <div class="duel-name">${away.name}</div>
+                <div class="duel-meta">Рейтинг ${away.rating}</div>
+                <div class="chance">${prediction.awayChance}% на победу</div>
+              </div>
+            </div>
+            <div class="article">
+              <p><strong>Раунд ${match.round}.</strong> Модель сейчас слегка выделяет <strong>${prediction.leader}</strong>, но решающий вес всё равно остаётся за текущим турниром, а не за рейтингом.</p>
+              <p>У этой пары пока нет свежей очной истории в зафиксированных результатах, поэтому расклад остаётся мягким: разница в шансах не выглядит критичной, и матч воспринимается как живая точка разворота сезона.</p>
+              <p>Если победитель заберёт эту игру, он первым получит реальное турнирное преимущество и сдвинется ближе к кубку на общей дистанции.</p>
+            </div>
+          `;
+        }
+
+        document.getElementById("standings").innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Игрок</th>
+                <th>И</th>
+                <th>В</th>
+                <th>Н</th>
+                <th>П</th>
+                <th>ЗМ</th>
+                <th>ПМ</th>
+                <th>РМ</th>
+                <th>О</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${board.map((row, index) => `
+                <tr>
+                  <td>${index + 1}</td>
+                  <td>${row.name}</td>
+                  <td>${row.played}</td>
+                  <td>${row.wins}</td>
+                  <td>${row.draws}</td>
+                  <td>${row.losses}</td>
+                  <td>${row.goalsFor}</td>
+                  <td>${row.goalsAgainst}</td>
+                  <td>${row.goalDiff > 0 ? "+" : ""}${row.goalDiff}</td>
+                  <td><strong>${row.points}</strong></td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        `;
+
+        document.getElementById("players").innerHTML = board.map((row, index) => `
+          <div class="player-card">
+            <div class="player-card-head">
+              <div class="player-main">
+                <img class="player-avatar" src="${row.photoUrl}" alt="${row.name}" />
+                <div>
+                  <div class="player-name">${row.name}</div>
+                  <div class="note">Место #${index + 1} · рейтинг ${row.rating}</div>
+                </div>
+              </div>
+              <div class="badge">${row.points} очк.</div>
+            </div>
+            <div class="stat-note" style="margin-top: 14px">
+              ${row.played ? `Баланс ${row.wins}-${row.draws}-${row.losses}, мячи ${row.goalsFor}:${row.goalsAgainst}.` : "Сезон только начинается: ждём первые результаты, чтобы профиль стал глубже."}
+            </div>
+          </div>
+        `).join("");
+
+        document.getElementById("insights").innerHTML = [
+          {
+            title: "Текущий расклад",
+            note: leader ? `${leader.name} формально впереди по дополнительному порядку, но таблица пока полностью открыта.` : "Таблица пока пустая."
+          },
+          {
+            title: "Стадия сезона",
+            note: playedMatches ? `Сыграно ${playedMatches} из ${totalMatches} матчей.` : `Все ${totalMatches} матчей стоят в расписании и ждут первых результатов.`
+          },
+          {
+            title: "Главная интрига",
+            note: match ? `${playerMap[match.homePlayerId].name} против ${playerMap[match.awayPlayerId].name} открывает борьбу за реальное лидерство.` : "Турнир завершён." 
+          }
+        ].map((item) => `
+          <div class="insight-card">
+            <div class="tiny-label">Короткий итог</div>
+            <h3 style="margin: 10px 0 8px; font-size: 18px">${item.title}</h3>
+            <div class="note">${item.note}</div>
+          </div>
+        `).join("");
+
+        document.getElementById("schedule").innerHTML = state.matches.map((match) => {
+          const home = playerMap[match.homePlayerId];
+          const away = playerMap[match.awayPlayerId];
+          const played = match.status === "played";
+          return `
+            <div class="schedule-card">
+              <div class="schedule-head">
+                <div>
+                  <div class="tiny-label">Раунд ${match.round}</div>
+                  <h3 style="margin: 8px 0 6px; font-size: 18px">${home.name} vs ${away.name}</h3>
+                  <div class="note">${played ? `${match.homeScore}:${match.awayScore}` : "Матч ещё не сыгран"}</div>
+                </div>
+                <div class="badge ${played ? "played" : "scheduled"}">${played ? "Сыгран" : "В расписании"}</div>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      render();
+    </script>
+  </body>
 </html>
