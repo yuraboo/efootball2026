@@ -365,7 +365,7 @@ function applyAdminAction(state, action) {
       draft.tournament.roundsCount = clamp(
         toNumber(payload.roundsCount, draft.tournament.roundsCount),
         1,
-        6
+        15
       );
       break;
 
