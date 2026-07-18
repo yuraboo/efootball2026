@@ -28,18 +28,19 @@
 }
 
 .runner-label {
-  min-width: 56px;
-  max-width: 56px;
-  padding: 4px 4px;
+  min-width: 52px;
+  max-width: 52px;
+  padding: 3px 4px;
   border-radius: 10px;
+  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.18);
 }
 
 .runner-name {
-  font-size: 6px;
+  font-size: 5px;
 }
 
 .runner-points {
-  font-size: 6px;
+  font-size: 5px;
 }
 
 .trophy-anchor {
@@ -49,6 +50,14 @@
 
 .trophy-image {
   width: 39px;
+}
+
+.runner.is-leader .runner-character {
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.22));
+}
+
+.runner.is-leader .runner-label {
+  transform: none;
 }
 
 @media (max-width: 760px) {
@@ -73,14 +82,14 @@
   }
 
   .runner-label {
-    min-width: 50px;
-    max-width: 50px;
+    min-width: 46px;
+    max-width: 46px;
     padding: 3px 4px;
   }
 
   .runner-name,
   .runner-points {
-    font-size: 6px;
+    font-size: 5px;
   }
 
   .trophy-image {
@@ -110,15 +119,15 @@
   }
 
   .runner-label {
-    min-width: 44px;
-    max-width: 44px;
-    padding: 3px 4px;
+    min-width: 40px;
+    max-width: 40px;
+    padding: 2px 3px;
     border-radius: 9px;
   }
 
   .runner-name,
   .runner-points {
-    font-size: 5px;
+    font-size: 4px;
   }
 
   .trophy-anchor {
