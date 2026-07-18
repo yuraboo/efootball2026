@@ -1,0 +1,51 @@
+.public-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 430px);
+  align-items: start;
+}
+
+.main-column,
+.side-column,
+.stack,
+.next-match-stage,
+.next-match-footer {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.main-column > *,
+.side-column > * {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.side-column {
+  width: 100%;
+  max-width: 430px;
+  justify-self: end;
+}
+
+.next-match,
+.feature-layout,
+.preview-article,
+.list-card {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.list-card {
+  overflow: hidden;
+}
+
+.segmented {
+  display: grid;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.segmented-btn {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
