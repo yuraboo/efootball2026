@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="./assets/race-overrides.css?v=2" />
     <link rel="stylesheet" href="./assets/standings-overrides.css?v=1" />
     <link rel="stylesheet" href="./assets/layout-fixes.css?v=2" />
+    <link rel="stylesheet" href="./assets/match-redesign-overrides.css?v=1" />
   </head>
   <body class="site-body">
     <header class="hero shell">
@@ -104,17 +105,38 @@
           <div class="players-grid" id="players-grid"></div>
         </article>
 
-        <article class="panel">
+        <article class="panel" id="matches-panel">
           <div class="panel-header">
             <div>
               <div class="panel-kicker">Сетка сезона</div>
               <h2 class="panel-title">Календарь и результаты</h2>
               <div class="panel-subtitle">
-                Полный список матчей сезона с ясным разделением сыгранных и будущих игр.
+                Сначала ближайшие сюжеты сезона, затем уже архив сыгранных матчей.
               </div>
             </div>
           </div>
-          <div class="matches-list" id="matches-list"></div>
+
+          <div class="segmented segmented-wide" data-tabs="matches">
+            <button class="segmented-btn is-active" data-tab-target="upcoming" type="button">
+              Ближайшие
+            </button>
+            <button class="segmented-btn" data-tab-target="played" type="button">
+              Сыгранные
+            </button>
+            <button class="segmented-btn" data-tab-target="all" type="button">
+              Все матчи
+            </button>
+          </div>
+
+          <div class="tab-pane is-active" data-tab-pane="upcoming">
+            <div class="matches-list" id="matches-upcoming"></div>
+          </div>
+          <div class="tab-pane" data-tab-pane="played" hidden>
+            <div class="matches-list" id="matches-played"></div>
+          </div>
+          <div class="tab-pane" data-tab-pane="all" hidden>
+            <div class="matches-list" id="matches-list"></div>
+          </div>
         </article>
       </section>
 
@@ -200,5 +222,6 @@
     <script src="./assets/js/public-static.js?v=30"></script>
     <script src="./assets/js/standings-overrides.js?v=1"></script>
     <script src="./assets/js/analytics-guide-overrides.js?v=1"></script>
+    <script src="./assets/js/match-redesign-overrides.js?v=1"></script>
   </body>
 </html>
