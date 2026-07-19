@@ -1,0 +1,183 @@
+(function () {
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function resultTone(goalsFor, goalsAgainst) {
+    if (goalsFor > goalsAgainst) {
+      return "win";
+    }
+    if (goalsFor < goalsAgainst) {
+      return "loss";
+    }
+    return "draw";
+  }
+
+  function resultToneClass(result) {
+    return result === "win" ? "chip-win" : result === "loss" ? "chip-loss" : "chip-draw";
+  }
+
+  function avatar(url, alt, className) {
+    if (url) {
+      return '<img class="' + className + '" src="' + escapeHtml(url) + '" alt="' + escapeHtml(alt) + '" />';
+    }
+    return '<div class="' + className + ' fallback">' + escapeHtml(String(alt || "").slice(0, 1) || "И") + '</div>';
+  }
+
+  function renderMatchCard(match) {
+    var isPlayed = match.status === "played";
+    var matchTone = isPlayed ? resultTone(match.homeScore, match.awayScore) : null;
+    var matchToneLabel = isPlayed
+      ? matchTone === "win"
+        ? "Победа хозяев"
+        : matchTone === "loss"
+          ? "Победа гостей"
+          : "Ничья"
+      : "";
+    var statusLabel = isPlayed ? "Сыгран" : "В расписании";
+    var statusClass = isPlayed ? "match-state-played" : "match-state-scheduled";
+    var scoreLeft = isPlayed ? match.homeScore : "—";
+    var scoreRight = isPlayed ? match.awayScore : "—";
+    var centerLabel = isPlayed ? "Финальный счет" : "Матч впереди";
+    var matchupLabel = match.prediction && match.prediction.matchup && match.prediction.matchup.label
+      ? match.prediction.matchup.label
+      : "Новый матчап";
+    var chips = match.prediction
+      ? '<span class="chip chip-win">П1 ' + escapeHtml(match.prediction.homeWinChance) + '%</span>' +
+        '<span class="chip chip-draw">Х ' + escapeHtml(match.prediction.drawChance) + '%</span>' +
+        '<span class="chip chip-loss">П2 ' + escapeHtml(match.prediction.awayWinChance) + '%</span>'
+      : "";
+    var resultChip = matchToneLabel
+      ? '<span class="chip ' + resultToneClass(matchTone) + '">' + escapeHtml(matchToneLabel) + '</span>'
+      : "";
+    var importance = match.importance
+      ? '<span class="impact-badge">' + escapeHtml(match.importance.score) + ' · ' + escapeHtml(match.importance.label) + '</span>'
+      : "";
+    var note = match.note
+      ? '<div class="match-card-note"><div class="match-card-note-label">Описание матча</div><p>' + escapeHtml(match.note) + '</p></div>'
+      : "";
+
+    return '' +
+      '<article class="match-card ' + (isPlayed ? 'played' : 'scheduled') + '">' +
+        '<div class="match-card-shell">' +
+          '<div class="match-card-top">' +
+            '<div class="match-card-top-left">' +
+              '<span class="round-pill ' + (isPlayed ? 'round-pill-played' : 'round-pill-scheduled') + '">Раунд ' + escapeHtml(match.round) + '</span>' +
+            '</div>' +
+            '<div class="match-card-top-right">' +
+              '<span class="match-state ' + statusClass + '">' + statusLabel + '</span>' +
+              importance +
+            '</div>' +
+          '</div>' +
+          '<div class="match-card-body">' +
+            '<div class="match-card-team match-card-team-home">' +
+              '<div class="match-card-player">' +
+                avatar(match.homePlayer.photoUrl, match.homePlayer.name, 'row-avatar') +
+                '<div class="match-card-copy">' +
+                  '<strong>' + escapeHtml(match.homePlayer.name) + '</strong>' +
+                  '<div class="card-meta">Хозяева</div>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="match-card-center">' +
+              '<div class="match-card-center-label">' + centerLabel + '</div>' +
+              '<div class="match-card-score-big">' +
+                '<span>' + escapeHtml(scoreLeft) + '</span>' +
+                '<small>:</small>' +
+                '<span>' + escapeHtml(scoreRight) + '</span>' +
+              '</div>' +
+              '<div class="match-card-center-subtitle">' + (isPlayed ? 'Матч завершен' : 'Ожидаем старт игры') + '</div>' +
+            '</div>' +
+            '<div class="match-card-team match-card-team-away">' +
+              '<div class="match-card-player">' +
+                '<div class="match-card-copy">' +
+                  '<strong>' + escapeHtml(match.awayPlayer.name) + '</strong>' +
+                  '<div class="card-meta">Гости</div>' +
+                '</div>' +
+                avatar(match.awayPlayer.photoUrl, match.awayPlayer.name, 'row-avatar') +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="match-card-footer">' +
+            '<div class="chip-row match-card-meta">' +
+              '<span class="chip">' + escapeHtml(matchupLabel) + '</span>' +
+              chips +
+              resultChip +
+            '</div>' +
+            note +
+          '</div>' +
+        '</div>' +
+      '</article>';
+  }
+
+  function renderMatchesList(targetId, matches, options) {
+    var holder = document.getElementById(targetId);
+    if (!holder) {
+      return;
+    }
+
+    if (!matches.length) {
+      holder.innerHTML = '<div class="empty">' + escapeHtml(options.emptyText) + '</div>';
+      return;
+    }
+
+    holder.innerHTML = (options.note ? '<div class="matches-note">' + escapeHtml(options.note) + '</div>' : '') + matches.map(renderMatchCard).join('');
+  }
+
+  function renderMatchesRedesign(model) {
+    if (!model || !model.derived || !Array.isArray(model.derived.matches)) {
+      return;
+    }
+
+    var matches = model.derived.matches.slice();
+    var upcoming = matches.filter(function (match) {
+      return match.status !== 'played';
+    });
+    var played = matches.filter(function (match) {
+      return match.status === 'played';
+    }).reverse();
+
+    renderMatchesList('matches-upcoming', upcoming, {
+      note: 'Здесь только ближайшие игры, которые еще могут заметно изменить порядок в таблице.',
+      emptyText: 'Будущих матчей больше нет: календарь этого сезона уже закрыт.'
+    });
+
+    renderMatchesList('matches-played', played, {
+      note: 'Архив уже сыгранных встреч с результатами, вероятностями и заметками по ходу сезона.',
+      emptyText: 'Сыгранных матчей пока нет. Как только появятся первые результаты, они окажутся здесь.'
+    });
+
+    renderMatchesList('matches-list', matches, {
+      note: 'Полная лента сезона: от ближайших развилок до уже сыгранных матчей.',
+      emptyText: 'Календарь пока не создан. Зайдите в админку и соберите расписание.'
+    });
+  }
+
+  window.renderMatches = renderMatchesRedesign;
+  try {
+    renderMatches = renderMatchesRedesign;
+  } catch (error) {
+    // no-op
+  }
+
+  function refreshMatches() {
+    if (!window.api || typeof window.api.publicState !== 'function') {
+      return;
+    }
+
+    window.api.publicState().then(renderMatchesRedesign).catch(function () {
+      // no-op
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', refreshMatches, { once: true });
+  } else {
+    refreshMatches();
+  }
+})();
