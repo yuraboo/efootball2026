@@ -37,6 +37,10 @@
   overflow: hidden;
 }
 
+.score-line .left {
+  padding-left: 10px;
+}
+
 .segmented {
   display: grid;
   width: 100%;
