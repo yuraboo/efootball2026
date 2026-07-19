@@ -171,6 +171,12 @@ renderStandings = function renderStandingsPatched(model) {
 
   body.innerHTML = model.derived.standings
     .map((row, index) => {
+      const player = playersById[row.playerId] || {};
+      const displayPhotoUrl = row.photoUrl || player.photoUrl || "";
+      const displayRating =
+        Number.isFinite(Number(row.rating)) && Number(row.rating) > 0
+          ? row.rating
+          : player.rating ?? 0;
       const rowClass =
         row.rank === 1 ? "rank-top" : row.rank === 2 ? "rank-second" : row.rank === 3 ? "rank-third" : "";
       const playerCard = playerCardsById[row.playerId];
@@ -192,11 +198,11 @@ renderStandings = function renderStandingsPatched(model) {
           </td>
           <td>
             <div class="player-row">
-              ${standingsAvatar(row.photoUrl, row.name, "row-avatar")}
+              ${standingsAvatar(displayPhotoUrl, row.name, "row-avatar")}
               <div class="standings-player-copy">
                 <span class="standings-player-name">${standingsEscapeHtml(row.name)}</span>
                 <div class="standings-player-meta">
-                  <span>Рейтинг ${formatRating(row.rating)}</span>
+                  <span>Рейтинг ${formatRating(displayRating)}</span>
                   <span>${row.wins}В · ${row.draws}Н · ${row.losses}П</span>
                 </div>
               </div>
@@ -222,6 +228,12 @@ renderStandings = function renderStandingsPatched(model) {
 
   cards.innerHTML = model.derived.standings
     .map((row) => {
+      const player = playersById[row.playerId] || {};
+      const displayPhotoUrl = row.photoUrl || player.photoUrl || "";
+      const displayRating =
+        Number.isFinite(Number(row.rating)) && Number(row.rating) > 0
+          ? row.rating
+          : player.rating ?? 0;
       const playerCard = playerCardsById[row.playerId];
       const formItems = playerCard?.form?.items || [];
       const formMarkup = standingsForm(formItems, row.playerId, matchesById, playersById);
@@ -236,7 +248,7 @@ renderStandings = function renderStandingsPatched(model) {
           <div class="standings-mobile-top">
             <div class="standings-mobile-player">
               <div class="standings-mobile-rank">${row.rank}</div>
-              ${standingsAvatar(row.photoUrl, row.name, "row-avatar")}
+              ${standingsAvatar(displayPhotoUrl, row.name, "row-avatar")}
               <div>
                 <strong>${standingsEscapeHtml(row.name)}</strong>
                 <div class="standings-mobile-subline">${row.wins}В · ${row.draws}Н · ${row.losses}П</div>
@@ -252,7 +264,7 @@ renderStandings = function renderStandingsPatched(model) {
             <span>Мячи ${row.goalsFor}:${row.goalsAgainst}</span>
             <span class="standings-goal-diff ${goalDiffClass}">РМ ${standingsGoalDiff(row.goalDiff)}</span>
           </div>
-          <div class="standings-mobile-rating">Рейтинг ${formatRating(row.rating)}</div>
+          <div class="standings-mobile-rating">Рейтинг ${formatRating(displayRating)}</div>
           <div class="standings-mobile-form">${formMarkup}</div>
         </article>
       `;
