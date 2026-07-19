@@ -1,0 +1,289 @@
+.match-card {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.16), transparent 32%),
+    radial-gradient(circle at 100% 18%, rgba(0, 229, 168, 0.08), transparent 26%),
+    linear-gradient(180deg, rgba(12, 22, 42, 0.98), rgba(9, 16, 31, 0.98));
+  box-shadow:
+    0 22px 54px rgba(3, 8, 20, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.match-card-shell {
+  display: grid;
+  position: relative;
+  z-index: 1;
+  gap: 22px;
+  width: 100%;
+  padding: 28px 28px 24px 42px;
+}
+
+.match-card::before {
+  content: "";
+  position: absolute;
+  inset: 16px auto 16px 12px;
+  z-index: 0;
+  width: 4px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  opacity: 0.96;
+}
+
+.match-card.played::before {
+  background: linear-gradient(180deg, var(--success), #1fb573);
+}
+
+.match-card.scheduled::before {
+  background: linear-gradient(180deg, var(--warning), #f0a022);
+}
+
+.match-card-top {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 0 0 16px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.match-card-top,
+.match-card-top-left,
+.match-card-top-right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.match-card-top {
+  display: grid;
+}
+
+.match-card-top-right {
+  justify-content: flex-end;
+}
+
+.match-card-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 290px minmax(0, 1fr);
+  align-items: center;
+  gap: 24px;
+  padding: 0 8px;
+}
+
+.match-card-team {
+  min-width: 0;
+}
+
+.match-card-player {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+  min-height: 172px;
+  padding: 22px 24px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.028);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.025),
+    0 18px 36px rgba(2, 10, 25, 0.18);
+}
+
+.match-card-team-home .match-card-player {
+  background:
+    linear-gradient(135deg, rgba(0, 229, 168, 0.1), rgba(255, 255, 255, 0.02));
+}
+
+.match-card-team-away .match-card-player {
+  justify-content: flex-end;
+  background:
+    linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(255, 255, 255, 0.02));
+}
+
+.match-card-copy {
+  min-width: 0;
+}
+
+.match-card-team-away .match-card-copy {
+  text-align: right;
+}
+
+.match-card-team strong {
+  display: block;
+  font-size: clamp(24px, 2.2vw, 32px);
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+
+.match-card .row-avatar {
+  width: 84px;
+  height: 84px;
+  border-radius: 24px;
+  border-width: 2px;
+}
+
+.match-card-center {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  min-height: 206px;
+  padding: 26px 20px;
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018));
+  box-shadow:
+    0 20px 36px rgba(2, 10, 24, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.match-card-center-label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.match-card-score-big {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 14px;
+  font-family: var(--font-title);
+  line-height: 1;
+}
+
+.match-card-score-big span {
+  font-size: clamp(52px, 4.6vw, 72px);
+  letter-spacing: -0.04em;
+  text-shadow: 0 10px 24px rgba(4, 12, 30, 0.26);
+}
+
+.match-card-score-big small {
+  color: var(--muted-2);
+  font-size: 26px;
+}
+
+.match-card-center-subtitle {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.match-card-footer {
+  display: grid;
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.match-card-meta {
+  margin-top: 0;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+}
+
+.match-card-note {
+  margin: 0;
+  padding: 16px 18px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02));
+  color: var(--text-soft);
+}
+
+.match-card-note-label {
+  margin-bottom: 8px;
+  color: var(--accent-2);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.match-card-note p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.72;
+}
+
+@media (max-width: 760px) {
+  .match-card-top,
+  .match-card-body {
+    grid-template-columns: 1fr;
+  }
+
+  .match-card-shell {
+    padding: 20px 16px 18px 28px;
+    gap: 16px;
+  }
+
+  .match-card::before {
+    inset: 14px auto 14px 8px;
+    width: 3px;
+  }
+
+  .match-card-top {
+    padding: 0 0 12px 6px;
+  }
+
+  .match-card-top-right {
+    justify-content: flex-start;
+  }
+
+  .match-card-center {
+    min-height: 144px;
+    padding: 20px 16px;
+  }
+
+  .match-card-team-away .match-card-player {
+    justify-content: flex-start;
+  }
+
+  .match-card-team-away .match-card-copy {
+    text-align: left;
+  }
+
+  .match-card-body {
+    gap: 14px;
+    padding: 0 6px;
+  }
+
+  .match-card-player {
+    min-height: 0;
+    padding: 16px;
+  }
+
+  .match-card .row-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+  }
+
+  .match-card-team strong {
+    font-size: 22px;
+  }
+
+  .match-card-score-big span {
+    font-size: 44px;
+  }
+
+  .match-card-center-subtitle {
+    font-size: 11px;
+  }
+
+  .match-card-meta,
+  .match-card-note {
+    margin-left: 6px;
+    padding: 12px 14px;
+  }
+}
