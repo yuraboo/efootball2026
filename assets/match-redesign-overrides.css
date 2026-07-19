@@ -1,3 +1,35 @@
+.matches-headline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 2px 4px;
+}
+
+.matches-note {
+  margin: 0;
+  max-width: 760px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.matches-count {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .match-card {
   position: relative;
   overflow: hidden;
@@ -16,9 +48,9 @@
   display: grid;
   position: relative;
   z-index: 1;
-  gap: 22px;
+  gap: 24px;
   width: 100%;
-  padding: 28px 28px 24px 42px;
+  padding: 30px 30px 26px 42px;
 }
 
 .match-card::before {
@@ -40,15 +72,23 @@
   background: linear-gradient(180deg, var(--warning), #f0a022);
 }
 
+.match-card-top,
+.score-lines,
+.timeline-head,
+.match-editor,
+.admin-tip-list {
+  display: grid;
+  gap: 10px;
+}
+
 .match-card-top {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   padding: 0 0 16px 8px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.match-card-top,
 .match-card-top-left,
 .match-card-top-right {
   display: flex;
@@ -57,19 +97,34 @@
   gap: 10px;
 }
 
-.match-card-top {
-  display: grid;
-}
-
 .match-card-top-right {
   justify-content: flex-end;
+  gap: 8px;
+  max-width: min(100%, 340px);
+  justify-self: end;
+}
+
+.match-card-stage {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  color: #8fb7ff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.18);
 }
 
 .match-card-body {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 290px minmax(0, 1fr);
+  grid-template-columns: 248px minmax(320px, 1fr) 248px;
   align-items: center;
-  gap: 24px;
+  justify-content: center;
+  gap: 22px;
   padding: 0 8px;
 }
 
@@ -78,12 +133,13 @@
 }
 
 .match-card-player {
-  display: flex;
-  align-items: center;
-  gap: 18px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 12px;
   min-width: 0;
-  min-height: 172px;
-  padding: 22px 24px;
+  min-height: 148px;
+  padding: 18px 18px;
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   background: rgba(255, 255, 255, 0.028);
@@ -98,39 +154,47 @@
 }
 
 .match-card-team-away .match-card-player {
-  justify-content: flex-end;
   background:
     linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(255, 255, 255, 0.02));
 }
 
 .match-card-copy {
   min-width: 0;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  text-align: center;
+  width: 100%;
 }
 
 .match-card-team-away .match-card-copy {
-  text-align: right;
+  text-align: center;
 }
 
 .match-card-team strong {
   display: block;
-  font-size: clamp(24px, 2.2vw, 32px);
-  line-height: 1.08;
+  max-width: 100%;
+  font-size: clamp(18px, 1.55vw, 23px);
+  line-height: 1.12;
   letter-spacing: -0.045em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .match-card .row-avatar {
-  width: 84px;
-  height: 84px;
-  border-radius: 24px;
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
   border-width: 2px;
 }
 
 .match-card-center {
   display: grid;
-  gap: 12px;
+  gap: 14px;
   justify-items: center;
-  min-height: 206px;
-  padding: 26px 20px;
+  min-height: 224px;
+  padding: 24px 22px;
   border-radius: 32px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
@@ -140,12 +204,46 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
+.match-card-center-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
 .match-card-center-label {
-  color: var(--muted);
-  font-size: 12px;
+  color: var(--muted-2);
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+}
+
+.match-result-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.match-card .round-pill,
+.match-card .impact-badge {
+  min-height: 26px;
+  padding: 0 10px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.match-card .impact-badge {
+  max-width: 100%;
+  text-align: center;
 }
 
 .match-card-score-big {
@@ -158,14 +256,14 @@
 }
 
 .match-card-score-big span {
-  font-size: clamp(52px, 4.6vw, 72px);
+  font-size: clamp(44px, 4vw, 68px);
   letter-spacing: -0.04em;
   text-shadow: 0 10px 24px rgba(4, 12, 30, 0.26);
 }
 
 .match-card-score-big small {
   color: var(--muted-2);
-  font-size: 26px;
+  font-size: 22px;
 }
 
 .match-card-center-subtitle {
@@ -183,11 +281,61 @@
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+.match-card-footer-label {
+  color: var(--muted-2);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0 4px;
+}
+
 .match-card-meta {
   margin-top: 0;
   padding: 0 4px;
-  border: 0;
-  background: transparent;
+  gap: 10px;
+}
+
+.match-card-meta .chip {
+  min-height: 46px;
+  padding: 0 20px;
+  font-size: 13px;
+  font-weight: 800;
+  border-width: 1px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.chip-matchup {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.055);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.chip-prefix {
+  margin-right: 8px;
+  color: var(--muted-2);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.chip-win {
+  color: var(--success);
+  background: rgba(87, 216, 162, 0.12);
+  border-color: rgba(87, 216, 162, 0.22);
+}
+
+.chip-draw {
+  color: var(--warning);
+  background: rgba(255, 189, 97, 0.12);
+  border-color: rgba(255, 189, 97, 0.22);
+}
+
+.chip-loss {
+  color: var(--danger);
+  background: rgba(255, 117, 135, 0.12);
+  border-color: rgba(255, 117, 135, 0.22);
 }
 
 .match-card-note {
@@ -222,6 +370,11 @@
     grid-template-columns: 1fr;
   }
 
+  .matches-headline {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .match-card-shell {
     padding: 20px 16px 18px 28px;
     gap: 16px;
@@ -238,19 +391,13 @@
 
   .match-card-top-right {
     justify-content: flex-start;
+    max-width: 100%;
+    justify-self: auto;
   }
 
   .match-card-center {
     min-height: 144px;
     padding: 20px 16px;
-  }
-
-  .match-card-team-away .match-card-player {
-    justify-content: flex-start;
-  }
-
-  .match-card-team-away .match-card-copy {
-    text-align: left;
   }
 
   .match-card-body {
@@ -260,7 +407,7 @@
 
   .match-card-player {
     min-height: 0;
-    padding: 16px;
+    padding: 16px 14px;
   }
 
   .match-card .row-avatar {
@@ -270,20 +417,30 @@
   }
 
   .match-card-team strong {
-    font-size: 22px;
+    font-size: 18px;
   }
 
   .match-card-score-big span {
-    font-size: 44px;
+    font-size: 36px;
   }
 
   .match-card-center-subtitle {
     font-size: 11px;
   }
 
+  .match-card-footer-label {
+    padding-left: 6px;
+  }
+
   .match-card-meta,
   .match-card-note {
     margin-left: 6px;
     padding: 12px 14px;
+  }
+
+  .match-card-meta .chip {
+    min-height: 40px;
+    padding: 0 16px;
+    font-size: 12px;
   }
 }
