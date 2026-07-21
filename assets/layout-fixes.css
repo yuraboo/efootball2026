@@ -269,3 +269,64 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 430px) {
+  .shell {
+    width: min(100% - 16px, 1280px);
+  }
+
+  .hero-card,
+  .panel {
+    padding: 16px 14px;
+    border-radius: 20px;
+  }
+
+  .hero,
+  .panel-header {
+    gap: 12px;
+  }
+
+  .hero-topline,
+  .panel-header,
+  .race-header {
+    gap: 10px;
+  }
+
+  .eyebrow,
+  .hero-kicker,
+  .panel-kicker {
+    font-size: 10px;
+  }
+
+  .hero-title {
+    font-size: clamp(28px, 10vw, 36px);
+  }
+
+  .panel-title {
+    font-size: clamp(23px, 7vw, 30px);
+  }
+
+  .hero-description,
+  .panel-subtitle,
+  .guide-lead,
+  .glossary-body {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .main-column,
+  .side-column,
+  .stack,
+  .matches-list,
+  .timeline,
+  .side-list,
+  .players-grid {
+    gap: 14px;
+  }
+
+  .jump-link,
+  .segmented-btn {
+    min-height: 38px;
+    font-size: 10px;
+  }
+}
