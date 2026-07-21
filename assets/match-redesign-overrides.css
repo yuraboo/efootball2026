@@ -559,12 +559,52 @@
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 640px) {
   .matches-note {
     font-size: 12px;
     line-height: 1.55;
   }
 
+  .match-card-body {
+    gap: 10px;
+  }
+
+  .match-card-center {
+    order: -1;
+  }
+
+  .match-card-team-home {
+    order: 1;
+  }
+
+  .match-card-team-away {
+    order: 2;
+  }
+
+  .match-card-player {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    justify-items: start;
+    gap: 12px;
+    text-align: left;
+  }
+
+  .match-card-copy,
+  .match-card-team-away .match-card-copy {
+    justify-items: start;
+    text-align: left;
+  }
+
+  .match-card-team strong {
+    font-size: 16px;
+  }
+
+  .match-card-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
   .match-card-shell {
     padding: 16px 12px 14px 18px;
   }
@@ -574,7 +614,14 @@
   }
 
   .match-card-player {
+    gap: 10px;
     padding: 12px 10px;
+  }
+
+  .match-card .row-avatar {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
   }
 
   .match-card-center {
@@ -593,5 +640,70 @@
 
   .match-card-meta {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 430px) {
+  .match-card-shell {
+    gap: 12px;
+    padding: 14px 10px 12px 16px;
+  }
+
+  .match-card-top {
+    padding-left: 2px;
+  }
+
+  .match-card-player {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 9px;
+    padding: 11px 9px;
+  }
+
+  .match-card .row-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+  }
+
+  .match-card-team strong {
+    font-size: 15px;
+  }
+
+  .match-card-center {
+    gap: 10px;
+    padding: 14px 10px;
+    border-radius: 20px;
+  }
+
+  .match-card-score-big {
+    gap: 8px;
+  }
+
+  .match-card-score-big span {
+    font-size: 24px;
+  }
+
+  .match-card-score-big small {
+    font-size: 15px;
+  }
+
+  .match-card-center-subtitle {
+    font-size: 9px;
+    text-align: center;
+  }
+
+  .match-card-meta .chip {
+    min-height: 34px;
+    padding: 0 10px;
+    font-size: 10px;
+  }
+
+  .match-card-note {
+    padding: 10px 11px 12px;
+  }
+
+  .match-card-note p {
+    font-size: 12px;
+    line-height: 1.55;
   }
 }
