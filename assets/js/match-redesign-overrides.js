@@ -39,11 +39,19 @@
     return result === 'win' ? 'chip-win' : result === 'loss' ? 'chip-loss' : 'chip-draw';
   }
 
+  function toChanceNumber(value) {
+    var numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : 0;
+  }
+
   function predictionChanceClass(chance, oppositeChance) {
-    if (Number(chance) > Number(oppositeChance)) {
+    var primaryChance = toChanceNumber(chance);
+    var opposite = toChanceNumber(oppositeChance);
+
+    if (primaryChance > opposite) {
       return 'chip-win';
     }
-    if (Number(chance) < Number(oppositeChance)) {
+    if (primaryChance < opposite) {
       return 'chip-loss';
     }
     return 'chip-draw';
@@ -75,16 +83,19 @@
       ? match.prediction.matchup.label
       : 'Новый матчап';
     var cardEyebrow = isPlayed ? 'Архив сезона' : 'Предстоящая игра';
+    var homeWinChance = match.prediction ? toChanceNumber(match.prediction.homeWinChance) : 0;
+    var drawChance = match.prediction ? toChanceNumber(match.prediction.drawChance) : 0;
+    var awayWinChance = match.prediction ? toChanceNumber(match.prediction.awayWinChance) : 0;
     var homePredictionClass = match.prediction
-      ? predictionChanceClass(match.prediction.homeWinChance, match.prediction.awayWinChance)
+      ? predictionChanceClass(homeWinChance, awayWinChance)
       : 'chip-win';
     var awayPredictionClass = match.prediction
-      ? predictionChanceClass(match.prediction.awayWinChance, match.prediction.homeWinChance)
+      ? predictionChanceClass(awayWinChance, homeWinChance)
       : 'chip-loss';
     var chips = match.prediction
-      ? '<span class="chip ' + homePredictionClass + '">П1 ' + escapeHtml(match.prediction.homeWinChance) + '%</span>' +
-        '<span class="chip chip-draw">Х ' + escapeHtml(match.prediction.drawChance) + '%</span>' +
-        '<span class="chip ' + awayPredictionClass + '">П2 ' + escapeHtml(match.prediction.awayWinChance) + '%</span>'
+      ? '<span class="chip ' + homePredictionClass + '">П1 ' + escapeHtml(homeWinChance) + '%</span>' +
+        '<span class="chip chip-draw">Х ' + escapeHtml(drawChance) + '%</span>' +
+        '<span class="chip ' + awayPredictionClass + '">П2 ' + escapeHtml(awayWinChance) + '%</span>'
       : '';
     var resultChip = matchToneLabel
       ? '<span class="chip ' + resultToneClass(matchTone) + '">' + escapeHtml(matchToneLabel) + '</span>'
