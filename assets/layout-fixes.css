@@ -12,6 +12,12 @@
   flex-direction: column;
 }
 
+.main-column,
+.side-column {
+  min-width: 0;
+  width: 100%;
+}
+
 .main-column > *,
 .side-column > * {
   width: 100%;
@@ -150,6 +156,16 @@
 }
 
 @media (max-width: 1180px) {
+  .public-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .main-column,
+  .side-column {
+    width: 100%;
+    max-width: 100%;
+  }
+
   .side-column {
     max-width: none;
     justify-self: stretch;
@@ -164,7 +180,13 @@
 
 @media (max-width: 760px) {
   .public-layout {
+    grid-template-columns: 1fr;
     gap: 20px;
+  }
+
+  .main-column,
+  .side-column {
+    max-width: 100%;
   }
 
   .side-column {
