@@ -119,8 +119,7 @@ const TROPHY_RACE_DEFAULT_VISUAL = {
 
 const TROPHY_RACE_START = 9;
 const TROPHY_RACE_FINISH = 84;
-const TROPHY_RACE_LANE_OFFSETS = [-24, 0, 24, -38, 38];
-const TROPHY_RACE_HORIZONTAL_OFFSETS = [-10, 0, 10, -16, 16];
+const TROPHY_RACE_BASE_Z_INDEX = 20;
 let trophyRaceBootstrapped = false;
 let trophyRaceBootTimer = null;
 
@@ -183,22 +182,18 @@ function buildRaceRows(model) {
       const basePosition =
         TROPHY_RACE_START +
         normalizedProgress * (TROPHY_RACE_FINISH - TROPHY_RACE_START);
-      const horizontalOffset = TROPHY_RACE_HORIZONTAL_OFFSETS[index] ?? 0;
-      const position = clamp(
-        basePosition + horizontalOffset,
-        TROPHY_RACE_START,
-        TROPHY_RACE_FINISH
-      );
+      const position = clamp(basePosition, TROPHY_RACE_START, TROPHY_RACE_FINISH);
 
       return {
         ...row,
         visual,
         position: Number(position.toFixed(2)),
-        laneOffset: TROPHY_RACE_LANE_OFFSETS[index] ?? 0,
+        laneOffset: 0,
         shortName: shortPlayerName(row.name).toUpperCase(),
         fullName: String(row.name || "Игрок").toUpperCase(),
         pointsLabel: formatRacePoints(row.points).toUpperCase(),
         isLeader: row.points === maxPoints,
+        stackOrder: standings.length - index,
         progressPercent: Math.round(normalizedProgress * 100)
       };
     })
@@ -236,6 +231,7 @@ function syncRaceRunner(element, row, options = {}) {
     `${startFromStart ? TROPHY_RACE_START : nextPosition}%`
   );
   element.style.setProperty("--lane-offset", `${row.laneOffset}px`);
+  element.style.zIndex = String(TROPHY_RACE_BASE_Z_INDEX + (row.stackOrder || 0));
   element.style.setProperty("--runner-accent", row.visual.primary);
   element.style.setProperty("--runner-accent-2", row.visual.secondary);
   element.style.setProperty("--runner-glow", row.visual.glow);
@@ -377,7 +373,7 @@ function renderHeroRace(model) {
   }
 
   holder.querySelector(".race-copy").textContent =
-    "Все участники бегут по одной линии. Чем больше очков у игрока, тем ближе он к кубку.";
+    "Все участники стоят на одной линии, а их положение зависит только от набранных очков.";
   holder.querySelector(".race-target-points").textContent =
     `Максимум сезона: ${targetPoints} очк.`;
   holder.querySelector(".race-player-count").textContent =
