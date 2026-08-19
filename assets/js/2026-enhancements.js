@@ -335,12 +335,17 @@
       links.forEach((link) => link.classList.toggle("is-active", link.getAttribute("href") === `#${active.target.id}`));
     }, { rootMargin:"-25% 0px -60% 0px", threshold:[0,.1,.35] });
     sections.forEach((section) => navObserver.observe(section));
+    let progressFrame = 0;
     const updateProgress = () => {
+      progressFrame = 0;
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const progress = max > 0 ? Math.min(100, Math.max(0, window.scrollY / max * 100)) : 0;
       document.documentElement.style.setProperty("--scroll-progress", `${progress}%`);
     };
-    window.addEventListener("scroll", updateProgress, { passive:true });
+    const requestProgressUpdate = () => {
+      if (!progressFrame) progressFrame = window.requestAnimationFrame(updateProgress);
+    };
+    window.addEventListener("scroll", requestProgressUpdate, { passive:true });
     updateProgress();
   }
 
