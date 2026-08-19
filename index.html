@@ -21,9 +21,37 @@
     <link rel="stylesheet" href="./assets/layout-fixes.css?v=5" />
     <link rel="stylesheet" href="./assets/match-redesign-overrides.css?v=6" />
     <link rel="stylesheet" href="./assets/neon-bubbles-theme.css?v=1" />
+    <link rel="stylesheet" href="./assets/2026-enhancements.css?v=1" />
   </head>
   <body class="site-body">
-    <header class="hero shell">
+    <div class="site-loader" id="site-loader" aria-live="polite">
+      <div class="loader-core">
+        <div class="loader-orbit" aria-hidden="true">
+          <span class="loader-ball"></span>
+          <span class="loader-ball"></span>
+          <span class="loader-ball"></span>
+        </div>
+        <div class="loader-title">Загружаем турнир</div>
+        <div class="loader-line" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <div class="floating-nav-wrap">
+      <nav class="floating-nav" aria-label="Навигация по турниру">
+        <a class="nav-brand" href="#home"><span class="nav-brand-dot"></span>eFootball League</a>
+        <div class="nav-links">
+          <a class="nav-link is-active" href="#home">Главная</a>
+          <a class="nav-link" href="#next-match-panel">Матч</a>
+          <a class="nav-link" href="#standings-section">Таблица</a>
+          <a class="nav-link" href="#players-section">Игроки</a>
+          <a class="nav-link" href="#matches-panel">Календарь</a>
+          <a class="nav-link" href="#analytics-section">Аналитика</a>
+        </div>
+        <div class="nav-progress" aria-hidden="true"><span></span></div>
+      </nav>
+    </div>
+
+    <header class="hero shell" id="home">
       <div class="hero-card hero-card-spotlight">
         <div class="hero-topline">
           <div class="eyebrow">Турнир под контролем</div>
@@ -47,6 +75,7 @@
           </div>
 
           <div class="hero-side">
+            <article class="hero-match-card" id="hero-next-match-card"></article>
             <div id="hero-race"></div>
           </div>
         </div>
@@ -57,7 +86,43 @@
       <section class="main-column">
         <article class="panel panel-feature" id="next-match-panel"></article>
 
-        <article class="panel panel-anchor">
+        <section class="modern-story-grid" aria-label="Сценарии и динамика турнира">
+          <article class="panel story-panel" id="scenario-panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-kicker">Симулятор расклада</div>
+                <h2 class="panel-title">Если победит…</h2>
+                <div class="panel-subtitle">Посмотрите, как ближайший результат предварительно изменит места и очки участников.</div>
+              </div>
+            </div>
+            <div class="scenario-tabs"></div>
+            <div class="scenario-stage" id="scenario-stage"></div>
+          </article>
+
+          <article class="panel story-panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-kicker">После последнего матча</div>
+                <h2 class="panel-title">Динамика позиций</h2>
+                <div class="panel-subtitle">Кто поднялся, кто потерял место и с каким балансом идёт дальше.</div>
+              </div>
+            </div>
+            <div class="movement-list" id="movement-list"></div>
+          </article>
+        </section>
+
+        <article class="panel" id="records-section">
+          <div class="panel-header">
+            <div>
+              <div class="panel-kicker">История создаётся сейчас</div>
+              <h2 class="panel-title">Рекорды сезона</h2>
+              <div class="panel-subtitle">Лучшие серии, главные матчи и достижения обновляются автоматически после каждого результата.</div>
+            </div>
+          </div>
+          <div class="records-grid" id="records-grid"></div>
+        </article>
+
+        <article class="panel panel-anchor" id="standings-section">
           <div class="panel-header panel-header-anchor">
             <div>
               <div class="panel-kicker">Ядро турнира</div>
@@ -93,7 +158,7 @@
           <div class="standings-cards" id="standings-cards"></div>
         </article>
 
-        <article class="panel">
+        <article class="panel" id="players-section">
           <div class="panel-header">
             <div>
               <div class="panel-kicker">Портреты сезона</div>
@@ -144,7 +209,7 @@
       <aside class="side-column">
         <article class="panel panel-soft guide-panel" id="analytics-guide-panel"></article>
 
-        <article class="panel panel-soft analytics-hub">
+        <article class="panel panel-soft analytics-hub" id="analytics-section">
           <div class="panel-header">
             <div>
               <div class="panel-kicker">Данные и вероятность</div>
@@ -224,5 +289,6 @@
     <script src="./assets/js/standings-overrides.js?v=1"></script>
     <script src="./assets/js/analytics-guide-overrides.js?v=1"></script>
     <script src="./assets/js/match-redesign-overrides.js?v=4"></script>
+    <script src="./assets/js/2026-enhancements.js?v=1"></script>
   </body>
 </html>
