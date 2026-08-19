@@ -1,0 +1,375 @@
+/* eFootball neon bubble theme — inspired by the supplied reference */
+:root {
+  --bg: #030319;
+  --bg-2: #07052b;
+  --bg-3: #0d0751;
+  --panel-strong: rgba(8, 5, 45, 0.93);
+  --panel: rgba(10, 7, 55, 0.82);
+  --panel-soft: rgba(13, 8, 67, 0.7);
+  --surface: rgba(255, 255, 255, 0.055);
+  --surface-2: rgba(255, 255, 255, 0.09);
+  --line: rgba(52, 226, 255, 0.17);
+  --line-strong: rgba(255, 0, 211, 0.46);
+  --text: #fffaff;
+  --text-soft: #ebe9ff;
+  --muted: #aaa9d8;
+  --muted-2: #7978ad;
+  --accent: #08e7f5;
+  --accent-2: #ff00d4;
+  --gold: #d8ff18;
+  --success: #16f1c1;
+  --warning: #ff9eea;
+  --danger: #ff3f91;
+  --shadow-lg: 0 30px 85px rgba(1, 0, 25, 0.55), 0 0 44px rgba(255, 0, 212, 0.09);
+  --shadow-md: 0 18px 44px rgba(1, 0, 25, 0.42);
+  --shadow-sm: 0 10px 24px rgba(1, 0, 25, 0.3);
+}
+
+html { color-scheme: dark; }
+
+body.site-body,
+body {
+  position: relative;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 8% 4%, rgba(240, 0, 255, 0.2), transparent 25%),
+    radial-gradient(circle at 94% 13%, rgba(255, 0, 193, 0.18), transparent 24%),
+    radial-gradient(circle at 52% 45%, rgba(22, 0, 184, 0.25), transparent 42%),
+    linear-gradient(145deg, #020215 0%, #090329 40%, #040222 68%, #020112 100%);
+  background-attachment: fixed;
+}
+
+.site-body::before {
+  content: "";
+  position: fixed;
+  z-index: -2;
+  inset: -6%;
+  pointer-events: none;
+  opacity: .82;
+  background:
+    radial-gradient(circle at 7% 13%, #ff03d7 0 3.5%, #8d00d9 3.8%, transparent 8%),
+    radial-gradient(circle at 90% 8%, #e900d4 0 6%, #8400e4 6.3%, transparent 12%),
+    radial-gradient(circle at 83% 35%, #03dbe9 0 2.4%, #0066f7 2.8%, transparent 5.8%),
+    radial-gradient(circle at 16% 47%, #0503b9 0 4.2%, #04dff0 4.5%, transparent 8.4%),
+    radial-gradient(circle at 94% 65%, #fb00bd 0 4%, #6200c9 4.5%, transparent 9%),
+    radial-gradient(circle at 11% 82%, #00e1e8 0 3%, #0055d8 3.3%, transparent 6.5%),
+    radial-gradient(circle at 70% 91%, #ff00d4 0 3.2%, #4900a9 3.7%, transparent 7.2%);
+  filter: blur(.2px) saturate(1.28);
+  animation: neonBubbleDrift 20s ease-in-out infinite alternate;
+  mask-image: none;
+}
+
+.site-body::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 14% 21%, rgba(255,255,255,.9) 0 .18%, rgba(0,231,245,.8) .22%, transparent .8%),
+    radial-gradient(circle at 76% 15%, rgba(255,255,255,.85) 0 .15%, rgba(255,0,212,.7) .2%, transparent .7%),
+    radial-gradient(circle at 86% 52%, rgba(0,231,245,.65) 0 .3%, transparent 1.1%),
+    radial-gradient(circle at 29% 72%, rgba(255,0,212,.65) 0 .25%, transparent 1%),
+    linear-gradient(rgba(255,255,255,.014) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.014) 1px, transparent 1px);
+  background-size: auto, auto, auto, auto, 42px 42px, 42px 42px;
+  opacity: .8;
+}
+
+@keyframes neonBubbleDrift {
+  from { transform: translate3d(-1%, -1%, 0) scale(1); }
+  to { transform: translate3d(1.5%, 1%, 0) scale(1.04); }
+}
+
+.hero { padding-top: 24px; }
+
+.hero-card,
+.panel,
+.admin-card,
+.login-card,
+.admin-dirty-bar {
+  border-color: rgba(79, 223, 255, .17);
+  background:
+    linear-gradient(145deg, rgba(255, 0, 212, .055), transparent 35%),
+    linear-gradient(180deg, rgba(12, 7, 64, .91), rgba(5, 4, 31, .94));
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,.045);
+  backdrop-filter: blur(22px) saturate(1.2);
+}
+
+.hero-card {
+  isolation: isolate;
+  border-color: rgba(255, 0, 212, .26);
+  background:
+    radial-gradient(circle at 88% 18%, rgba(255, 0, 212, .2), transparent 27%),
+    radial-gradient(circle at 54% 100%, rgba(0, 225, 241, .11), transparent 38%),
+    linear-gradient(135deg, rgba(18, 5, 86, .97), rgba(4, 4, 33, .97));
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,.065);
+}
+
+.hero-card::before {
+  z-index: -1;
+  inset: 0;
+  opacity: .9;
+  background:
+    radial-gradient(circle at 92% 15%, #ff00d4 0 8%, #7800e8 8.7%, transparent 18%),
+    radial-gradient(circle at 73% 68%, #02dce8 0 4%, #003ee8 4.6%, transparent 10%),
+    radial-gradient(circle at 88% 76%, #fb19e2 0 2.8%, transparent 7%),
+    radial-gradient(circle at 58% 15%, rgba(0,222,244,.9) 0 1.8%, transparent 4.8%);
+  filter: drop-shadow(0 0 20px rgba(255,0,212,.22));
+}
+
+.hero-card::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 270px;
+  aspect-ratio: 1;
+  right: 18%;
+  top: -150px;
+  border-radius: 50%;
+  border: 9px solid rgba(255, 0, 212, .82);
+  box-shadow: 0 0 28px rgba(255,0,212,.62), inset 0 0 34px rgba(17,0,255,.4);
+  opacity: .55;
+}
+
+.hero-title span,
+.panel-title,
+.admin-title {
+  background: linear-gradient(100deg, #fff 0%, #65f6ff 42%, #ff3edb 76%, #fff 100%);
+  background-size: 180% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-title { text-shadow: 0 0 36px rgba(255, 0, 212, .12); }
+
+.eyebrow,
+.hero-kicker,
+.panel-kicker,
+.article-kicker,
+.chance,
+.section-chip,
+.card-rating,
+.chip-accent,
+.inline-status {
+  color: var(--accent);
+}
+
+.eyebrow,
+.chip-accent,
+.inline-status,
+.section-chip,
+.card-rating {
+  border-color: rgba(0, 231, 245, .28);
+  background: rgba(0, 231, 245, .085);
+  box-shadow: inset 0 0 18px rgba(0, 231, 245, .055);
+}
+
+.eyebrow::before {
+  background: #ff15dc;
+  box-shadow: 0 0 7px #ff15dc, 0 0 20px #ff00d4;
+}
+
+.utility-link,
+.segmented,
+.chip,
+.badge,
+.round-pill,
+.impact-badge,
+.section-chip,
+.inline-status {
+  border-color: rgba(255, 255, 255, .09);
+  background-color: rgba(255, 255, 255, .055);
+}
+
+.panel-feature,
+.panel-anchor {
+  border-color: rgba(255, 0, 212, .18);
+}
+
+.panel,
+.stat-card,
+.mini-card,
+.list-card,
+.player-card,
+.match-card,
+.timeline-item,
+.editor-card,
+.admin-action-card,
+.player-tile,
+.preview-article,
+.race-card {
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease, background .22s ease;
+}
+
+.stat-card:hover,
+.mini-card:hover,
+.list-card:hover,
+.player-card:hover,
+.match-card:hover,
+.timeline-item:hover {
+  transform: translateY(-3px);
+  border-color: rgba(0, 231, 245, .3);
+  box-shadow: 0 16px 34px rgba(0,0,30,.34), 0 0 22px rgba(0,231,245,.07);
+}
+
+.stat-card,
+.mini-card,
+.list-card,
+.player-card,
+.match-card,
+.timeline-item,
+.editor-card,
+.admin-action-card,
+.player-tile,
+.preview-article {
+  border-color: rgba(116, 107, 255, .16);
+  background:
+    radial-gradient(circle at 100% 0, rgba(255,0,212,.075), transparent 35%),
+    linear-gradient(160deg, rgba(23, 12, 91, .58), rgba(6, 5, 35, .78));
+}
+
+.race-card {
+  border-color: rgba(255, 0, 212, .22);
+  background:
+    radial-gradient(circle at 94% 8%, rgba(255, 0, 212, .17), transparent 24%),
+    linear-gradient(165deg, rgba(18, 8, 81, .91), rgba(4, 4, 30, .95));
+}
+
+.race-track-base,
+.race-track,
+.bar-fill,
+.match-card::before {
+  background: linear-gradient(90deg, #02e5ef, #2154ff 45%, #ff00d4) !important;
+  box-shadow: 0 0 22px rgba(0, 231, 245, .22);
+}
+
+.bar-fill.alt {
+  background: linear-gradient(90deg, #ff00d4, #8735ff, #d8ff18) !important;
+}
+
+.trophy-pill {
+  color: #e9ff71;
+  border-color: rgba(216,255,24,.28);
+  background: rgba(216,255,24,.08);
+  box-shadow: 0 0 22px rgba(216,255,24,.08);
+}
+
+.vs-circle {
+  color: white;
+  border-color: rgba(0,231,245,.4);
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255,255,255,.48), transparent 8%),
+    radial-gradient(circle at 40% 32%, #0be2ee, #1736d8 55%, #6f00e8 85%);
+  box-shadow: 0 0 25px rgba(0,231,245,.38), 0 0 46px rgba(255,0,212,.2);
+}
+
+.btn {
+  position: relative;
+  overflow: hidden;
+  border-radius: 999px;
+}
+
+.btn-primary {
+  color: #fff;
+  background: linear-gradient(100deg, #0acfe7, #5137ff 48%, #ff00c8);
+  box-shadow: 0 8px 26px rgba(255,0,212,.2);
+}
+
+.btn-secondary {
+  color: #fff;
+  border-color: rgba(255,0,212,.34);
+  background: linear-gradient(100deg, rgba(18,216,235,.13), rgba(255,0,212,.16));
+  box-shadow: inset 0 0 20px rgba(255,0,212,.06), 0 8px 25px rgba(0,0,20,.22);
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+  box-shadow: 0 10px 30px rgba(255,0,212,.3), 0 0 24px rgba(0,231,245,.16);
+}
+
+.segmented {
+  border-color: rgba(121, 95, 255, .2);
+  background: rgba(4, 3, 30, .62);
+}
+
+.segmented-btn.is-active,
+.segmented-btn:hover {
+  color: #fff;
+  background: linear-gradient(100deg, rgba(0,231,245,.24), rgba(255,0,212,.25));
+  box-shadow: 0 0 20px rgba(255,0,212,.08);
+}
+
+.standings-table thead th {
+  color: #a8faff;
+  background: rgba(11, 7, 62, .92);
+  border-color: rgba(0,231,245,.12);
+}
+
+.standings-table tbody tr:hover td {
+  background-color: rgba(255,0,212,.08);
+}
+
+.rank-top td {
+  background: linear-gradient(90deg, rgba(216,255,24,.13), rgba(18,9,77,.78) 30%);
+}
+.rank-second td {
+  background: linear-gradient(90deg, rgba(0,231,245,.12), rgba(18,9,77,.78) 30%);
+}
+.rank-third td {
+  background: linear-gradient(90deg, rgba(255,0,212,.12), rgba(18,9,77,.78) 30%);
+}
+
+.row-avatar,
+.card-avatar,
+.avatar {
+  border-color: rgba(0,231,245,.34);
+  box-shadow: 0 0 20px rgba(0,231,245,.12);
+}
+
+.form-win { background: rgba(0,231,191,.16); color: #22ffd1; }
+.form-draw { background: rgba(255,0,212,.15); color: #ff9cea; }
+.form-loss { background: rgba(255,63,145,.17); color: #ff7aac; }
+
+.badge-played,
+.match-state-played,
+.round-pill-played {
+  color: #21ffd2;
+  background: rgba(0,231,191,.1);
+  border-color: rgba(0,231,191,.22);
+}
+
+.badge-scheduled,
+.match-state-scheduled,
+.round-pill-scheduled,
+.impact-badge {
+  color: #ff9dea;
+  background: rgba(255,0,212,.1);
+  border-color: rgba(255,0,212,.22);
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: rgba(0,231,245,.52);
+  box-shadow: 0 0 0 4px rgba(0,231,245,.09), 0 0 22px rgba(255,0,212,.08);
+}
+
+@media (max-width: 760px) {
+  .site-body::before { opacity: .6; }
+  .hero-card::after {
+    width: 180px;
+    right: -55px;
+    top: -80px;
+    border-width: 6px;
+  }
+  .hero-card::before {
+    background:
+      radial-gradient(circle at 94% 13%, #ff00d4 0 6%, #7800e8 6.7%, transparent 14%),
+      radial-gradient(circle at 82% 75%, #02dce8 0 3.8%, #003ee8 4.5%, transparent 9%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-body::before { animation: none; }
+}
