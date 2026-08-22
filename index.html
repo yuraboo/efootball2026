@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Турнир eFootball 2026</title>
+    <title>Турнир eFootball 2027</title>
     <meta
       name="description"
-      content="Закрытая лига eFootball: таблица, форма игроков, главный матч, аналитика и хронология сезона в одном премиальном экране."
+      content="Закрытая лига eFootball 2027: главный матч, таблица, календарь и ключевая аналитика в компактной публичной панели."
     />
     <link rel="canonical" href="https://yuraboo.github.io/efootball2026/" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="./assets/match-redesign-overrides.css?v=6" />
     <link rel="stylesheet" href="./assets/neon-bubbles-theme.css?v=1" />
     <link rel="stylesheet" href="./assets/2026-enhancements.css?v=2" />
+    <link rel="stylesheet" href="./assets/focus-priority-overrides.css?v=1" />
   </head>
   <body class="site-body">
     <div class="site-loader" id="site-loader" aria-live="polite">
@@ -43,7 +44,6 @@
           <a class="nav-link is-active" href="#home">Главная</a>
           <a class="nav-link" href="#next-match-panel">Матч</a>
           <a class="nav-link" href="#standings-section">Таблица</a>
-          <a class="nav-link" href="#players-section">Игроки</a>
           <a class="nav-link" href="#matches-panel">Календарь</a>
           <a class="nav-link" href="#analytics-section">Аналитика</a>
         </div>
@@ -55,21 +55,24 @@
       <div class="hero-card hero-card-spotlight">
         <div class="hero-topline">
           <div class="eyebrow">Турнир под контролем</div>
-          <div class="utility-link">Публичная версия GitHub Pages</div>
+          <div class="utility-link">Сезон 2027</div>
         </div>
 
         <div class="hero-grid">
           <div class="hero-copy">
             <div class="hero-kicker" id="status-badge">Регулярный сезон</div>
             <h1 class="hero-title" id="hero-title">
-              Турнир eFootball 2026
+              Турнир eFootball 2027
               <span>Лига друзей</span>
             </h1>
             <p class="hero-description" id="hero-description">
-              Единая публичная панель турнира: таблица, главный матч, аналитика и движение к титулу.
+              Главный матч, таблица, календарь и топ-аналитика собраны в одной компактной панели без лишней перегрузки.
             </p>
-            <div class="btn-row" style="margin-top: 18px">
-              <a class="btn btn-secondary" href="./admin.html">Открыть админку</a>
+            <div class="hero-route-row" aria-label="Главный маршрут по турниру">
+              <a class="hero-route-chip hero-route-chip--primary" href="#next-match-panel">Главный матч</a>
+              <a class="hero-route-chip" href="#standings-section">Таблица</a>
+              <a class="hero-route-chip" href="#matches-panel">Календарь</a>
+              <a class="hero-route-chip" href="#analytics-section">Топ-аналитика</a>
             </div>
             <div class="hero-stats hero-stats-tight" id="hero-stats"></div>
           </div>
@@ -85,42 +88,6 @@
     <main class="shell public-layout">
       <section class="main-column">
         <article class="panel panel-feature" id="next-match-panel"></article>
-
-        <section class="modern-story-grid" aria-label="Сценарии и динамика турнира">
-          <article class="panel story-panel" id="scenario-panel">
-            <div class="panel-header">
-              <div>
-                <div class="panel-kicker">Симулятор расклада</div>
-                <h2 class="panel-title">Если победит…</h2>
-                <div class="panel-subtitle">Посмотрите, как ближайший результат предварительно изменит места и очки участников.</div>
-              </div>
-            </div>
-            <div class="scenario-tabs"></div>
-            <div class="scenario-stage" id="scenario-stage"></div>
-          </article>
-
-          <article class="panel story-panel">
-            <div class="panel-header">
-              <div>
-                <div class="panel-kicker">После последнего матча</div>
-                <h2 class="panel-title">Динамика позиций</h2>
-                <div class="panel-subtitle">Кто поднялся, кто потерял место и с каким балансом идёт дальше.</div>
-              </div>
-            </div>
-            <div class="movement-list" id="movement-list"></div>
-          </article>
-        </section>
-
-        <article class="panel" id="records-section">
-          <div class="panel-header">
-            <div>
-              <div class="panel-kicker">История создаётся сейчас</div>
-              <h2 class="panel-title">Рекорды сезона</h2>
-              <div class="panel-subtitle">Лучшие серии, главные матчи и достижения обновляются автоматически после каждого результата.</div>
-            </div>
-          </div>
-          <div class="records-grid" id="records-grid"></div>
-        </article>
 
         <article class="panel panel-anchor" id="standings-section">
           <div class="panel-header panel-header-anchor">
@@ -158,19 +125,6 @@
           <div class="standings-cards" id="standings-cards"></div>
         </article>
 
-        <article class="panel" id="players-section">
-          <div class="panel-header">
-            <div>
-              <div class="panel-kicker">Портреты сезона</div>
-              <h2 class="panel-title">Профили игроков</h2>
-              <div class="panel-subtitle">
-                Главное сверху, расширенная аналитика внутри карточки по раскрытию.
-              </div>
-            </div>
-          </div>
-          <div class="players-grid" id="players-grid"></div>
-        </article>
-
         <article class="panel" id="matches-panel">
           <div class="panel-header">
             <div>
@@ -204,18 +158,14 @@
             <div class="matches-list" id="matches-list"></div>
           </div>
         </article>
-      </section>
-
-      <aside class="side-column">
-        <article class="panel panel-soft guide-panel" id="analytics-guide-panel"></article>
 
         <article class="panel panel-soft analytics-hub" id="analytics-section">
           <div class="panel-header">
             <div>
               <div class="panel-kicker">Данные и вероятность</div>
-              <h2 class="panel-title">Аналитический центр</h2>
+              <h2 class="panel-title">Топ-аналитика сезона</h2>
               <div class="panel-subtitle">
-                Прогноз сезона, индекс силы и влияние матчей собраны в одном компактном блоке.
+                Самое важное по шансам на титул, индексу силы и весу ближайших матчей собрано в одном блоке.
               </div>
             </div>
           </div>
@@ -242,6 +192,61 @@
             <div class="side-list" id="importance-board"></div>
           </div>
         </article>
+
+        <section class="secondary-flow" aria-label="Дополнительные блоки турнира">
+          <section class="modern-story-grid" aria-label="Сценарии и динамика турнира">
+            <article class="panel story-panel" id="scenario-panel">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-kicker">Симулятор расклада</div>
+                  <h2 class="panel-title">Если победит…</h2>
+                  <div class="panel-subtitle">Посмотрите, как ближайший результат предварительно изменит места и очки участников.</div>
+                </div>
+              </div>
+              <div class="scenario-tabs"></div>
+              <div class="scenario-stage" id="scenario-stage"></div>
+            </article>
+
+            <article class="panel story-panel">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-kicker">После последнего матча</div>
+                  <h2 class="panel-title">Динамика позиций</h2>
+                  <div class="panel-subtitle">Кто поднялся, кто потерял место и с каким балансом идёт дальше.</div>
+                </div>
+              </div>
+              <div class="movement-list" id="movement-list"></div>
+            </article>
+          </section>
+
+          <article class="panel" id="records-section">
+            <div class="panel-header">
+              <div>
+                <div class="panel-kicker">История создаётся сейчас</div>
+                <h2 class="panel-title">Рекорды сезона</h2>
+                <div class="panel-subtitle">Лучшие серии, главные матчи и достижения обновляются автоматически после каждого результата.</div>
+              </div>
+            </div>
+            <div class="records-grid" id="records-grid"></div>
+          </article>
+
+          <article class="panel" id="players-section">
+            <div class="panel-header">
+              <div>
+                <div class="panel-kicker">Портреты сезона</div>
+                <h2 class="panel-title">Профили игроков</h2>
+                <div class="panel-subtitle">
+                  Главное сверху, расширенная аналитика внутри карточки по раскрытию.
+                </div>
+              </div>
+            </div>
+            <div class="players-grid" id="players-grid"></div>
+          </article>
+        </section>
+      </section>
+
+      <aside class="side-column">
+        <article class="panel panel-soft guide-panel" id="analytics-guide-panel"></article>
 
         <article class="panel panel-soft">
           <div class="panel-header">
@@ -290,5 +295,6 @@
     <script src="./assets/js/analytics-guide-overrides.js?v=1"></script>
     <script src="./assets/js/match-redesign-overrides.js?v=4"></script>
     <script src="./assets/js/2026-enhancements.js?v=2"></script>
+    <script src="./assets/js/focus-priority-overrides.js?v=1"></script>
   </body>
 </html>
