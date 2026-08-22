@@ -187,6 +187,7 @@
   grid-template-columns: minmax(0, 1.02fr) minmax(280px, 0.98fr);
   gap: 18px;
   margin-top: 6px;
+  align-items: start;
 }
 
 .focus-priority-panel .next-match-footer {
@@ -198,10 +199,21 @@
 .focus-priority-panel .next-match,
 .focus-priority-panel .feature-layout,
 .focus-priority-panel .preview-article {
-  min-height: 100%;
+  min-height: 0;
+  height: auto;
+  align-self: start;
+}
+
+.focus-priority-panel .next-match {
+  align-items: start;
 }
 
 .focus-priority-panel .player-tile {
+  min-height: 0;
+  height: auto;
+  display: grid;
+  align-content: start;
+  gap: 10px;
   padding: 16px 14px;
   border-radius: 22px;
 }
@@ -223,6 +235,7 @@
 }
 
 .focus-priority-panel .preview-article {
+  display: grid;
   gap: 14px;
 }
 
@@ -248,16 +261,19 @@
   gap: 10px;
 }
 
+.focus-priority-panel .match-preview-grid .metric-pill:nth-child(4),
+.focus-priority-panel .match-preview-grid .metric-pill:nth-child(5),
+.focus-priority-panel .metric-pill.metric-pill-secondary {
+  display: none;
+}
+
 .focus-priority-panel .metric-pill {
   min-height: 0;
   padding: 12px 14px;
 }
 
-.focus-priority-panel .metric-pill.metric-pill-secondary {
-  display: none;
-}
-
 .focus-priority-panel .article-body {
+  display: grid;
   gap: 10px;
 }
 
@@ -422,10 +438,6 @@
   .focus-priority-panel .next-match-stage,
   .focus-priority-panel .next-match-footer {
     grid-template-columns: 1fr;
-  }
-
-  .focus-priority-panel .metric-pill.metric-pill-secondary {
-    display: grid;
   }
 }
 
