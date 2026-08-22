@@ -18,11 +18,21 @@
     }
   }
 
+  function markSecondaryMetricPills(panel) {
+    panel.querySelectorAll(".match-preview-grid .metric-pill").forEach((pill) => {
+      const label = pill.querySelector("span")?.textContent?.trim();
+      const isSecondary = label === "Внешний рейтинг" || label === "Баланс сезона";
+      pill.classList.toggle("metric-pill-secondary", isSecondary);
+    });
+  }
+
   function enhanceNextMatch() {
     const panel = document.getElementById("next-match-panel");
     if (!panel || panel.querySelector(".empty")) {
       return;
     }
+
+    panel.classList.add("focus-priority-panel");
 
     const headingBox = panel.querySelector(".panel-header > div:first-child");
     if (headingBox) {
@@ -41,10 +51,9 @@
 
       const subtitle = headingBox.querySelector(".panel-subtitle");
       if (subtitle) {
-        subtitle.textContent = subtitle.textContent.replace(
-          "Главный матч ближайшего игрового окна с журналистским превью и индексом важности.",
-          "Самая важная ближайшая игра: короткий анонс, шансы на исход и ключевой контекст по встрече."
-        );
+        const roundMatch = subtitle.textContent.match(/Раунд\s+\d+/i);
+        const roundPrefix = roundMatch ? `${roundMatch[0]}. ` : "";
+        subtitle.textContent = `${roundPrefix}Ближайшая ключевая игра сезона: вероятности, короткий анонс и контекст перед стартом.`;
       }
     }
 
@@ -54,6 +63,8 @@
         node.textContent = `Шанс победы ${value[0]}`;
       }
     });
+
+    markSecondaryMetricPills(panel);
 
     const footerNote = panel.querySelector(".next-match-footer > .note");
     if (footerNote && !panel.querySelector(".next-match-note-card")) {
