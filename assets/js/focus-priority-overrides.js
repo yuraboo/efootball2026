@@ -26,6 +26,128 @@
     });
   }
 
+  function extractMetricValue(article, labelText) {
+    const pill = Array.from(article.querySelectorAll(".match-preview-grid .metric-pill")).find((item) => {
+      const label = item.querySelector("span")?.textContent?.trim();
+      return label === labelText;
+    });
+    return pill?.querySelector("strong")?.textContent?.trim() || "";
+  }
+
+  function ensureSectionLabel(article, targetSelector, className, text) {
+    const target = article.querySelector(targetSelector);
+    if (!target) {
+      return;
+    }
+    let label = article.querySelector(`.${className}`);
+    if (!label) {
+      label = document.createElement("div");
+      label.className = className;
+      target.before(label);
+    }
+    label.textContent = text;
+  }
+
+  function enhanceFeatureArticle(panel) {
+    const article = panel.querySelector(".preview-article");
+    if (!article) {
+      return;
+    }
+
+    article.classList.add("feature-article-editorial");
+
+    const kicker = article.querySelector(".article-kicker");
+    if (kicker) {
+      kicker.textContent = "Предматчевая статья";
+    }
+
+    const players = Array.from(panel.querySelectorAll(".next-match .player-name"))
+      .map((node) => node.textContent.trim())
+      .filter(Boolean);
+    const roundText =
+      panel.querySelector(".panel-subtitle")?.textContent.match(/Раунд\s+\d+/i)?.[0] || "Ключевой матч";
+    const impactText = panel.querySelector(".impact-badge")?.textContent.trim() || "Ключевая дуэль сезона";
+
+    if (players.length >= 2) {
+      let banner = article.querySelector(".feature-duel-banner");
+      if (!banner) {
+        banner = document.createElement("div");
+        banner.className = "feature-duel-banner";
+        if (kicker) {
+          kicker.insertAdjacentElement("afterend", banner);
+        } else {
+          article.prepend(banner);
+        }
+      }
+
+      banner.innerHTML = `
+        <div class="feature-duel-topline">
+          <span class="feature-duel-tag">Афиша тура</span>
+          <span class="feature-duel-round">${roundText}</span>
+        </div>
+        <div class="feature-duel-line">
+          <span class="feature-duel-player feature-duel-player--home">${players[0]}</span>
+          <span class="feature-duel-separator">vs</span>
+          <span class="feature-duel-player feature-duel-player--away">${players[1]}</span>
+        </div>
+        <div class="feature-duel-subline">${impactText}</div>
+      `;
+    }
+
+    const title = article.querySelector(".article-title");
+    if (title) {
+      if (!title.dataset.originalTitle) {
+        title.dataset.originalTitle = title.textContent.trim();
+      }
+      const originalTitle = title.dataset.originalTitle;
+      const shortTitle = originalTitle.includes(":")
+        ? originalTitle.split(":").slice(1).join(":").trim()
+        : originalTitle;
+      title.textContent = shortTitle || originalTitle;
+    }
+
+    const highlightMetrics = [
+      {
+        label: "Прогноз пары",
+        value: extractMetricValue(article, "Прогноз пары")
+      },
+      {
+        label: "Ничья по модели",
+        value: extractMetricValue(article, "Ничья по модели")
+      },
+      {
+        label: "Вес матча",
+        value: extractMetricValue(article, "Вес матча") || impactText
+      }
+    ].filter((item) => item.value);
+
+    let metaStrip = article.querySelector(".feature-article-meta-strip");
+    if (!metaStrip && highlightMetrics.length) {
+      metaStrip = document.createElement("div");
+      metaStrip.className = "feature-article-meta-strip";
+      const dek = article.querySelector(".article-dek");
+      if (dek) {
+        dek.insertAdjacentElement("afterend", metaStrip);
+      }
+    }
+
+    if (metaStrip) {
+      metaStrip.innerHTML = highlightMetrics
+        .map(
+          (item) => `
+            <div class="feature-article-meta-item">
+              <span>${item.label}</span>
+              <strong>${item.value}</strong>
+            </div>
+          `
+        )
+        .join("");
+    }
+
+    ensureSectionLabel(article, ".match-preview-grid", "feature-article-grid-label", "Ключевые цифры");
+    ensureSectionLabel(article, ".article-body", "feature-article-body-label", "Редакционный разбор");
+  }
+
   function enhanceNextMatch() {
     const panel = document.getElementById("next-match-panel");
     if (!panel || panel.querySelector(".empty")) {
@@ -65,6 +187,7 @@
     });
 
     markSecondaryMetricPills(panel);
+    enhanceFeatureArticle(panel);
 
     const footerNote = panel.querySelector(".next-match-footer > .note");
     if (footerNote && !panel.querySelector(".next-match-note-card")) {
