@@ -1,0 +1,104 @@
+(function () {
+  function enhanceHero() {
+    const stats = document.querySelectorAll("#hero-stats .stat-card");
+    if (!stats.length) {
+      return;
+    }
+
+    const labels = ["Лидер", "Фаворит модели", "Power-рейтинг"];
+    stats.forEach((card, index) => {
+      const label = card.querySelector(".stat-label");
+      if (label && labels[index]) {
+        label.textContent = labels[index];
+      }
+    });
+
+    if (stats[3]) {
+      stats[3].remove();
+    }
+  }
+
+  function enhanceNextMatch() {
+    const panel = document.getElementById("next-match-panel");
+    if (!panel || panel.querySelector(".empty")) {
+      return;
+    }
+
+    const headingBox = panel.querySelector(".panel-header > div:first-child");
+    if (headingBox) {
+      let kicker = headingBox.querySelector(".panel-kicker");
+      if (!kicker) {
+        kicker = document.createElement("div");
+        kicker.className = "panel-kicker";
+        headingBox.prepend(kicker);
+      }
+      kicker.textContent = "В фокусе тура";
+
+      const title = headingBox.querySelector(".panel-title");
+      if (title) {
+        title.textContent = "Главный матч тура";
+      }
+
+      const subtitle = headingBox.querySelector(".panel-subtitle");
+      if (subtitle) {
+        subtitle.textContent = subtitle.textContent.replace(
+          "Главный матч ближайшего игрового окна с журналистским превью и индексом важности.",
+          "Самая важная ближайшая игра: короткий анонс, шансы на исход и ключевой контекст по встрече."
+        );
+      }
+    }
+
+    panel.querySelectorAll(".chance").forEach((node) => {
+      const value = node.textContent.match(/\d+%/);
+      if (value) {
+        node.textContent = `Шанс победы ${value[0]}`;
+      }
+    });
+
+    const footerNote = panel.querySelector(".next-match-footer > .note");
+    if (footerNote && !panel.querySelector(".next-match-note-card")) {
+      const noteCard = document.createElement("div");
+      noteCard.className = "next-match-note-card";
+      noteCard.innerHTML = `
+        <div class="stat-label">Краткий вывод</div>
+        <div class="stat-note">${footerNote.textContent}</div>
+      `;
+      footerNote.replaceWith(noteCard);
+    }
+  }
+
+  const originalRenderHero = window.renderHero;
+  if (typeof originalRenderHero === "function") {
+    window.renderHero = function (model) {
+      originalRenderHero(model);
+      enhanceHero();
+    };
+  }
+
+  const originalRenderNextMatch = window.renderNextMatch;
+  if (typeof originalRenderNextMatch === "function") {
+    window.renderNextMatch = function (model) {
+      originalRenderNextMatch(model);
+      enhanceNextMatch();
+    };
+  }
+
+  function rerenderWithOverrides() {
+    if (typeof window.renderAll === "function") {
+      try {
+        window.renderAll();
+      } catch (error) {
+        console.error("focus-priority-overrides renderAll failed", error);
+      }
+    } else {
+      enhanceHero();
+      enhanceNextMatch();
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", rerenderWithOverrides, { once: true });
+  } else {
+    window.setTimeout(rerenderWithOverrides, 0);
+  }
+})();
