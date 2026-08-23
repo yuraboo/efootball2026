@@ -119,104 +119,69 @@
                   <th scope="col"><span class="standings-head-hint" tabindex="0" data-tooltip="Забито мячей">ЗМ</span></th>
                   <th scope="col"><span class="standings-head-hint" tabindex="0" data-tooltip="Пропущено мячей">ПМ</span></th>
                   <th scope="col"><span class="standings-head-hint" tabindex="0" data-tooltip="Разница мячей">РМ</span></th>
-                  <th scope="col"><span class="standings-head-hint" tabindex="0" data-tooltip="Последние пять матчей">Форма</span></th>
                   <th scope="col"><span class="standings-head-hint" tabindex="0" data-tooltip="Очки">О</span></th>
+                  <th scope="col"><span class="standings-head-hint" tabindex="0" data-tooltip="Форма за последние матчи">Форма</span></th>
                 </tr>
               </thead>
               <tbody id="standings-body"></tbody>
             </table>
           </div>
-
-          <div class="standings-cards" id="standings-cards"></div>
         </article>
 
-        <article class="panel" id="matches-panel">
-          <div class="panel-header">
+        <article class="panel panel-anchor" id="matches-panel">
+          <div class="panel-header panel-header-anchor">
             <div>
-              <div class="panel-kicker">Сетка сезона</div>
+              <div class="panel-kicker">Маршрут сезона</div>
               <h2 class="panel-title">Календарь и результаты</h2>
               <div class="panel-subtitle">
                 Фильтруйте календарь по статусу: предстоящие игры, сыгранные встречи или вся лента сезона.
               </div>
             </div>
+            <div class="segment-control" id="match-filter">
+              <button class="segment-btn is-active" data-filter="all" type="button">Все</button>
+              <button class="segment-btn" data-filter="scheduled" type="button">Предстоящие</button>
+              <button class="segment-btn" data-filter="played" type="button">Сыгранные</button>
+            </div>
           </div>
 
-          <div class="segmented segmented-wide" data-tabs="matches">
-            <button class="segmented-btn is-active" data-tab-target="upcoming" type="button">
-              Предстоящие
-            </button>
-            <button class="segmented-btn" data-tab-target="played" type="button">
-              Сыгранные
-            </button>
-            <button class="segmented-btn" data-tab-target="all" type="button">
-              Все матчи
-            </button>
-          </div>
-
-          <div class="tab-pane is-active" data-tab-pane="upcoming">
-            <div class="matches-list" id="matches-upcoming"></div>
-          </div>
-          <div class="tab-pane" data-tab-pane="played" hidden>
-            <div class="matches-list" id="matches-played"></div>
-          </div>
-          <div class="tab-pane" data-tab-pane="all" hidden>
-            <div class="matches-list" id="matches-list"></div>
-          </div>
+          <div class="matches-grid" id="matches-grid"></div>
         </article>
+      </section>
 
-        <article class="panel panel-soft analytics-hub" id="analytics-section">
-          <div class="panel-header">
+      <section class="main-column secondary-column">
+        <article class="panel panel-anchor" id="analytics-section">
+          <div class="panel-header panel-header-anchor">
             <div>
-              <div class="panel-kicker">Данные и вероятность</div>
+              <div class="panel-kicker">Главные выводы</div>
               <h2 class="panel-title">Топ-аналитика сезона</h2>
               <div class="panel-subtitle">
-                Самое важное по шансам на титул, индексу силы и весу ближайших матчей собрано в одном блоке.
+                Рейтинг силы, шансы на титул, контекст последних игр и турнирный импульс в одной зоне.
               </div>
             </div>
           </div>
 
-          <div class="segmented" data-tabs="analytics">
-            <button class="segmented-btn is-active" data-tab-target="forecast" type="button">
-              Прогноз сезона
-            </button>
-            <button class="segmented-btn" data-tab-target="power" type="button">
-              Индекс силы
-            </button>
-            <button class="segmented-btn" data-tab-target="importance" type="button">
-              Вес матчей
-            </button>
+          <div class="analytics-priority-grid">
+            <article class="analytic-hero-card" id="title-race-card"></article>
+            <article class="analytic-hero-card" id="power-ranking-card"></article>
           </div>
 
-          <div class="tab-pane is-active" data-tab-pane="forecast">
-            <div class="side-list" id="season-forecast"></div>
-          </div>
-          <div class="tab-pane" data-tab-pane="power" hidden>
-            <div class="side-list" id="power-ranking"></div>
-          </div>
-          <div class="tab-pane" data-tab-pane="importance" hidden>
-            <div class="side-list" id="importance-board"></div>
-          </div>
-        </article>
-
-        <section class="secondary-flow" aria-label="Дополнительные блоки турнира">
-          <section class="modern-story-grid" aria-label="Сценарии и динамика турнира">
-            <article class="panel story-panel" id="scenario-panel">
-              <div class="panel-header">
+          <section class="analytics-stream">
+            <article class="panel panel-soft">
+              <div class="panel-header compact-header">
                 <div>
-                  <div class="panel-kicker">Симулятор расклада</div>
-                  <h2 class="panel-title">Если победит…</h2>
-                  <div class="panel-subtitle">Посмотрите, как ближайший результат предварительно изменит места и очки участников.</div>
+                  <div class="panel-kicker">Перед матчем</div>
+                  <h3 class="panel-title panel-title-small">Предматчевая статья</h3>
+                  <div class="panel-subtitle">Выделенный сюжет ближайшей игры с прогнозом, статистикой и контекстом.</div>
                 </div>
               </div>
-              <div class="scenario-tabs"></div>
-              <div class="scenario-stage" id="scenario-stage"></div>
+              <div id="preview-article-slot"></div>
             </article>
 
-            <article class="panel story-panel">
-              <div class="panel-header">
+            <article class="panel panel-soft">
+              <div class="panel-header compact-header">
                 <div>
-                  <div class="panel-kicker">После последнего матча</div>
-                  <h2 class="panel-title">Динамика позиций</h2>
+                  <div class="panel-kicker">Движение таблицы</div>
+                  <h3 class="panel-title panel-title-small">Кто растёт, кто проседает</h3>
                   <div class="panel-subtitle">Кто поднялся, кто потерял место и с каким балансом идёт дальше.</div>
                 </div>
               </div>
@@ -247,7 +212,7 @@
             </div>
             <div class="players-grid" id="players-grid"></div>
           </article>
-        </section>
+        </article>
       </section>
 
       <aside class="side-column">
@@ -291,7 +256,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-    <script src="./assets/js/shared/league-core-a.js?v=26"></script>
+    <script src="./assets/js/shared/league-core-a.js?v=27"></script>
     <script src="./assets/js/shared/league-core-b.js?v=25"></script>
     <script src="./assets/js/shared/league-core-c.js?v=26"></script>
     <script src="./assets/js/api-static.js?v=2"></script>
