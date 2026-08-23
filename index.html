@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="./assets/focus-priority-overrides.css?v=5" />
     <link rel="stylesheet" href="./assets/article-continuity-fixes.css?v=1" />
     <link rel="stylesheet" href="./assets/calendar-player-readability.css?v=4" />
-    <link rel="stylesheet" href="./assets/layout-hotfix-20260823.css?v=1" />
+    <link rel="stylesheet" href="./assets/layout-hotfix-20260823.css?v=2" />
   </head>
   <body class="site-body">
     <div class="site-loader" id="site-loader" aria-live="polite">
@@ -40,42 +40,59 @@
       </div>
     </div>
 
-    <div class="floating-nav-wrap">
-      <nav class="floating-nav" aria-label="Навигация по турниру">
-        <a class="nav-brand" href="#home"><span class="nav-brand-dot"></span>eFootball League</a>
-        <div class="nav-links">
-          <a class="nav-link is-active" href="#home">Главная</a>
-          <a class="nav-link" href="#next-match-panel">Матч</a>
-          <a class="nav-link" href="#standings-section">Таблица</a>
-          <a class="nav-link" href="#matches-panel">Календарь</a>
-          <a class="nav-link" href="#analytics-section">Аналитика</a>
-        </div>
-        <a class="nav-admin-link" href="./admin.html">Админка</a>
-        <div class="nav-progress" aria-hidden="true"><span></span></div>
-      </nav>
+    <div class="background-grid" aria-hidden="true"></div>
+    <div class="background-gradient background-gradient-left" aria-hidden="true"></div>
+    <div class="background-gradient background-gradient-right" aria-hidden="true"></div>
+    <div class="background-stars" aria-hidden="true"></div>
+    <div class="background-bubbles" aria-hidden="true">
+      <span class="bubble bubble-a"></span>
+      <span class="bubble bubble-b"></span>
+      <span class="bubble bubble-c"></span>
+      <span class="bubble bubble-d"></span>
+      <span class="bubble bubble-e"></span>
+      <span class="bubble bubble-f"></span>
+      <span class="bubble bubble-g"></span>
     </div>
 
-    <header class="hero shell" id="home">
-      <div class="hero-card hero-card-spotlight">
-        <div class="hero-topline">
-          <div class="eyebrow">Турнир под контролем</div>
+    <div class="floating-nav" aria-label="Быстрая навигация">
+      <div class="nav-brand">
+        <span class="nav-brand-mark">eFootball League</span>
+      </div>
+      <div class="nav-links">
+        <a class="nav-link" href="#hero-next-match-card">Главная</a>
+        <a class="nav-link" href="#next-match-panel">Матч</a>
+        <a class="nav-link" href="#standings-section">Таблица</a>
+        <a class="nav-link" href="#matches-panel">Календарь</a>
+        <a class="nav-link" href="#analytics-section">Аналитика</a>
+        <a class="nav-admin-link" href="./admin.html">Админка</a>
+      </div>
+      <div class="nav-progress" aria-hidden="true">
+        <span class="nav-progress-fill"></span>
+      </div>
+    </div>
+
+    <header class="hero-shell shell">
+      <div class="hero-card hero-card-compact">
+        <div class="hero-topline hero-topline-compact">
+          <div>
+            <div class="hero-kicker">Турнир под контролем</div>
+            <div class="hero-season-pill">Сезон 2027</div>
+          </div>
           <div class="hero-topline-actions">
-            <div class="utility-link">Сезон 2027</div>
-            <a class="admin-entry-link" href="./admin.html">Войти в админку</a>
+            <a class="utility-link admin-entry-link" href="./admin.html">Войти в админку</a>
           </div>
         </div>
 
-        <div class="hero-grid">
-          <div class="hero-copy">
-            <div class="hero-kicker" id="status-badge">Регулярный сезон</div>
-            <h1 class="hero-title" id="hero-title">
-              Турнир eFootball 2027
-              <span>Лига друзей</span>
-            </h1>
-            <p class="hero-description" id="hero-description">
-              Главный матч, таблица, календарь и топ-аналитика собраны в одной компактной панели без лишней перегрузки.
+        <div class="hero-grid hero-grid-compact">
+          <div class="hero-copy hero-copy-compact">
+            <div class="hero-chip-row">
+              <span class="section-chip">Регулярный сезон</span>
+            </div>
+            <h1 class="hero-title hero-title-compact">Турнир eFootball 2026</h1>
+            <p class="hero-description hero-description-compact">
+              Закрытый турнир с общей таблицей, календарем, формой игроков и прогнозами на ближайшие матчи.
             </p>
-            <div class="hero-route-row" aria-label="Главный маршрут по турниру">
+            <div class="hero-route-row">
               <a class="hero-route-chip hero-route-chip--primary" href="#next-match-panel">Главный матч</a>
               <a class="hero-route-chip" href="#standings-section">Таблица</a>
               <a class="hero-route-chip" href="#matches-panel">Календарь</a>
