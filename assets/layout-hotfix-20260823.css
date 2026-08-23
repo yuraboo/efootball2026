@@ -1,10 +1,11 @@
 .public-layout {
-  grid-template-columns: minmax(0, 1.16fr) minmax(360px, 0.82fr) minmax(280px, 0.62fr);
+  grid-template-columns: minmax(0, 1.42fr) minmax(340px, 0.92fr) minmax(250px, 0.56fr);
   align-items: start;
 }
 
 .public-layout > * {
   min-width: 0;
+  width: 100%;
 }
 
 .secondary-column,
@@ -19,8 +20,6 @@
 #analytics-section .panel-header > div,
 #preview-article-slot,
 #preview-article-slot > *,
-#records-section .records-grid,
-#analytics-section .analytics-priority-grid,
 .focus-priority-panel .feature-layout,
 .focus-priority-panel .preview-article,
 .focus-priority-panel .article-title,
@@ -55,12 +54,6 @@
   max-width: none;
 }
 
-#analytics-section .analytics-priority-grid,
-#records-section .records-grid,
-.side-column .grid-2.compact-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
 .focus-priority-panel .preview-article,
 .feature-duel-banner,
 .focus-priority-panel .guide-lead,
@@ -73,10 +66,23 @@
   width: 100%;
 }
 
+.focus-priority-panel .next-match-stage {
+  grid-template-columns: minmax(0, 0.94fr) minmax(320px, 1.06fr);
+  gap: 16px;
+}
+
 .feature-duel-player,
 .feature-article-meta-item strong,
 .focus-priority-panel .metric-pill strong {
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+.feature-duel-player {
+  font-size: clamp(20px, 1.65vw, 25px);
+  line-height: 1.08;
+  text-wrap: balance;
 }
 
 .feature-article-meta-strip {
@@ -89,17 +95,17 @@
 
 .focus-priority-panel .article-title {
   max-width: none;
-  font-size: clamp(20px, 1.7vw, 26px);
+  font-size: clamp(20px, 1.65vw, 26px);
 }
 
 .feature-article-meta-item strong,
 .focus-priority-panel .metric-pill strong {
-  font-size: clamp(15px, 1.15vw, 18px);
+  font-size: clamp(15px, 1.05vw, 18px);
 }
 
-@media (max-width: 1380px) {
+@media (max-width: 1180px) {
   .public-layout {
-    grid-template-columns: minmax(0, 1.2fr) minmax(340px, 0.8fr);
+    grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
   }
 
   .secondary-column {
@@ -120,22 +126,59 @@
 
 @media (max-width: 760px) {
   .public-layout {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: minmax(0, 1fr) !important;
     gap: 16px;
+  }
+
+  .public-layout > .main-column,
+  .public-layout > .secondary-column,
+  .public-layout > .side-column {
+    grid-column: 1 !important;
+    width: 100% !important;
+    min-width: 0;
   }
 
   .main-column,
   .secondary-column,
   .side-column {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) !important;
+    align-content: start;
     gap: 16px;
   }
 
   #analytics-section .analytics-priority-grid,
   #records-section .records-grid,
-  .side-column .grid-2.compact-grid,
+  .side-column .grid-2.compact-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .focus-priority-panel .next-match-stage {
+    grid-template-columns: 1fr !important;
+    gap: 14px;
+  }
+
+  .focus-priority-panel .next-match-footer,
   .feature-article-meta-strip,
   .focus-priority-panel .match-preview-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .focus-priority-panel .panel-title {
+    font-size: clamp(24px, 10.5vw, 36px);
+  }
+
+  .focus-priority-panel .panel-subtitle {
+    font-size: 13px;
+    line-height: 1.58;
+  }
+
+  .focus-priority-panel .player-tile {
+    padding: 14px 12px;
+  }
+
+  .focus-priority-panel .player-name {
+    font-size: clamp(18px, 5.8vw, 22px);
   }
 
   .focus-priority-panel .next-match-stage {
@@ -163,7 +206,8 @@
   }
 
   .feature-duel-player {
-    font-size: clamp(18px, 6vw, 22px);
+    font-size: clamp(17px, 5.2vw, 21px);
+    text-wrap: pretty;
   }
 
   .feature-duel-separator {
@@ -173,7 +217,7 @@
   }
 
   .focus-priority-panel .article-title {
-    font-size: clamp(18px, 7vw, 24px);
+    font-size: clamp(18px, 6.6vw, 23px);
   }
 
   .focus-priority-panel .article-dek {
@@ -215,14 +259,9 @@
 }
 
 @media (max-width: 560px) {
-  #analytics-section .analytics-priority-grid,
-  #records-section .records-grid,
-  .side-column .grid-2.compact-grid,
+  .focus-priority-panel .next-match-footer,
   .feature-article-meta-strip,
-  .focus-priority-panel .match-preview-grid {
-    grid-template-columns: 1fr !important;
-  }
-
+  .focus-priority-panel .match-preview-grid,
   .feature-duel-line {
     grid-template-columns: 1fr !important;
   }
