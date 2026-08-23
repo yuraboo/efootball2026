@@ -257,6 +257,28 @@
     grid-template-columns: 1fr !important;
   }
 
+  .match-card-body {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .match-card-center {
+    gap: 8px;
+    padding: 14px 12px;
+  }
+
+  .match-card-center-subtitle {
+    display: none;
+  }
+
+  .match-card-score-big span {
+    font-size: 28px;
+  }
+
+  .match-card-score-big small {
+    font-size: 16px;
+  }
+
   .match-card-top-right,
   .match-card-top-left {
     width: 100%;
@@ -264,13 +286,17 @@
   }
 
   .match-card-meta {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
   }
 
   .match-card-meta .chip {
     width: 100%;
     white-space: normal;
     text-align: center;
+    min-height: 34px;
+    padding: 6px 8px;
+    font-size: 10px;
   }
 
   .match-card-team strong {
@@ -292,6 +318,50 @@
 }
 
 @media (max-width: 520px) {
+  .match-card-body {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-items: stretch;
+  }
+
+  .match-card-center {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+
+  .match-card-player {
+    grid-template-columns: 42px minmax(0, 1fr);
+    align-items: center;
+    justify-items: start;
+    gap: 8px;
+    padding: 10px 9px;
+    text-align: left;
+  }
+
+  .match-card-copy,
+  .match-card-team-away .match-card-copy {
+    justify-items: start;
+    text-align: left;
+  }
+
+  .match-card .row-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .match-card-team strong {
+    font-size: 14px;
+    line-height: 1.16;
+  }
+
+  .match-card-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .chip-matchup {
+    grid-column: 1 / -1;
+  }
+
   .hero-match-actions {
     flex-direction: column;
     align-items: flex-start;
