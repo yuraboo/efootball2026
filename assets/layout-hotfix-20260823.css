@@ -1,12 +1,18 @@
 .public-layout {
-  grid-template-columns: minmax(0, 1.16fr) minmax(360px, 0.84fr);
+  grid-template-columns: minmax(0, 1.22fr) minmax(340px, 0.78fr);
   gap: 24px;
   align-items: start;
 }
 
 .public-layout > * {
-  min-width: 0;
   width: 100%;
+  min-width: 0;
+}
+
+.public-layout > .main-column,
+.public-layout > .secondary-column,
+.public-layout > .side-column {
+  min-width: 0;
 }
 
 .public-layout > .secondary-column {
@@ -19,50 +25,157 @@
 .public-layout > .side-column {
   grid-column: 1 / -1;
   display: grid;
-  align-content: start;
   gap: 20px;
-  margin-top: 0;
+  align-content: start;
 }
 
 .main-column,
 .secondary-column,
-.side-column {
+.side-column,
+.analytics-stream,
+#analytics-section,
+#matches-panel,
+#next-match-panel,
+#players-section,
+#records-section {
   min-width: 0;
 }
 
-#next-match-panel,
-#matches-panel,
-#analytics-section,
-#players-section,
-#preview-article-slot,
-#preview-article-slot > *,
-.focus-priority-panel .feature-layout,
-.focus-priority-panel .preview-article,
-.focus-priority-panel .article-title,
-.focus-priority-panel .article-dek,
-.focus-priority-panel .article-body,
-.focus-priority-panel .article-body p,
+.panel,
+.list-card,
+.mini-card,
+.metric-pill,
+.player-card,
+.match-card,
+.match-card-shell,
+.preview-article,
 .feature-duel-banner,
-.feature-duel-line,
-.feature-duel-player,
-.feature-article-meta-strip,
-.feature-article-meta-item,
-.feature-article-meta-item strong,
-.focus-priority-panel .match-preview-grid,
-.focus-priority-panel .metric-pill,
-.focus-priority-panel .metric-pill strong,
-.side-column .panel,
-.side-column .panel-subtitle,
-.side-column .panel-title,
-#players-section .player-card,
-#players-section .player-card * {
-  min-width: 0;
-  max-width: 100%;
+.next-match-note-card,
+#title-race-card,
+#power-ranking-card,
+#analytics-section,
+#matches-panel,
+#players-section,
+#preview-article-slot {
+  overflow: hidden;
   box-sizing: border-box;
 }
 
-#preview-article-slot {
-  overflow: hidden;
+#analytics-section,
+#matches-panel,
+#players-section,
+#records-section,
+#next-match-panel.focus-priority-panel {
+  padding: 20px;
+}
+
+#analytics-section .panel-header,
+#analytics-section .panel-header.panel-header-anchor,
+#matches-panel .panel-header,
+#matches-panel .panel-header.panel-header-anchor,
+#players-section .panel-header,
+#records-section .panel-header,
+.focus-priority-panel .panel-header,
+.compact-header {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+#analytics-section .panel-title,
+#matches-panel .panel-title,
+#players-section .panel-title,
+#records-section .panel-title,
+.focus-priority-panel .panel-title,
+.panel-title-small,
+#title-race-card .panel-title,
+#power-ranking-card .panel-title {
+  margin: 0;
+  max-width: none;
+  font-size: clamp(20px, 1.8vw, 30px);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+}
+
+#analytics-section .panel-subtitle,
+#matches-panel .panel-subtitle,
+#players-section .panel-subtitle,
+#records-section .panel-subtitle,
+.side-column .panel-subtitle,
+.focus-priority-panel .panel-subtitle,
+.focus-priority-panel .article-dek,
+.matches-note,
+.card-meta,
+.stat-note,
+.note {
+  max-width: none;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+
+#matches-panel .segment-control,
+#matches-panel #match-filter,
+.segmented,
+.hero-route-row,
+.hero-topline-actions,
+.nav-links,
+.player-card .chip-row,
+.focus-priority-panel .chip-row,
+.focus-priority-panel .stack-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+#matches-panel .segment-btn,
+.segmented-btn,
+.hero-route-chip,
+.nav-link,
+.nav-admin-link,
+.chip,
+.badge,
+.round-pill,
+.impact-badge {
+  min-width: 0;
+  white-space: normal;
+  text-align: center;
+}
+
+#matches-panel .matches-headline {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.focus-priority-panel .panel-title {
+  font-size: clamp(24px, 2.3vw, 36px);
+}
+
+.focus-priority-panel .next-match-stage {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+.focus-priority-panel .next-match {
+  gap: 14px;
+  align-items: stretch;
+}
+
+.focus-priority-panel .next-match,
+.focus-priority-panel .feature-layout,
+.focus-priority-panel .preview-article {
+  height: auto;
+  min-width: 0;
+  max-width: 100%;
+  align-self: start;
 }
 
 .focus-priority-panel .feature-layout,
@@ -70,125 +183,261 @@
 .feature-duel-banner {
   position: relative;
   inset: auto;
-  margin: 0;
   transform: none;
-  overflow: hidden;
+  margin: 0;
 }
 
-.focus-priority-panel .next-match-stage {
-  grid-template-columns: 1fr;
-  gap: 18px;
+.focus-priority-panel .player-tile {
+  min-height: 0;
+  padding: 16px 14px;
+  display: grid;
+  align-content: start;
+  gap: 10px;
 }
 
-.focus-priority-panel .next-match-footer {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.focus-priority-panel .next-match,
-.focus-priority-panel .feature-layout,
-.focus-priority-panel .preview-article {
-  height: auto;
-  align-self: start;
-}
-
+.focus-priority-panel .player-name,
+.player-name,
+.standings-player-name,
+.match-card-team strong,
 .feature-duel-player,
 .feature-article-meta-item strong,
 .focus-priority-panel .metric-pill strong,
-#players-section .player-card,
-#players-section .player-card strong,
-#players-section .player-card summary {
+.player-card summary,
+.player-card strong,
+.list-card h4,
+.power-row strong {
   overflow-wrap: break-word;
   word-break: normal;
   hyphens: none;
 }
 
-.feature-duel-player {
-  font-size: clamp(21px, 1.55vw, 25px);
-  line-height: 1.08;
-  text-wrap: balance;
+.focus-priority-panel .player-name {
+  font-size: clamp(18px, 1.5vw, 23px);
+  line-height: 1.16;
 }
 
-#analytics-section .panel-header.panel-header-anchor,
-#matches-panel .panel-header.panel-header-anchor,
-#players-section .panel-header {
-  display: grid;
-  grid-template-columns: 1fr;
-  align-items: flex-start;
-  gap: 14px;
+.feature-duel-banner {
+  gap: 10px;
+  padding: 14px 16px;
 }
 
-#analytics-section .panel-title,
-#matches-panel .panel-title,
-#players-section .panel-title {
-  font-size: clamp(24px, 2.25vw, 34px);
-  line-height: 1.06;
-  letter-spacing: -0.04em;
-  max-width: 12ch;
-  text-wrap: balance;
-}
-
-#analytics-section .panel-subtitle,
-#matches-panel .panel-subtitle,
-#players-section .panel-subtitle,
-.side-column .panel-subtitle {
-  max-width: 44ch;
-  font-size: 14px;
-  line-height: 1.58;
-}
-
-#matches-panel .segment-control,
-#matches-panel #match-filter {
-  width: 100%;
-  justify-content: flex-start;
-  flex-wrap: wrap;
+.feature-duel-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
-#matches-panel .segment-btn {
-  min-width: 0;
+.feature-duel-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
 }
 
-#matches-panel .matches-headline {
+.feature-duel-player {
+  font-size: clamp(19px, 1.45vw, 24px);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.feature-duel-player--away {
+  text-align: right;
+}
+
+.feature-duel-separator {
+  width: 42px;
+  height: 42px;
+  font-size: 10px;
+}
+
+.focus-priority-panel .preview-article {
+  display: grid;
   gap: 12px;
+  padding: 18px 18px 16px;
+  border-radius: 24px;
 }
 
-#players-section .players-grid {
-  grid-template-columns: 1fr;
-  gap: 18px;
-}
-
-#analytics-section .analytics-priority-grid,
-#records-section .records-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.focus-priority-panel .article-title {
+  max-width: none;
+  font-size: clamp(20px, 1.55vw, 26px);
+  line-height: 1.14;
 }
 
 .feature-article-meta-strip {
+  display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
 }
 
-.feature-article-meta-item:last-child,
+.feature-article-meta-item {
+  padding: 12px;
+}
+
+.feature-article-meta-item:last-child {
+  grid-column: 1 / -1;
+}
+
+.focus-priority-panel .match-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.focus-priority-panel .metric-pill,
+.focus-priority-panel .next-match-footer > div,
+.focus-priority-panel .mini-card,
+.focus-priority-panel .next-match-note-card {
+  min-height: 0;
+  padding: 13px 14px 15px;
+}
+
+.focus-priority-panel .metric-pill strong,
+.feature-article-meta-item strong {
+  font-size: 16px;
+  line-height: 1.16;
+}
+
 .focus-priority-panel .match-preview-grid .metric-pill:nth-child(3) {
   grid-column: 1 / -1;
 }
 
+.focus-priority-panel .article-body {
+  gap: 10px;
+  padding-top: 10px;
+}
+
+.focus-priority-panel .article-body p {
+  font-size: 13px;
+  line-height: 1.66;
+}
+
+.focus-priority-panel .article-body p:first-child::first-letter {
+  font-size: 30px;
+  margin: 2px 8px 0 0;
+}
+
+#analytics-section .analytics-priority-grid,
+#records-section .records-grid,
+.side-column .grid-2.compact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+#players-section .players-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.player-card {
+  padding: 16px;
+}
+
+.player-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.player-card .card-stats,
+.player-card details .stack {
+  min-width: 0;
+}
+
+.player-card .card-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.player-card details {
+  min-width: 0;
+}
+
+.player-card summary {
+  line-height: 1.45;
+}
+
+.match-card-shell {
+  gap: 16px;
+  padding: 18px 18px 16px 22px;
+}
+
+.match-card-top,
+.match-card-footer,
+.match-card-meta {
+  gap: 8px;
+}
+
+.match-card-body {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) minmax(180px, 0.92fr) minmax(140px, 1fr);
+  gap: 10px;
+  padding: 0;
+}
+
+.match-card-player {
+  min-height: 108px;
+  padding: 12px 10px;
+  gap: 8px;
+}
+
+.match-card .row-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+}
+
+.match-card-team strong {
+  font-size: clamp(16px, 1.2vw, 19px);
+  line-height: 1.16;
+}
+
+.match-card-center {
+  min-height: 148px;
+  gap: 8px;
+  padding: 16px 14px;
+}
+
+.match-card-score-big span {
+  font-size: clamp(28px, 2.2vw, 42px);
+}
+
+.match-card-score-big small {
+  font-size: 16px;
+}
+
+.match-card-meta .chip {
+  min-height: 34px;
+  padding: 6px 10px;
+  font-size: 11px;
+}
+
 @media (max-width: 1480px) {
   .public-layout {
-    grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
+    grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
   }
 
   #analytics-section .panel-title,
   #matches-panel .panel-title,
-  #players-section .panel-title {
-    font-size: clamp(22px, 2vw, 30px);
-    max-width: 13ch;
+  #players-section .panel-title,
+  #records-section .panel-title,
+  .focus-priority-panel .panel-title {
+    font-size: clamp(19px, 1.7vw, 27px);
+  }
+
+  .match-card-body {
+    grid-template-columns: minmax(128px, 1fr) minmax(170px, 0.92fr) minmax(128px, 1fr);
   }
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 1260px) {
   .public-layout {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 20px;
   }
 
   .public-layout > .secondary-column,
@@ -197,8 +446,21 @@
   }
 
   #analytics-section .analytics-priority-grid,
-  #records-section .records-grid {
+  #records-section .records-grid,
+  .side-column .grid-2.compact-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .match-card-body,
+  .focus-priority-panel .next-match-footer,
+  .player-card .card-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .match-card-center {
+    min-height: 0;
   }
 }
 
@@ -223,60 +485,108 @@
     gap: 16px;
   }
 
+  #analytics-section,
+  #matches-panel,
+  #players-section,
+  #records-section,
+  #next-match-panel.focus-priority-panel,
+  .panel,
+  .panel-feature {
+    padding: 16px 14px;
+  }
+
+  #analytics-section .panel-title,
+  #matches-panel .panel-title,
+  #players-section .panel-title,
+  #records-section .panel-title,
+  .focus-priority-panel .panel-title,
+  .panel-title-small {
+    font-size: clamp(18px, 6.6vw, 24px);
+    max-width: none;
+  }
+
+  #analytics-section .panel-subtitle,
+  #matches-panel .panel-subtitle,
+  #players-section .panel-subtitle,
+  #records-section .panel-subtitle,
+  .focus-priority-panel .panel-subtitle,
+  .focus-priority-panel .article-dek,
+  .matches-note,
+  .card-meta,
+  .stat-note,
+  .note {
+    font-size: 12px;
+    line-height: 1.56;
+  }
+
   .focus-priority-panel .next-match-stage,
   .focus-priority-panel .next-match-footer,
   .feature-article-meta-strip,
   .focus-priority-panel .match-preview-grid,
   #analytics-section .analytics-priority-grid,
   #records-section .records-grid,
-  #players-section .players-grid {
+  #players-section .players-grid,
+  .side-column .grid-2.compact-grid,
+  .player-card .card-stats,
+  .match-card-body,
+  .match-card-top {
     grid-template-columns: 1fr !important;
   }
 
-  #analytics-section .panel-title,
-  #matches-panel .panel-title,
-  #players-section .panel-title,
-  .focus-priority-panel .panel-title {
-    font-size: clamp(20px, 7.2vw, 28px);
-    max-width: none;
-  }
-
-  .focus-priority-panel .panel-subtitle,
-  #analytics-section .panel-subtitle,
-  #matches-panel .panel-subtitle,
-  #players-section .panel-subtitle {
-    font-size: 13px;
-    line-height: 1.56;
-    max-width: none;
-  }
-
-  .focus-priority-panel .player-tile,
   .focus-priority-panel .preview-article,
   .feature-duel-banner,
-  #players-section .player-card {
+  .player-card,
+  .match-card-shell,
+  .match-card-note {
     padding-left: 14px;
     padding-right: 14px;
   }
 
   .feature-duel-line {
     grid-template-columns: 1fr !important;
-    gap: 10px;
+    gap: 8px;
   }
 
   .feature-duel-player,
   .feature-duel-player--away {
     text-align: left;
-    font-size: clamp(18px, 5.6vw, 22px);
+    font-size: clamp(17px, 5.6vw, 21px);
   }
 
   .feature-duel-separator {
     justify-self: start;
-    width: 38px;
-    height: 38px;
-    font-size: 10px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .match-card-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .chip-matchup,
+  .focus-priority-panel .match-preview-grid .metric-pill:nth-child(3) {
+    grid-column: 1 / -1;
   }
 
   .focus-priority-panel .article-body p:nth-child(n + 2) {
     display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .segment-btn,
+  .segmented-btn,
+  .hero-route-chip,
+  .nav-link,
+  .nav-admin-link {
+    flex: 1 1 100%;
+  }
+
+  .match-card-meta,
+  .feature-article-meta-strip,
+  .focus-priority-panel .match-preview-grid {
+    grid-template-columns: 1fr !important;
   }
 }
