@@ -1,0 +1,240 @@
+@media (max-width: 760px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  .site-body,
+  .shell,
+  .hero-grid,
+  .hero-copy,
+  .hero-side,
+  .public-layout,
+  .main-column,
+  .secondary-column,
+  .side-column,
+  .panel,
+  .panel-feature,
+  .panel-soft,
+  #next-match-panel,
+  #matches-panel,
+  #analytics-section,
+  #players-section,
+  #records-section,
+  .matches-grid,
+  .match-card,
+  .match-card-shell,
+  .match-card-body,
+  .match-card-player,
+  .match-card-copy,
+  .match-card-center,
+  .match-card-meta,
+  .player-card,
+  .player-card-top,
+  .player-card .card-stats,
+  .player-card details,
+  .player-card details .stack,
+  .preview-article,
+  .feature-layout,
+  .feature-duel-banner,
+  .feature-duel-line,
+  .feature-article-meta-strip,
+  .focus-priority-panel .next-match,
+  .focus-priority-panel .next-match-stage,
+  .focus-priority-panel .next-match-footer,
+  .focus-priority-panel .match-preview-grid {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .floating-nav {
+    width: min(100%, calc(100vw - 20px));
+    padding: 10px 12px;
+  }
+
+  .nav-links,
+  .hero-route-row,
+  .segment-control,
+  .segmented,
+  #matches-panel #match-filter {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .nav-link,
+  .nav-admin-link,
+  .hero-route-chip,
+  .segment-btn,
+  .segmented-btn {
+    flex: 1 1 100%;
+    min-height: 40px;
+    min-width: 0;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .hero-title {
+    font-size: clamp(28px, 10vw, 40px);
+    line-height: 1.04;
+  }
+
+  .hero-description,
+  .panel-subtitle,
+  .matches-note,
+  .card-meta,
+  .stat-note,
+  .note,
+  .focus-priority-panel .article-dek,
+  .focus-priority-panel .panel-subtitle {
+    font-size: 12px;
+    line-height: 1.56;
+    max-width: none;
+  }
+
+  .panel-title,
+  .panel-title-small,
+  .focus-priority-panel .panel-title,
+  .focus-priority-panel .article-title,
+  .player-name,
+  .standings-player-name,
+  .match-card-team strong,
+  .feature-duel-player,
+  .feature-article-meta-item strong,
+  .focus-priority-panel .metric-pill strong,
+  .player-card summary,
+  .player-card strong,
+  .list-card h4,
+  .power-row strong {
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: none;
+  }
+
+  .focus-priority-panel .panel-title,
+  .panel-title,
+  .panel-title-small {
+    font-size: clamp(18px, 6.4vw, 24px);
+    line-height: 1.14;
+    max-width: none;
+  }
+
+  .focus-priority-panel .next-match,
+  .focus-priority-panel .next-match-stage,
+  .focus-priority-panel .next-match-footer,
+  .feature-duel-line,
+  .feature-article-meta-strip,
+  .focus-priority-panel .match-preview-grid,
+  .player-card .card-stats,
+  .match-card-body,
+  .match-card-top {
+    grid-template-columns: 1fr !important;
+  }
+
+  .focus-priority-panel .player-tile,
+  .focus-priority-panel .preview-article,
+  .feature-duel-banner,
+  .player-card,
+  .match-card-shell,
+  .match-card-note,
+  .match-card-center {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .feature-duel-player,
+  .feature-duel-player--away {
+    text-align: left;
+    font-size: clamp(17px, 5.4vw, 21px);
+    line-height: 1.14;
+  }
+
+  .feature-duel-separator {
+    justify-self: start;
+    width: 36px;
+    height: 36px;
+  }
+
+  .player-card {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  .player-card-top {
+    gap: 10px;
+  }
+
+  .player-card .chip-row,
+  .focus-priority-panel .chip-row,
+  .match-card-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .chip-matchup,
+  .focus-priority-panel .match-preview-grid .metric-pill:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+
+  .match-card .row-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .match-card-player {
+    grid-template-columns: 42px minmax(0, 1fr);
+    align-items: center;
+    justify-items: start;
+    gap: 8px;
+    padding: 10px 0;
+    text-align: left;
+  }
+
+  .match-card-copy,
+  .match-card-team-away .match-card-copy {
+    justify-items: start;
+    text-align: left;
+  }
+
+  .match-card-team strong {
+    font-size: 14px;
+    line-height: 1.16;
+  }
+
+  .match-card-score-big span {
+    font-size: 28px;
+  }
+
+  .match-card-score-big small {
+    font-size: 16px;
+  }
+
+  .match-card-center-subtitle {
+    display: none;
+  }
+
+  .matches-grid .matches-headline {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    align-items: start;
+  }
+
+  .matches-grid .matches-count {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 520px) {
+  .player-card .chip-row,
+  .focus-priority-panel .chip-row,
+  .match-card-meta,
+  .feature-article-meta-strip,
+  .focus-priority-panel .match-preview-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
