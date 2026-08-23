@@ -8,26 +8,26 @@ const firebaseConfig = {
 };
 
 const STORAGE_KEY = "ef2026_admin_session_v1";
-const LOCAL_STATE_KEY = "ef2026_state_local_v1";
+const LOCAL_STATE_KEY = "ef2026_state_local_v2";
 const PASSWORD = "1111";
 const SESSION_TTL_MS = 12 * 60 * 60 * 1000;
 const STATE_COLLECTION = "league_room_v2";
 const STATE_DOCUMENT = "state";
 const PUBLISHED_STATE_URL = new URL(
   window.location.pathname.includes("/public/")
-    ? "../data/tournament.json?v=20260718"
-    : "./data/tournament.json?v=20260718",
+    ? "../data/tournament.json?v=20260823"
+    : "./data/tournament.json?v=20260823",
   window.location.href
 ).toString();
 const DEFAULT_STATE = {
   tournament: {
-    title: "Турнир eFootball 2026",
+    title: "Турнир eFootball 2027",
     subtitle: "Лига друзей",
     description:
-      "Закрытый турнир с общей таблицей, календарем, формой игроков и прогнозами на ближайшие матчи.",
+      "Компактная публичная панель с главным матчем, таблицей, календарем и ключевой аналитикой сезона.",
     roundsCount: 2,
     statusLabel: "Регулярный сезон",
-    updatedAt: "2026-07-17T13:09:44.939Z"
+    updatedAt: "2026-08-22T00:00:00.000Z"
   },
   players: [
     {
@@ -143,6 +143,14 @@ function ensureFirebase() {
 
   if (!firestoreDb) {
     firestoreDb = window.firebase.firestore();
+    try {
+      firestoreDb.settings({
+        experimentalAutoDetectLongPolling: true,
+        useFetchStreams: false
+      });
+    } catch {
+      // settings can only be applied once; ignore if firestore is already active
+    }
   }
 
   return firestoreDb;
@@ -192,10 +200,6 @@ function requireAdminSession() {
 }
 
 async function loadFallbackState() {
-  const localState = readLocalState();
-  if (localState) {
-    return localState;
-  }
   try {
     const response = await fetch(PUBLISHED_STATE_URL, {
       cache: "no-store"
@@ -204,6 +208,12 @@ async function loadFallbackState() {
       return writeLocalState(await response.json());
     }
   } catch {}
+
+  const localState = readLocalState();
+  if (localState) {
+    return localState;
+  }
+
   return writeLocalState(clone(DEFAULT_STATE));
 }
 
@@ -254,8 +264,8 @@ async function ensureRemoteState() {
     setStorageStatus(
       "local",
       hasLocalState
-        ? "Облако турнира сейчас недоступно. Панель работает в локальном режиме этого браузера."
-        : "Облако турнира сейчас недоступно. Загружен резервный шаблон в локальном режиме браузера."
+        ? "Облако турнира сейчас недоступно. Панель работает по свежему резервному состоянию этого браузера."
+        : "Облако турнира сейчас недоступно. Загружен резервный опубликованный снимок турнира."
     );
     return writeLocalState(fallbackState);
   }
