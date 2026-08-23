@@ -482,52 +482,132 @@ function createLeagueSchedule(players, roundsCount) {
     return [];
   }
 
-  const roster = activePlayers.slice();
-  if (roster.length % 2 !== 0) {
-    roster.push(null);
+  function shuffleItems(items, random) {
+    const shuffled = items.slice();
+    for (let index = shuffled.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(random() * (index + 1));
+      [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+    }
+    return shuffled;
   }
 
-  const baseRounds = [];
-  const rotation = roster.slice();
-  const lastIndex = rotation.length - 1;
-
-  for (let roundIndex = 0; roundIndex < rotation.length - 1; roundIndex += 1) {
-    const pairings = [];
-    for (let pairIndex = 0; pairIndex < rotation.length / 2; pairIndex += 1) {
-      const home = rotation[pairIndex];
-      const away = rotation[lastIndex - pairIndex];
-      if (home && away) {
-        pairings.push({ homePlayerId: home, awayPlayerId: away });
-      }
+  function buildCycleRounds(playerIds) {
+    const roster = playerIds.slice();
+    if (roster.length % 2 !== 0) {
+      roster.push(null);
     }
-    baseRounds.push(pairings);
 
-    const [fixed, ...rest] = rotation;
-    rest.unshift(rest.pop());
-    rotation.splice(0, rotation.length, fixed, ...rest);
+    const rounds = [];
+    const rotation = roster.slice();
+    const lastIndex = rotation.length - 1;
+
+    for (let roundIndex = 0; roundIndex < rotation.length - 1; roundIndex += 1) {
+      const pairings = [];
+      for (let pairIndex = 0; pairIndex < rotation.length / 2; pairIndex += 1) {
+        const home = rotation[pairIndex];
+        const away = rotation[lastIndex - pairIndex];
+        if (home && away) {
+          pairings.push({ homePlayerId: home, awayPlayerId: away });
+        }
+      }
+      rounds.push(pairings);
+
+      const [fixed, ...rest] = rotation;
+      rest.unshift(rest.pop());
+      rotation.splice(0, rotation.length, fixed, ...rest);
+    }
+
+    return rounds;
+  }
+
+  function pairingKey(pairing) {
+    return [pairing.homePlayerId, pairing.awayPlayerId].sort().join(":");
+  }
+
+  function roundsSignature(rounds) {
+    return rounds
+      .map((pairings) =>
+        pairings.map((pairing) => pairingKey(pairing)).sort().join("|")
+      )
+      .join(" /");
   }
 
   const schedule = [];
+  const pairMeetingCounts = new Map();
+  const pairFirstHome = new Map();
   let counter = 1;
+  let previousSignature = "";
+  let previousOpeningPair = "";
 
   for (let cycle = 0; cycle < roundsCount; cycle += 1) {
-    baseRounds.forEach((roundPairings, roundIndex) => {
+    const random = createRng(
+      buildSeed(
+        `${activePlayers.join("|")}:${roundsCount}:${cycle}:${Date.now()}:${Math.random()}`
+      )
+    );
+
+    let cycleRounds = buildCycleRounds(activePlayers);
+    let cycleSignature = roundsSignature(cycleRounds);
+    let cycleOpeningPair = cycleRounds[0]?.[0] ? pairingKey(cycleRounds[0][0]) : "";
+
+    for (let attempt = 0; attempt < 16; attempt += 1) {
+      const candidateRounds = shuffleItems(
+        buildCycleRounds(shuffleItems(activePlayers, random)).map((pairings) =>
+          shuffleItems(pairings, random)
+        ),
+        random
+      );
+      const candidateSignature = roundsSignature(candidateRounds);
+      const candidateOpeningPair =
+        candidateRounds[0]?.[0] ? pairingKey(candidateRounds[0][0]) : "";
+      const repeatsPreviousCycle =
+        candidateSignature === previousSignature ||
+        (candidateOpeningPair && candidateOpeningPair === previousOpeningPair);
+
+      cycleRounds = candidateRounds;
+      cycleSignature = candidateSignature;
+      cycleOpeningPair = candidateOpeningPair;
+
+      if (!repeatsPreviousCycle) {
+        break;
+      }
+    }
+
+    cycleRounds.forEach((roundPairings, roundIndex) => {
       roundPairings.forEach((pairing) => {
-        const reversed = cycle % 2 === 1;
+        const key = pairingKey(pairing);
+        const meetingsPlayed = pairMeetingCounts.get(key) || 0;
+
+        if (!pairFirstHome.has(key)) {
+          pairFirstHome.set(key, pairing.homePlayerId);
+        }
+
+        const firstHomeId = pairFirstHome.get(key);
+        const participants = key.split(":");
+        const oppositeHomeId = participants.find((playerId) => playerId !== firstHomeId);
+        const homePlayerId = meetingsPlayed % 2 === 0 ? firstHomeId : oppositeHomeId;
+        const awayPlayerId =
+          homePlayerId === participants[0] ? participants[1] : participants[0];
+
         schedule.push({
           id: `match-${counter}`,
-          round: cycle * baseRounds.length + roundIndex + 1,
-          homePlayerId: reversed ? pairing.awayPlayerId : pairing.homePlayerId,
-          awayPlayerId: reversed ? pairing.homePlayerId : pairing.awayPlayerId,
+          round: cycle * cycleRounds.length + roundIndex + 1,
+          homePlayerId,
+          awayPlayerId,
           status: "scheduled",
           homeScore: null,
           awayScore: null,
           playedAt: null,
           note: ""
         });
+
+        pairMeetingCounts.set(key, meetingsPlayed + 1);
         counter += 1;
       });
     });
+
+    previousSignature = cycleSignature;
+    previousOpeningPair = cycleOpeningPair;
   }
 
   return schedule;
