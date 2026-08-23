@@ -1,0 +1,68 @@
+.matches-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.matches-grid .matches-headline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 14px;
+  margin-bottom: 2px;
+}
+
+.matches-grid .matches-note {
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.matches-grid .matches-count {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: var(--accent);
+  background: rgba(111, 215, 255, 0.08);
+  border: 1px solid rgba(111, 215, 255, 0.16);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.players-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.player-card {
+  padding: 18px 18px 20px;
+}
+
+.player-card-top {
+  align-items: flex-start;
+}
+
+.player-card .card-meta,
+.player-card .stat-note,
+.player-card summary {
+  line-height: 1.5;
+}
+
+.player-card .chip-row {
+  row-gap: 8px;
+}
+
+.player-card details .mini-card {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+@media (max-width: 900px) {
+  .matches-grid .matches-headline {
+    align-items: flex-start;
+  }
+
+  .players-grid {
+    grid-template-columns: 1fr;
+  }
+}
