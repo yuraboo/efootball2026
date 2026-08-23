@@ -14,29 +14,29 @@
     var mod10 = value % 10;
 
     if (mod100 >= 11 && mod100 <= 14) {
-      return value + ' матчей';
+      return value + " матчей";
     }
     if (mod10 === 1) {
-      return value + ' матч';
+      return value + " матч";
     }
     if (mod10 >= 2 && mod10 <= 4) {
-      return value + ' матча';
+      return value + " матча";
     }
-    return value + ' матчей';
+    return value + " матчей";
   }
 
   function resultTone(goalsFor, goalsAgainst) {
     if (goalsFor > goalsAgainst) {
-      return 'win';
+      return "win";
     }
     if (goalsFor < goalsAgainst) {
-      return 'loss';
+      return "loss";
     }
-    return 'draw';
+    return "draw";
   }
 
   function resultToneClass(result) {
-    return result === 'win' ? 'chip-win' : result === 'loss' ? 'chip-loss' : 'chip-draw';
+    return result === "win" ? "chip-win" : result === "loss" ? "chip-loss" : "chip-draw";
   }
 
   function toChanceNumber(value) {
@@ -49,63 +49,111 @@
     var opposite = toChanceNumber(oppositeChance);
 
     if (primaryChance > opposite) {
-      return 'chip-win';
+      return "chip-win";
     }
     if (primaryChance < opposite) {
-      return 'chip-loss';
+      return "chip-loss";
     }
-    return 'chip-draw';
+    return "chip-draw";
   }
 
   function avatar(url, alt, className) {
     if (url) {
       return '<img class="' + className + '" src="' + escapeHtml(url) + '" alt="' + escapeHtml(alt) + '" />';
     }
-    return '<div class="' + className + ' fallback">' + escapeHtml(String(alt || '').slice(0, 1) || 'И') + '</div>';
+    return '<div class="' + className + ' fallback">' + escapeHtml(String(alt || "").slice(0, 1) || "И") + '</div>';
+  }
+
+  function resolveMatchesTargetId() {
+    if (document.getElementById("matches-grid")) {
+      return "matches-grid";
+    }
+    if (document.getElementById("matches-list")) {
+      return "matches-list";
+    }
+    return null;
+  }
+
+  function currentMatchFilter() {
+    var activeButton = document.querySelector("#match-filter [data-filter].is-active");
+    return activeButton ? activeButton.dataset.filter || "all" : "all";
+  }
+
+  function setActiveMatchFilter(filter) {
+    document.querySelectorAll("#match-filter [data-filter]").forEach(function (button) {
+      button.classList.toggle("is-active", button.dataset.filter === filter);
+    });
+  }
+
+  function rootOptionsForFilter(filter, matches, upcoming, played) {
+    if (filter === "scheduled") {
+      return {
+        rows: upcoming,
+        note: "Только предстоящие игры, которые ещё могут заметно изменить турнирную таблицу.",
+        counter: formatMatchCount(upcoming.length),
+        emptyText: "Будущих матчей больше нет: календарь этого сезона уже закрыт."
+      };
+    }
+
+    if (filter === "played") {
+      return {
+        rows: played,
+        note: "Архив уже сыгранных встреч с результатами, вероятностями и заметками по ходу сезона.",
+        counter: formatMatchCount(played.length),
+        emptyText: "Сыгранных матчей пока нет. Как только появятся первые результаты, они окажутся здесь."
+      };
+    }
+
+    return {
+      rows: matches,
+      note: "Полная лента сезона: от ближайших развилок до уже сыгранных матчей.",
+      counter: formatMatchCount(matches.length),
+      emptyText: "Календарь пока не создан. Зайдите в админку и соберите расписание."
+    };
   }
 
   function renderMatchCard(match) {
-    var isPlayed = match.status === 'played';
+    var isPlayed = match.status === "played";
     var matchTone = isPlayed ? resultTone(match.homeScore, match.awayScore) : null;
     var matchToneLabel = isPlayed
-      ? matchTone === 'win'
-        ? 'Победа хозяев'
-        : matchTone === 'loss'
-          ? 'Победа гостей'
-          : 'Ничья'
-      : '';
-    var statusLabel = isPlayed ? 'Сыгран' : 'В расписании';
-    var statusClass = isPlayed ? 'match-state-played' : 'match-state-scheduled';
-    var scoreLeft = isPlayed ? match.homeScore : '—';
-    var scoreRight = isPlayed ? match.awayScore : '—';
-    var centerLabel = isPlayed ? 'Финальный счет' : 'Матч впереди';
+      ? matchTone === "win"
+        ? "Победа хозяев"
+        : matchTone === "loss"
+          ? "Победа гостей"
+          : "Ничья"
+      : "";
+    var statusLabel = isPlayed ? "Сыгран" : "В расписании";
+    var statusClass = isPlayed ? "match-state-played" : "match-state-scheduled";
+    var scoreLeft = isPlayed ? match.homeScore : "—";
+    var scoreRight = isPlayed ? match.awayScore : "—";
+    var centerLabel = isPlayed ? "Финальный счет" : "Матч впереди";
     var matchupLabel = match.prediction && match.prediction.matchup && match.prediction.matchup.label
       ? match.prediction.matchup.label
-      : 'Новый матчап';
-    var cardEyebrow = isPlayed ? 'Архив сезона' : 'Предстоящая игра';
+      : "Новый матчап";
+    var cardEyebrow = isPlayed ? "Архив сезона" : "Предстоящая игра";
     var homeWinChance = match.prediction ? toChanceNumber(match.prediction.homeWinChance) : 0;
     var drawChance = match.prediction ? toChanceNumber(match.prediction.drawChance) : 0;
     var awayWinChance = match.prediction ? toChanceNumber(match.prediction.awayWinChance) : 0;
     var homePredictionClass = match.prediction
       ? predictionChanceClass(homeWinChance, awayWinChance)
-      : 'chip-win';
+      : "chip-win";
     var awayPredictionClass = match.prediction
       ? predictionChanceClass(awayWinChance, homeWinChance)
-      : 'chip-loss';
+      : "chip-loss";
     var chips = match.prediction
       ? '<span class="chip ' + homePredictionClass + '">П1 ' + escapeHtml(homeWinChance) + '%</span>' +
         '<span class="chip chip-draw">Х ' + escapeHtml(drawChance) + '%</span>' +
         '<span class="chip ' + awayPredictionClass + '">П2 ' + escapeHtml(awayWinChance) + '%</span>'
-      : '';
+      : "";
     var resultChip = matchToneLabel
       ? '<span class="chip ' + resultToneClass(matchTone) + '">' + escapeHtml(matchToneLabel) + '</span>'
-      : '';
+      : "";
     var importance = match.importance
       ? '<span class="impact-badge">' + escapeHtml(match.importance.score) + ' · ' + escapeHtml(match.importance.label) + '</span>'
-      : '';
+      : "";
     var note = match.note
       ? '<div class="match-card-note"><div class="match-card-note-label">Описание матча</div><p>' + escapeHtml(match.note) + '</p></div>'
-      : '';
+      : "";
 
     return '' +
       '<article class="match-card ' + (isPlayed ? 'played' : 'scheduled') + '">' +
@@ -210,11 +258,13 @@
       emptyText: 'Сыгранных матчей пока нет. Как только появятся первые результаты, они окажутся здесь.'
     });
 
-    renderMatchesList('matches-list', matches, {
-      note: 'Полная лента сезона: от ближайших развилок до уже сыгранных матчей.',
-      counter: formatMatchCount(matches.length),
-      emptyText: 'Календарь пока не создан. Зайдите в админку и соберите расписание.'
-    });
+    var rootTargetId = resolveMatchesTargetId();
+    if (!rootTargetId) {
+      return;
+    }
+
+    var rootOptions = rootOptionsForFilter(currentMatchFilter(), matches, upcoming, played);
+    renderMatchesList(rootTargetId, rootOptions.rows, rootOptions);
   }
 
   window.renderMatches = renderMatchesRedesign;
@@ -224,7 +274,12 @@
     // no-op
   }
 
-  function refreshMatches() {
+  function rerenderMatchesFromState() {
+    if (typeof baseModel !== 'undefined' && baseModel && baseModel.derived) {
+      renderMatchesRedesign(baseModel);
+      return;
+    }
+
     if (!window.api || typeof window.api.publicState !== 'function') {
       return;
     }
@@ -232,6 +287,29 @@
     window.api.publicState().then(renderMatchesRedesign).catch(function () {
       // no-op
     });
+  }
+
+  function setupMatchFilter() {
+    var controls = document.getElementById('match-filter');
+    if (!controls || controls.dataset.bound === '1') {
+      return;
+    }
+
+    controls.dataset.bound = '1';
+    controls.addEventListener('click', function (event) {
+      var button = event.target.closest('[data-filter]');
+      if (!button) {
+        return;
+      }
+
+      setActiveMatchFilter(button.dataset.filter || 'all');
+      rerenderMatchesFromState();
+    });
+  }
+
+  function refreshMatches() {
+    setupMatchFilter();
+    rerenderMatchesFromState();
   }
 
   if (document.readyState === 'loading') {
