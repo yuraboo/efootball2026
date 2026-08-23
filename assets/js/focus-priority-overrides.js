@@ -218,16 +218,22 @@
   }
 
   function rerenderWithOverrides() {
+    const model = typeof baseModel !== "undefined" ? baseModel : null;
+    if (!model?.state || !model?.derived) {
+      return;
+    }
+
     if (typeof window.renderAll === "function") {
       try {
         window.renderAll();
       } catch (error) {
         console.error("focus-priority-overrides renderAll failed", error);
       }
-    } else {
-      enhanceHero();
-      enhanceNextMatch();
+      return;
     }
+
+    enhanceHero();
+    enhanceNextMatch();
   }
 
   if (document.readyState === "loading") {
