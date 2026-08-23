@@ -66,3 +66,201 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 760px) {
+  .floating-nav {
+    width: min(100%, 100vw - 24px);
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .nav-links {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .nav-link,
+  .nav-admin-link {
+    flex: 1 1 calc(50% - 4px);
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .nav-brand {
+    width: 100%;
+  }
+
+  .nav-progress {
+    display: none;
+  }
+
+  .public-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 16px;
+  }
+
+  .main-column,
+  .secondary-column,
+  .side-column,
+  .secondary-flow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .hero-card,
+  .panel,
+  .panel-feature,
+  #matches-panel,
+  #next-match-panel.focus-priority-panel {
+    padding: 18px 16px;
+  }
+
+  .hero-topline,
+  .hero-topline-actions,
+  .panel-header,
+  .panel-header-anchor {
+    gap: 10px;
+  }
+
+  .panel-header-anchor {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .hero-route-row,
+  .segment-control,
+  .segmented {
+    width: 100%;
+  }
+
+  .segment-control,
+  .segmented {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .segment-btn,
+  .segmented-btn {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
+  }
+
+  .next-match-stage,
+  .next-match-footer,
+  .focus-priority-panel .next-match-stage,
+  .focus-priority-panel .next-match-footer,
+  .feature-duel-line,
+  .feature-article-meta-strip,
+  .focus-priority-panel .match-preview-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .feature-duel-topline {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .feature-duel-player,
+  .feature-duel-player--away {
+    text-align: left;
+    font-size: clamp(18px, 6.2vw, 24px);
+    word-break: break-word;
+  }
+
+  .feature-duel-separator {
+    width: 40px;
+    height: 40px;
+    margin: 0;
+  }
+
+  .focus-priority-panel .article-title,
+  .article-title {
+    max-width: none;
+  }
+
+  .matches-grid,
+  .matches-list,
+  .players-grid,
+  .match-card,
+  .match-card-shell,
+  .match-card-body,
+  .match-card-player,
+  .match-card-copy,
+  .match-card-meta {
+    min-width: 0;
+  }
+
+  .match-card {
+    overflow: hidden;
+  }
+
+  .match-card-body,
+  .match-card-top {
+    grid-template-columns: 1fr !important;
+  }
+
+  .match-card-top-right,
+  .match-card-top-left {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .match-card-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .match-card-meta .chip {
+    width: 100%;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .match-card-team strong {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .player-card {
+    padding: 16px;
+  }
+
+  .player-card-top {
+    gap: 12px;
+  }
+
+  .player-card .chip-row {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 520px) {
+  .floating-nav {
+    padding: 10px 12px;
+  }
+
+  .nav-link,
+  .nav-admin-link,
+  .segment-btn,
+  .segmented-btn,
+  .hero-route-chip {
+    flex: 1 1 100%;
+  }
+
+  .hero-card,
+  .panel,
+  .panel-feature,
+  #matches-panel,
+  #next-match-panel.focus-priority-panel {
+    padding: 16px 14px;
+  }
+
+  .focus-priority-panel .preview-article,
+  .feature-duel-banner,
+  .match-card-note {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
