@@ -41,6 +41,12 @@ function playerNameMap(players) {
   return Object.fromEntries(players.map((player) => [player.id, player]));
 }
 
+function elementByIds(...ids) {
+  return ids
+    .map((id) => document.getElementById(id))
+    .find(Boolean) || null;
+}
+
 function renderPredictionChips(prediction) {
   return prediction.factors
     .map(
@@ -373,7 +379,7 @@ function renderHeroRace(model) {
   }
 
   holder.querySelector(".race-copy").textContent =
-    "Все участники стоят на одной линии, а их положение зависит только от набранных очков.";
+    "Позиции меняются только за счет очков, поэтому дистанция читается с одного взгляда.";
   holder.querySelector(".race-target-points").textContent =
     `Максимум сезона: ${targetPoints} очк.`;
   holder.querySelector(".race-player-count").textContent =
@@ -407,13 +413,21 @@ function renderHero(model) {
   const leader = derived.standings[0];
   const forecastLeader = derived.forecast.rows[0];
   const powerLeader = derived.powerRanking[0];
+  const heroTitle = elementByIds("hero-title");
+  const heroDescription = elementByIds("hero-description");
+  const heroStatsHolder = elementByIds("hero-stats");
+  const statusBadge = elementByIds("status-badge");
 
-  document.getElementById("hero-title").innerHTML = `${state.tournament.title}<span>${state.tournament.subtitle}</span>`;
-  document.getElementById("hero-description").textContent = state.tournament.description;
+  if (heroTitle) {
+    heroTitle.innerHTML = `${state.tournament.title}<span>${state.tournament.subtitle}</span>`;
+  }
+  if (heroDescription) {
+    heroDescription.textContent = state.tournament.description;
+  }
 
   const heroStats = [
     {
-      label: "Лидер сейчас",
+      label: "Лидер",
       value: leader ? leader.name : "—",
       note: leader ? `${leader.points} очк. и РМ ${leader.goalDiff > 0 ? "+" : ""}${leader.goalDiff}` : "Таблица еще не сформирована"
     },
@@ -425,33 +439,32 @@ function renderHero(model) {
         : "Появится после первого расчета"
     },
     {
-      label: "Power rating",
+      label: "Power-рейтинг",
       value: powerLeader ? powerLeader.name : "—",
       note: powerLeader
         ? `${powerLeader.score} очков силы · ${powerLeader.trendLabel}`
         : "Появится после первых игр"
-    },
-    {
-      label: "Режим",
-      value: "Лига",
-      note: `${state.players.length} участника(ов), ${state.tournament.roundsCount} круг(а)`
     }
   ];
 
-  document.getElementById("hero-stats").innerHTML = heroStats
-    .map(
-      (item) => `
-        <div class="stat-card">
-          <div class="stat-label">${item.label}</div>
-          <div class="stat-value">${item.value}</div>
-          <div class="stat-note">${item.note}</div>
-        </div>
-      `
-    )
-    .join("");
+  if (heroStatsHolder) {
+    heroStatsHolder.innerHTML = heroStats
+      .map(
+        (item) => `
+          <div class="stat-card">
+            <div class="stat-label">${item.label}</div>
+            <div class="stat-value">${item.value}</div>
+            <div class="stat-note">${item.note}</div>
+          </div>
+        `
+      )
+      .join("");
+  }
 
   renderHeroRace(model);
-  document.getElementById("status-badge").textContent = state.tournament.statusLabel;
+  if (statusBadge) {
+    statusBadge.textContent = state.tournament.statusLabel;
+  }
 }
 
 function renderTableContext(model) {
@@ -470,6 +483,9 @@ function renderTableContext(model) {
 
 function renderNextMatch(model) {
   const panel = document.getElementById("next-match-panel");
+  if (!panel) {
+    return;
+  }
   const nextMatch = model.derived.nextMatch;
 
   if (!nextMatch) {
@@ -492,8 +508,9 @@ function renderNextMatch(model) {
   panel.innerHTML = `
     <div class="panel-header">
       <div>
-        <h2 class="panel-title">Следующий матч</h2>
-        <div class="panel-subtitle">Раунд ${nextMatch.round}. Главный матч ближайшего игрового окна с журналистским превью и индексом важности.</div>
+        <div class="panel-kicker">В фокусе тура</div>
+        <h2 class="panel-title">Главный матч тура</h2>
+        <div class="panel-subtitle">Раунд ${nextMatch.round}. Самая важная ближайшая игра: короткий анонс, шансы на исход и ключевой контекст по встрече.</div>
       </div>
       <div class="stack-inline">
         <div class="badge">Уверенность модели: ${prediction.confidence}%</div>
@@ -510,7 +527,7 @@ function renderNextMatch(model) {
           ${avatar(nextMatch.homePlayer.photoUrl, nextMatch.homePlayer.name)}
           <div class="player-name">${nextMatch.homePlayer.name}</div>
           <div class="player-meta">Рейтинг ${formatRating(nextMatch.homePlayer.rating)}<br /><span class="rating-hint">Меньше число = сильнее игрок</span></div>
-          <div class="chance">${prediction.homeChance}% на победу</div>
+          <div class="chance">Шанс победы ${prediction.homeChance}%</div>
         </div>
         <div class="vs-holder">
           <div class="vs-circle">VS</div>
@@ -519,7 +536,7 @@ function renderNextMatch(model) {
           ${avatar(nextMatch.awayPlayer.photoUrl, nextMatch.awayPlayer.name)}
           <div class="player-name">${nextMatch.awayPlayer.name}</div>
           <div class="player-meta">Рейтинг ${formatRating(nextMatch.awayPlayer.rating)}<br /><span class="rating-hint">Меньше число = сильнее игрок</span></div>
-          <div class="chance">${prediction.awayChance}% на победу</div>
+          <div class="chance">Шанс победы ${prediction.awayChance}%</div>
         </div>
       </div>
       <div class="feature-layout">
@@ -541,7 +558,10 @@ function renderNextMatch(model) {
         <strong>${prediction.matchup.label}</strong>
         <div class="stat-note">${prediction.matchup.summary}</div>
       </div>
-      <p class="note">${prediction.summary}</p>
+      <div class="next-match-note-card">
+        <div class="stat-label">Краткий вывод</div>
+        <div class="stat-note">${prediction.summary}</div>
+      </div>
     </div>
   `;
 }
@@ -549,6 +569,9 @@ function renderNextMatch(model) {
 function renderStandings(model) {
   const body = document.getElementById("standings-body");
   const cards = document.getElementById("standings-cards");
+  if (!body) {
+    return;
+  }
   body.innerHTML = model.derived.standings
     .map((row) => {
       const rowClass =
@@ -617,6 +640,9 @@ function renderStandings(model) {
 function renderPlayers(model) {
   const names = playerNameMap(model.state.players);
   const grid = document.getElementById("players-grid");
+  if (!grid) {
+    return;
+  }
   grid.innerHTML = model.derived.playerCards
     .map((item) => {
       const nextOpponent = item.nextOpponentId ? names[item.nextOpponentId]?.name || "—" : "Нет ближайшего соперника";
@@ -691,7 +717,10 @@ function renderPlayers(model) {
 }
 
 function renderMatches(model) {
-  const list = document.getElementById("matches-list");
+  const list = elementByIds("matches-grid", "matches-list");
+  if (!list) {
+    return;
+  }
   list.innerHTML = model.derived.matches.length
     ? model.derived.matches
         .map((match) => {
@@ -748,8 +777,11 @@ function renderMatches(model) {
 }
 
 function renderForecast(model) {
-  const list = document.getElementById("season-forecast");
-  list.innerHTML = model.derived.forecast.rows
+  const list = elementByIds("title-race-card", "season-forecast");
+  if (!list) {
+    return;
+  }
+  const cards = model.derived.forecast.rows
     .map(
       (row) => `
         <div class="list-card">
@@ -779,11 +811,30 @@ function renderForecast(model) {
       `
     )
     .join("");
+
+  if (list.id === "title-race-card") {
+    list.innerHTML = `
+      <div class="panel-header compact-header">
+        <div>
+          <div class="panel-kicker">Титульная гонка</div>
+          <h3 class="panel-title panel-title-small">Шансы на титул</h3>
+          <div class="panel-subtitle">Модель сезона и ожидаемое распределение верхних мест.</div>
+        </div>
+      </div>
+      ${cards}
+    `;
+    return;
+  }
+
+  list.innerHTML = cards;
 }
 
 function renderPowerRanking(model) {
-  const list = document.getElementById("power-ranking");
-  list.innerHTML = model.derived.powerRanking
+  const list = elementByIds("power-ranking-card", "power-ranking");
+  if (!list) {
+    return;
+  }
+  const cards = model.derived.powerRanking
     .map(
       (row) => `
         <div class="list-card">
@@ -800,10 +851,29 @@ function renderPowerRanking(model) {
       `
     )
     .join("");
+
+  if (list.id === "power-ranking-card") {
+    list.innerHTML = `
+      <div class="panel-header compact-header">
+        <div>
+          <div class="panel-kicker">Сила сезона</div>
+          <h3 class="panel-title panel-title-small">Power-рейтинг</h3>
+          <div class="panel-subtitle">Кто выглядит сильнее по форме, стилю и общему турнирному импульсу.</div>
+        </div>
+      </div>
+      ${cards}
+    `;
+    return;
+  }
+
+  list.innerHTML = cards;
 }
 
 function renderImportanceBoard(model) {
   const list = document.getElementById("importance-board");
+  if (!list) {
+    return;
+  }
   const rows = model.derived.importanceBoard.slice(0, 5);
   list.innerHTML = rows.length
     ? rows
@@ -825,6 +895,9 @@ function renderImportanceBoard(model) {
 
 function renderInsights(model) {
   const grid = document.getElementById("insights-grid");
+  if (!grid) {
+    return;
+  }
   const { standings, totals, topScoringMatch, powerRanking, playerCards, importanceBoard } =
     model.derived;
   const leader = standings[0];
@@ -907,6 +980,9 @@ function renderInsights(model) {
 
 function renderLastMatch(model) {
   const holder = document.getElementById("last-match");
+  if (!holder) {
+    return;
+  }
   const last = model.derived.lastMatch;
   const timelineLast = model.derived.timeline.slice(-1)[0];
   if (!last) {
@@ -929,6 +1005,9 @@ function renderLastMatch(model) {
 
 function renderTimeline(model) {
   const holder = document.getElementById("season-timeline");
+  if (!holder) {
+    return;
+  }
   const rows = model.derived.timeline;
   holder.innerHTML = rows.length
     ? rows
@@ -959,6 +1038,9 @@ function renderTimeline(model) {
 }
 
 function renderAll() {
+  if (!baseModel?.state || !baseModel?.derived) {
+    return;
+  }
   renderHero(baseModel);
   renderNextMatch(baseModel);
   renderTableContext(baseModel);
