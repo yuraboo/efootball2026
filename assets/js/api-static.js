@@ -16,6 +16,7 @@ const STATE_COLLECTION = "tournament";
 const STATE_DOCUMENT = "state";
 const CLOUD_POLL_INTERVAL_MS = 15000;
 const LOCAL_POLL_INTERVAL_MS = 5000;
+const FIRESTORE_REST_DOCUMENT_URL = `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents/${STATE_COLLECTION}/${STATE_DOCUMENT}?key=${firebaseConfig.apiKey}`;
 const PUBLISHED_STATE_URL = new URL(
   window.location.pathname.includes("/public/")
     ? "../data/tournament.json?v=20260823"
@@ -122,7 +123,6 @@ const DEFAULT_STATE = {
   ]
 };
 
-let firestoreDb = null;
 let storageMode = "cloud";
 let storageMessage = "";
 
@@ -133,35 +133,6 @@ function clone(data) {
 function setStorageStatus(mode, message = "") {
   storageMode = mode;
   storageMessage = message;
-}
-
-function ensureFirebase() {
-  if (typeof window === "undefined" || !window.firebase) {
-    throw new Error("Не удалось подключить облачное хранилище турнира.");
-  }
-
-  if (!window.firebase.apps.length) {
-    window.firebase.initializeApp(firebaseConfig);
-  }
-
-  if (!firestoreDb) {
-    firestoreDb = window.firebase.firestore();
-    try {
-      firestoreDb.settings({
-        experimentalForceLongPolling: true,
-        useFetchStreams: false,
-        merge: true
-      });
-    } catch {
-      // settings can only be applied once; ignore if firestore is already active
-    }
-  }
-
-  return firestoreDb;
-}
-
-function stateRef() {
-  return ensureFirebase().collection(STATE_COLLECTION).doc(STATE_DOCUMENT);
 }
 
 function readSession() {
@@ -422,6 +393,125 @@ function normalizeStateShape(source) {
   return normalizeTournamentState(nextState);
 }
 
+function toFirestoreValue(value) {
+  if (value === null || value === undefined) {
+    return { nullValue: null };
+  }
+  if (Array.isArray(value)) {
+    return {
+      arrayValue: {
+        values: value.map((item) => toFirestoreValue(item))
+      }
+    };
+  }
+  if (typeof value === "object") {
+    return {
+      mapValue: {
+        fields: Object.fromEntries(
+          Object.entries(value).map(([key, item]) => [key, toFirestoreValue(item)])
+        )
+      }
+    };
+  }
+  if (typeof value === "number") {
+    return Number.isInteger(value)
+      ? { integerValue: String(value) }
+      : { doubleValue: value };
+  }
+  if (typeof value === "boolean") {
+    return { booleanValue: value };
+  }
+  return { stringValue: String(value) };
+}
+
+function fromFirestoreValue(value) {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+  if (Object.prototype.hasOwnProperty.call(value, "nullValue")) {
+    return null;
+  }
+  if (Object.prototype.hasOwnProperty.call(value, "stringValue")) {
+    return String(value.stringValue);
+  }
+  if (Object.prototype.hasOwnProperty.call(value, "integerValue")) {
+    return Number(value.integerValue);
+  }
+  if (Object.prototype.hasOwnProperty.call(value, "doubleValue")) {
+    return Number(value.doubleValue);
+  }
+  if (Object.prototype.hasOwnProperty.call(value, "booleanValue")) {
+    return Boolean(value.booleanValue);
+  }
+  if (Object.prototype.hasOwnProperty.call(value, "timestampValue")) {
+    return String(value.timestampValue);
+  }
+  if (value.arrayValue) {
+    return Array.isArray(value.arrayValue.values)
+      ? value.arrayValue.values.map((item) => fromFirestoreValue(item))
+      : [];
+  }
+  if (value.mapValue) {
+    const fields = value.mapValue.fields || {};
+    return Object.fromEntries(
+      Object.entries(fields).map(([key, item]) => [key, fromFirestoreValue(item)])
+    );
+  }
+  return null;
+}
+
+function toFirestoreFields(data) {
+  const fields = {};
+  Object.entries(data || {}).forEach(([key, value]) => {
+    fields[key] = toFirestoreValue(value);
+  });
+  return fields;
+}
+
+function fromFirestoreFields(fields) {
+  const next = {};
+  Object.entries(fields || {}).forEach(([key, value]) => {
+    next[key] = fromFirestoreValue(value);
+  });
+  return next;
+}
+
+async function readRemoteDocument() {
+  const response = await fetch(FIRESTORE_REST_DOCUMENT_URL, {
+    method: "GET",
+    cache: "no-store"
+  });
+
+  if (response.status === 404) {
+    return null;
+  }
+  if (!response.ok) {
+    throw new Error(`Cloud read failed: ${response.status}`);
+  }
+
+  const payload = await response.json();
+  return fromFirestoreFields(payload.fields || {});
+}
+
+async function writeRemoteDocument(state) {
+  const response = await fetch(FIRESTORE_REST_DOCUMENT_URL, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      fields: toFirestoreFields(clone(state))
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Cloud write failed: ${response.status}`);
+  }
+
+  const payload = await response.json();
+  return fromFirestoreFields(payload.fields || {});
+}
+
 async function loadPublishedState() {
   try {
     const response = await fetch(PUBLISHED_STATE_URL, {
@@ -485,17 +575,16 @@ async function ensureRemoteState() {
   const localState = readLocalState();
 
   try {
-    const ref = stateRef();
-    const snapshot = await ref.get();
+    const remoteRaw = await readRemoteDocument();
 
-    if (snapshot.exists) {
-      const remoteState = normalizeStateShape(snapshot.data());
+    if (remoteRaw) {
+      const remoteState = normalizeStateShape(remoteRaw);
 
       if (localState && stateTimestamp(localState) > stateTimestamp(remoteState)) {
-        await ref.set(clone(localState));
-        writeLocalState(localState);
+        const syncedLocal = normalizeStateShape(await writeRemoteDocument(localState));
+        writeLocalState(syncedLocal);
         setStorageStatus("cloud");
-        return localState;
+        return syncedLocal;
       }
 
       writeLocalState(remoteState);
@@ -504,10 +593,10 @@ async function ensureRemoteState() {
     }
 
     const fallback = await loadFallbackState();
-    await ref.set(clone(fallback.state));
-    writeLocalState(fallback.state);
+    const writtenFallback = normalizeStateShape(await writeRemoteDocument(fallback.state));
+    writeLocalState(writtenFallback);
     setStorageStatus("cloud");
-    return fallback.state;
+    return writtenFallback;
   } catch {
     const fallback = await loadFallbackState();
     setStorageStatus(
@@ -526,10 +615,10 @@ async function writeRemoteState(nextState, options = {}) {
   const normalized = normalizeStateShape(nextState);
 
   try {
-    await stateRef().set(clone(normalized));
-    writeLocalState(normalized);
+    const writtenState = normalizeStateShape(await writeRemoteDocument(normalized));
+    writeLocalState(writtenState);
     setStorageStatus("cloud");
-    return normalized;
+    return writtenState;
   } catch {
     writeLocalState(normalized);
     const localOnlyMessage =
