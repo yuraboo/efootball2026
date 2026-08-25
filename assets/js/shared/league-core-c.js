@@ -381,12 +381,19 @@ function applyAdminAction(state, action) {
       );
       break;
 
-    case "generate_schedule":
+    case "generate_schedule": {
+      const hasPlayedMatches = draft.matches.some((match) => match.status === "played");
+      if (hasPlayedMatches) {
+        throw new Error(
+          "Нельзя пересобрать календарь, пока в сезоне уже есть сыгранные матчи. Иначе результаты сотрутся. Если нужен новый сезон, сначала нажмите «Очистить календарь» осознанно."
+        );
+      }
       draft.matches = createLeagueSchedule(
         draft.players,
         draft.tournament.roundsCount
       );
       break;
+    }
 
     case "save_match_result": {
       const target = draft.matches.find((match) => match.id === payload.matchId);
