@@ -16,7 +16,6 @@ const STATE_COLLECTION = "tournament";
 const STATE_DOCUMENT = "state";
 const CLOUD_POLL_INTERVAL_MS = 15000;
 const LOCAL_POLL_INTERVAL_MS = 5000;
-const FIRESTORE_REST_DOCUMENT_URL = `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents/${STATE_COLLECTION}/${STATE_DOCUMENT}?key=${firebaseConfig.apiKey}`;
 const PUBLISHED_STATE_URL = new URL(
   window.location.pathname.includes("/public/")
     ? "../data/tournament.json?v=20260823"
@@ -125,6 +124,8 @@ const DEFAULT_STATE = {
 
 let storageMode = "cloud";
 let storageMessage = "";
+let firebaseApp = null;
+let firestoreDb = null;
 
 function clone(data) {
   return JSON.parse(JSON.stringify(data));
@@ -133,6 +134,29 @@ function clone(data) {
 function setStorageStatus(mode, message = "") {
   storageMode = mode;
   storageMessage = message;
+}
+
+function getFirestoreDb() {
+  if (firestoreDb) {
+    return firestoreDb;
+  }
+
+  if (!window.firebase?.firestore) {
+    throw new Error("Firebase недоступен в браузере.");
+  }
+
+  if (window.firebase.apps?.length) {
+    firebaseApp = window.firebase.app();
+  } else {
+    firebaseApp = window.firebase.initializeApp(firebaseConfig);
+  }
+
+  firestoreDb = firebaseApp.firestore();
+  return firestoreDb;
+}
+
+function stateRef() {
+  return getFirestoreDb().collection(STATE_COLLECTION).doc(STATE_DOCUMENT);
 }
 
 function readSession() {
@@ -393,123 +417,18 @@ function normalizeStateShape(source) {
   return normalizeTournamentState(nextState);
 }
 
-function toFirestoreValue(value) {
-  if (value === null || value === undefined) {
-    return { nullValue: null };
-  }
-  if (Array.isArray(value)) {
-    return {
-      arrayValue: {
-        values: value.map((item) => toFirestoreValue(item))
-      }
-    };
-  }
-  if (typeof value === "object") {
-    return {
-      mapValue: {
-        fields: Object.fromEntries(
-          Object.entries(value).map(([key, item]) => [key, toFirestoreValue(item)])
-        )
-      }
-    };
-  }
-  if (typeof value === "number") {
-    return Number.isInteger(value)
-      ? { integerValue: String(value) }
-      : { doubleValue: value };
-  }
-  if (typeof value === "boolean") {
-    return { booleanValue: value };
-  }
-  return { stringValue: String(value) };
-}
-
-function fromFirestoreValue(value) {
-  if (!value || typeof value !== "object") {
-    return null;
-  }
-  if (Object.prototype.hasOwnProperty.call(value, "nullValue")) {
-    return null;
-  }
-  if (Object.prototype.hasOwnProperty.call(value, "stringValue")) {
-    return String(value.stringValue);
-  }
-  if (Object.prototype.hasOwnProperty.call(value, "integerValue")) {
-    return Number(value.integerValue);
-  }
-  if (Object.prototype.hasOwnProperty.call(value, "doubleValue")) {
-    return Number(value.doubleValue);
-  }
-  if (Object.prototype.hasOwnProperty.call(value, "booleanValue")) {
-    return Boolean(value.booleanValue);
-  }
-  if (Object.prototype.hasOwnProperty.call(value, "timestampValue")) {
-    return String(value.timestampValue);
-  }
-  if (value.arrayValue) {
-    return Array.isArray(value.arrayValue.values)
-      ? value.arrayValue.values.map((item) => fromFirestoreValue(item))
-      : [];
-  }
-  if (value.mapValue) {
-    const fields = value.mapValue.fields || {};
-    return Object.fromEntries(
-      Object.entries(fields).map(([key, item]) => [key, fromFirestoreValue(item)])
-    );
-  }
-  return null;
-}
-
-function toFirestoreFields(data) {
-  const fields = {};
-  Object.entries(data || {}).forEach(([key, value]) => {
-    fields[key] = toFirestoreValue(value);
-  });
-  return fields;
-}
-
-function fromFirestoreFields(fields) {
-  const next = {};
-  Object.entries(fields || {}).forEach(([key, value]) => {
-    next[key] = fromFirestoreValue(value);
-  });
-  return next;
-}
-
 async function readRemoteDocument() {
-  const response = await fetch(FIRESTORE_REST_DOCUMENT_URL, {
-    method: "GET",
-    cache: "no-store"
-  });
-
-  if (response.status === 404) {
+  const snapshot = await stateRef().get();
+  if (!snapshot.exists) {
     return null;
   }
-  if (!response.ok) {
-    throw new Error(`Cloud read failed: ${response.status}`);
-  }
-
-  const payload = await response.json();
-  return fromFirestoreFields(payload.fields || {});
+  return snapshot.data();
 }
 
 async function writeRemoteDocument(state) {
-  const response = await fetch(FIRESTORE_REST_DOCUMENT_URL, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      fields: toFirestoreFields(clone(state))
-    })
-  });
-
-  if (!response.ok) {
-    throw new Error(`Cloud write failed: ${response.status}`);
-  }
-
-  const payload = await response.json();
-  return fromFirestoreFields(payload.fields || {});
+  const normalized = normalizeStateShape(state);
+  await stateRef().set(clone(normalized));
+  return normalized;
 }
 
 async function loadPublishedState() {
