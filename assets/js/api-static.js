@@ -12,7 +12,7 @@ const LOCAL_STATE_KEY = "ef2026_state_local_v3";
 const LEGACY_LOCAL_STATE_KEYS = ["ef2026_state_local_v2"];
 const PASSWORD = "1111";
 const SESSION_TTL_MS = 12 * 60 * 60 * 1000;
-const STATE_COLLECTION = "league_room_v2";
+const STATE_COLLECTION = "tournament";
 const STATE_DOCUMENT = "state";
 const CLOUD_POLL_INTERVAL_MS = 15000;
 const LOCAL_POLL_INTERVAL_MS = 5000;
@@ -214,7 +214,7 @@ function readStateByKey(key) {
     if (!raw) {
       return null;
     }
-    return normalizeTournamentState(JSON.parse(raw));
+    return normalizeStateShape(JSON.parse(raw));
   } catch {
     return null;
   }
@@ -235,13 +235,200 @@ function resolveFallbackCandidate(candidates) {
   })[0];
 }
 
+function parseLegacyStatusLabel(mode) {
+  if (mode === "playoff") {
+    return "Плей-офф";
+  }
+  if (mode === "league") {
+    return "Лига";
+  }
+  return DEFAULT_TOURNAMENT.statusLabel;
+}
+
+function parseLegacyScorePair(match) {
+  const directHome =
+    match?.homeScore ??
+    match?.scoreHome ??
+    match?.goalsHome ??
+    match?.player1Score ??
+    match?.score1 ??
+    match?.goals1;
+  const directAway =
+    match?.awayScore ??
+    match?.scoreAway ??
+    match?.goalsAway ??
+    match?.player2Score ??
+    match?.score2 ??
+    match?.goals2;
+
+  if (directHome !== undefined || directAway !== undefined) {
+    return [
+      directHome === undefined || directHome === null || directHome === ""
+        ? null
+        : Math.max(0, toNumber(directHome, 0)),
+      directAway === undefined || directAway === null || directAway === ""
+        ? null
+        : Math.max(0, toNumber(directAway, 0))
+    ];
+  }
+
+  const scoreText = String(match?.score || match?.result || "").trim();
+  const scoreMatch = scoreText.match(/(\d+)\s*[:\-]\s*(\d+)/);
+  if (scoreMatch) {
+    return [Number(scoreMatch[1]), Number(scoreMatch[2])];
+  }
+
+  return [null, null];
+}
+
+function parseLegacyName(match, keys) {
+  for (const key of keys) {
+    const value = match?.[key];
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+  return "";
+}
+
+function normalizeLegacyMatches(matches, playersByName) {
+  if (!Array.isArray(matches)) {
+    return [];
+  }
+
+  return matches
+    .map((match, index) => {
+      if (!match || typeof match !== "object") {
+        return null;
+      }
+
+      const homeName = parseLegacyName(match, [
+        "homePlayer",
+        "homePlayerName",
+        "home",
+        "player1",
+        "playerOne",
+        "leftPlayer",
+        "left",
+        "host",
+        "team1",
+        "firstPlayer"
+      ]);
+      const awayName = parseLegacyName(match, [
+        "awayPlayer",
+        "awayPlayerName",
+        "away",
+        "player2",
+        "playerTwo",
+        "rightPlayer",
+        "right",
+        "guest",
+        "team2",
+        "secondPlayer"
+      ]);
+
+      const homePlayerId = playersByName[homeName];
+      const awayPlayerId = playersByName[awayName];
+      if (!homePlayerId || !awayPlayerId || homePlayerId === awayPlayerId) {
+        return null;
+      }
+
+      const [homeScore, awayScore] = parseLegacyScorePair(match);
+      const hasScore = Number.isInteger(homeScore) && Number.isInteger(awayScore);
+
+      return {
+        id: match.id || `match-${index + 1}`,
+        round: Math.max(
+          1,
+          toNumber(
+            match.round ?? match.tour ?? match.week ?? match.stage ?? index + 1,
+            index + 1
+          )
+        ),
+        homePlayerId,
+        awayPlayerId,
+        status:
+          match.status === "played" || match.played === true || hasScore
+            ? "played"
+            : "scheduled",
+        homeScore,
+        awayScore,
+        playedAt: safeDate(
+          match.playedAt ?? match.date ?? match.datetime ?? match.played_on ?? null
+        ),
+        note: String(match.note || match.comment || match.summary || "").trim()
+      };
+    })
+    .filter(Boolean);
+}
+
+function isLegacyStateShape(source) {
+  return (
+    source &&
+    !source.tournament &&
+    Array.isArray(source.players) &&
+    source.players.some((player) => typeof player === "string")
+  );
+}
+
+function normalizeStateShape(source) {
+  if (!isLegacyStateShape(source)) {
+    return normalizeTournamentState(source);
+  }
+
+  const names = source.players
+    .map((player, index) =>
+      typeof player === "string" && player.trim()
+        ? player.trim()
+        : `Игрок ${index + 1}`
+    )
+    .filter(Boolean);
+  const profiles = source.profiles && typeof source.profiles === "object" ? source.profiles : {};
+
+  const players = names.map((name, index) => {
+    const profile =
+      profiles[name] && typeof profiles[name] === "object" ? profiles[name] : {};
+    return {
+      id: slugify(name) || `player-${index + 1}`,
+      name,
+      rating: normalizeRating(profile.rating, 1000),
+      photoUrl: String(profile.photoUrl || profile.photo || "").trim(),
+      notes: String(profile.notes || profile.note || "").trim()
+    };
+  });
+
+  const playersByName = Object.fromEntries(players.map((player) => [player.name, player.id]));
+  const nextState = {
+    tournament: {
+      title: String(source.title || DEFAULT_TOURNAMENT.title).trim(),
+      subtitle: String(source.subtitle || DEFAULT_TOURNAMENT.subtitle).trim(),
+      description: String(
+        source.description || DEFAULT_TOURNAMENT.description
+      ).trim(),
+      roundsCount: clamp(
+        toNumber(source.leagueRounds ?? source.roundsCount, DEFAULT_TOURNAMENT.roundsCount),
+        1,
+        15
+      ),
+      statusLabel: String(
+        source.statusLabel || parseLegacyStatusLabel(source.mode)
+      ).trim(),
+      updatedAt: safeDate(source.updatedAt) || new Date().toISOString()
+    },
+    players,
+    matches: normalizeLegacyMatches(source.matches, playersByName)
+  };
+
+  return normalizeTournamentState(nextState);
+}
+
 async function loadPublishedState() {
   try {
     const response = await fetch(PUBLISHED_STATE_URL, {
       cache: "no-store"
     });
     if (response.ok) {
-      return normalizeTournamentState(await response.json());
+      return normalizeStateShape(await response.json());
     }
   } catch {}
 
@@ -251,7 +438,7 @@ async function loadPublishedState() {
 async function loadFallbackState() {
   const localState = readLocalState();
   const publishedState = await loadPublishedState();
-  const defaultState = clone(DEFAULT_STATE);
+  const defaultState = normalizeStateShape(clone(DEFAULT_STATE));
   const fallback =
     resolveFallbackCandidate([
       { state: localState, source: "local", priority: 3 },
@@ -278,7 +465,7 @@ function readLocalState() {
 }
 
 function writeLocalState(nextState) {
-  const normalized = normalizeTournamentState(nextState);
+  const normalized = normalizeStateShape(nextState);
 
   try {
     window.localStorage.setItem(LOCAL_STATE_KEY, JSON.stringify(clone(normalized)));
@@ -302,7 +489,7 @@ async function ensureRemoteState() {
     const snapshot = await ref.get();
 
     if (snapshot.exists) {
-      const remoteState = normalizeTournamentState(snapshot.data());
+      const remoteState = normalizeStateShape(snapshot.data());
 
       if (localState && stateTimestamp(localState) > stateTimestamp(remoteState)) {
         await ref.set(clone(localState));
@@ -336,7 +523,7 @@ async function ensureRemoteState() {
 }
 
 async function writeRemoteState(nextState, options = {}) {
-  const normalized = normalizeTournamentState(nextState);
+  const normalized = normalizeStateShape(nextState);
 
   try {
     await stateRef().set(clone(normalized));
