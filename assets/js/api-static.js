@@ -14,6 +14,8 @@ const PASSWORD = "1111";
 const SESSION_TTL_MS = 12 * 60 * 60 * 1000;
 const STATE_COLLECTION = "league_room_v2";
 const STATE_DOCUMENT = "state";
+const CLOUD_POLL_INTERVAL_MS = 15000;
+const LOCAL_POLL_INTERVAL_MS = 5000;
 const PUBLISHED_STATE_URL = new URL(
   window.location.pathname.includes("/public/")
     ? "../data/tournament.json?v=20260823"
@@ -146,8 +148,9 @@ function ensureFirebase() {
     firestoreDb = window.firebase.firestore();
     try {
       firestoreDb.settings({
-        experimentalAutoDetectLongPolling: true,
-        useFetchStreams: false
+        experimentalForceLongPolling: true,
+        useFetchStreams: false,
+        merge: true
       });
     } catch {
       // settings can only be applied once; ignore if firestore is already active
@@ -292,15 +295,25 @@ function writeLocalState(nextState) {
 }
 
 async function ensureRemoteState() {
+  const localState = readLocalState();
+
   try {
     const ref = stateRef();
     const snapshot = await ref.get();
 
     if (snapshot.exists) {
-      const normalized = normalizeTournamentState(snapshot.data());
-      writeLocalState(normalized);
+      const remoteState = normalizeTournamentState(snapshot.data());
+
+      if (localState && stateTimestamp(localState) > stateTimestamp(remoteState)) {
+        await ref.set(clone(localState));
+        writeLocalState(localState);
+        setStorageStatus("cloud");
+        return localState;
+      }
+
+      writeLocalState(remoteState);
       setStorageStatus("cloud");
-      return normalized;
+      return remoteState;
     }
 
     const fallback = await loadFallbackState();
@@ -322,7 +335,7 @@ async function ensureRemoteState() {
   }
 }
 
-async function writeRemoteState(nextState) {
+async function writeRemoteState(nextState, options = {}) {
   const normalized = normalizeTournamentState(nextState);
 
   try {
@@ -331,11 +344,16 @@ async function writeRemoteState(nextState) {
     setStorageStatus("cloud");
     return normalized;
   } catch {
-    setStorageStatus(
-      "local",
-      "Облако турнира сейчас недоступно. Изменения сохранены локально только в этом браузере."
-    );
-    return writeLocalState(normalized);
+    writeLocalState(normalized);
+    const localOnlyMessage =
+      "Облако турнира сейчас недоступно. Изменения остались только в этом браузере и не синхронизировались на другие устройства.";
+    setStorageStatus("local", localOnlyMessage);
+
+    if (options.requireCloud) {
+      throw new Error(localOnlyMessage);
+    }
+
+    return normalized;
   }
 }
 
@@ -384,76 +402,70 @@ const api = {
     requireAdminSession();
     const currentState = await ensureRemoteState();
     const nextState = applyAdminAction(currentState, { type, payload });
-    await writeRemoteState(nextState);
-    return toViewModel(nextState);
+    const savedState = await writeRemoteState(nextState, { requireCloud: true });
+    return toViewModel(savedState);
   },
 
   subscribe(onChange, onError = () => {}) {
     let active = true;
-    let unsubscribe = () => {};
+    let lastFingerprint = "";
+    let intervalId = null;
 
-    if (storageMode === "local") {
-      const handleStorage = async (event) => {
-        if (!active || (event.key && event.key !== LOCAL_STATE_KEY)) {
-          return;
-        }
+    const emitLatestState = async () => {
+      const model = toViewModel(await ensureRemoteState());
+      const fingerprint = JSON.stringify(model.state);
+      const shouldEmit =
+        fingerprint !== lastFingerprint || model.meta?.storageMode === "local";
 
-        try {
-          onChange(toViewModel(await ensureRemoteState()));
-        } catch (error) {
-          onError(error.message);
-        }
-      };
+      if (!active || !shouldEmit) {
+        return;
+      }
 
-      window.addEventListener("storage", handleStorage);
-      Promise.resolve().then(async () => {
-        try {
-          onChange(toViewModel(await ensureRemoteState()));
-        } catch (error) {
-          onError(error.message);
-        }
-      });
+      lastFingerprint = fingerprint;
+      onChange(model);
+    };
 
-      return () => {
-        active = false;
-        window.removeEventListener("storage", handleStorage);
-      };
-    }
+    const handleStorage = async (event) => {
+      if (
+        !active ||
+        (event.key &&
+          event.key !== LOCAL_STATE_KEY &&
+          !LEGACY_LOCAL_STATE_KEYS.includes(event.key))
+      ) {
+        return;
+      }
 
-    try {
-      unsubscribe = stateRef().onSnapshot(
-        async (snapshot) => {
-          try {
-            const state = snapshot.exists
-              ? normalizeTournamentState(snapshot.data())
-              : (await ensureRemoteState());
+      try {
+        await emitLatestState();
+      } catch (error) {
+        onError(error.message);
+      }
+    };
 
-            if (active) {
-              onChange(toViewModel(state));
-            }
-          } catch (error) {
-            if (active) {
-              onError(error.message);
-            }
-          }
-        },
-        async () => {
-          if (active) {
-            try {
-              onChange(toViewModel(await ensureRemoteState()));
-            } catch (error) {
-              onError(error.message);
-            }
-          }
-        }
-      );
-    } catch (error) {
-      onError(error.message);
-    }
+    window.addEventListener("storage", handleStorage);
+
+    Promise.resolve().then(async () => {
+      try {
+        await emitLatestState();
+      } catch (error) {
+        onError(error.message);
+      }
+    });
+
+    intervalId = window.setInterval(async () => {
+      try {
+        await emitLatestState();
+      } catch (error) {
+        onError(error.message);
+      }
+    }, storageMode === "cloud" ? CLOUD_POLL_INTERVAL_MS : LOCAL_POLL_INTERVAL_MS);
 
     return () => {
       active = false;
-      unsubscribe();
+      if (intervalId) {
+        window.clearInterval(intervalId);
+      }
+      window.removeEventListener("storage", handleStorage);
     };
   }
 };
