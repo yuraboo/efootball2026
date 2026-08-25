@@ -8,7 +8,8 @@ const firebaseConfig = {
 };
 
 const STORAGE_KEY = "ef2026_admin_session_v1";
-const LOCAL_STATE_KEY = "ef2026_state_local_v2";
+const LOCAL_STATE_KEY = "ef2026_state_local_v3";
+const LEGACY_LOCAL_STATE_KEYS = ["ef2026_state_local_v2"];
 const PASSWORD = "1111";
 const SESSION_TTL_MS = 12 * 60 * 60 * 1000;
 const STATE_COLLECTION = "league_room_v2";
@@ -199,27 +200,14 @@ function requireAdminSession() {
   }
 }
 
-async function loadFallbackState() {
-  try {
-    const response = await fetch(PUBLISHED_STATE_URL, {
-      cache: "no-store"
-    });
-    if (response.ok) {
-      return writeLocalState(await response.json());
-    }
-  } catch {}
-
-  const localState = readLocalState();
-  if (localState) {
-    return localState;
-  }
-
-  return writeLocalState(clone(DEFAULT_STATE));
+function stateTimestamp(state) {
+  const updatedAt = safeDate(state?.tournament?.updatedAt);
+  return updatedAt ? new Date(updatedAt).getTime() : 0;
 }
 
-function readLocalState() {
+function readStateByKey(key) {
   try {
-    const raw = window.localStorage.getItem(LOCAL_STATE_KEY);
+    const raw = window.localStorage.getItem(key);
     if (!raw) {
       return null;
     }
@@ -229,11 +217,73 @@ function readLocalState() {
   }
 }
 
+function resolveFallbackCandidate(candidates) {
+  const items = candidates.filter((item) => item?.state);
+  if (!items.length) {
+    return null;
+  }
+
+  return items.sort((left, right) => {
+    const timeDiff = stateTimestamp(right.state) - stateTimestamp(left.state);
+    if (timeDiff !== 0) {
+      return timeDiff;
+    }
+    return (right.priority || 0) - (left.priority || 0);
+  })[0];
+}
+
+async function loadPublishedState() {
+  try {
+    const response = await fetch(PUBLISHED_STATE_URL, {
+      cache: "no-store"
+    });
+    if (response.ok) {
+      return normalizeTournamentState(await response.json());
+    }
+  } catch {}
+
+  return null;
+}
+
+async function loadFallbackState() {
+  const localState = readLocalState();
+  const publishedState = await loadPublishedState();
+  const defaultState = clone(DEFAULT_STATE);
+  const fallback =
+    resolveFallbackCandidate([
+      { state: localState, source: "local", priority: 3 },
+      { state: publishedState, source: "published", priority: 2 },
+      { state: defaultState, source: "default", priority: 1 }
+    ]) || { state: defaultState, source: "default" };
+
+  return {
+    state: writeLocalState(fallback.state),
+    source: fallback.source
+  };
+}
+
+function readLocalState() {
+  const states = [LOCAL_STATE_KEY, ...LEGACY_LOCAL_STATE_KEYS]
+    .map((key) => readStateByKey(key))
+    .filter(Boolean);
+
+  if (!states.length) {
+    return null;
+  }
+
+  return states.sort((left, right) => stateTimestamp(right) - stateTimestamp(left))[0];
+}
+
 function writeLocalState(nextState) {
   const normalized = normalizeTournamentState(nextState);
 
   try {
     window.localStorage.setItem(LOCAL_STATE_KEY, JSON.stringify(clone(normalized)));
+    LEGACY_LOCAL_STATE_KEYS.forEach((key) => {
+      try {
+        window.localStorage.removeItem(key);
+      } catch {}
+    });
   } catch {
     return normalized;
   }
@@ -253,21 +303,22 @@ async function ensureRemoteState() {
       return normalized;
     }
 
-    const fallbackState = await loadFallbackState();
-    await ref.set(clone(fallbackState));
-    writeLocalState(fallbackState);
+    const fallback = await loadFallbackState();
+    await ref.set(clone(fallback.state));
+    writeLocalState(fallback.state);
     setStorageStatus("cloud");
-    return fallbackState;
-  } catch (error) {
-    const fallbackState = await loadFallbackState();
-    const hasLocalState = Boolean(readLocalState());
+    return fallback.state;
+  } catch {
+    const fallback = await loadFallbackState();
     setStorageStatus(
       "local",
-      hasLocalState
-        ? "Облако турнира сейчас недоступно. Панель работает по свежему резервному состоянию этого браузера."
-        : "Облако турнира сейчас недоступно. Загружен резервный опубликованный снимок турнира."
+      fallback.source === "local"
+        ? "Облако турнира сейчас недоступно. Панель работает по последнему сохраненному состоянию этого браузера."
+        : fallback.source === "published"
+          ? "Облако турнира сейчас недоступно. Загружен резервный опубликованный снимок турнира."
+          : "Облако турнира сейчас недоступно. Загружено стартовое состояние турнира."
     );
-    return writeLocalState(fallbackState);
+    return fallback.state;
   }
 }
 
@@ -375,7 +426,7 @@ const api = {
           try {
             const state = snapshot.exists
               ? normalizeTournamentState(snapshot.data())
-              : await ensureRemoteState();
+              : (await ensureRemoteState());
 
             if (active) {
               onChange(toViewModel(state));
