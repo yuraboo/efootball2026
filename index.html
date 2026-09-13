@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Турнир eFootball 2027</title>
+    <title>Friends League — eFootball 2027</title>
     <meta
       name="description"
-      content="Закрытая лига eFootball 2027: главный матч, таблица, календарь и ключевая аналитика в компактной публичной панели."
+      content="Friends League. Играем по-дружески. Считаем по-серьёзному. Таблица, календарь и аналитика eFootball 2027."
     />
     <link rel="canonical" href="https://yuraboo.github.io/efootball2026/" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -27,8 +27,10 @@
     <link rel="stylesheet" href="./assets/calendar-player-readability.css?v=4" />
     <link rel="stylesheet" href="./assets/layout-hotfix-20260823.css?v=4" />
     <link rel="stylesheet" href="./assets/mobile-only-hotfix-20260824.css?v=1" />
+    <link rel="icon" type="image/png" href="./assets/media/brand/fl-monogram.png" />
+    <link rel="stylesheet" href="./assets/friends-league.css?v=1" />
   </head>
-  <body class="site-body">
+  <body class="site-body friends-league">
     <div class="site-loader" id="site-loader" aria-live="polite">
       <div class="loader-core">
         <div class="loader-orbit" aria-hidden="true">
@@ -41,6 +43,7 @@
       </div>
     </div>
 
+    <a class="fl-skip" href="#standings-section">Перейти к таблице</a>
     <div class="background-grid" aria-hidden="true"></div>
     <div class="background-gradient background-gradient-left" aria-hidden="true"></div>
     <div class="background-gradient background-gradient-right" aria-hidden="true"></div>
@@ -55,60 +58,51 @@
       <span class="bubble bubble-g"></span>
     </div>
 
-    <div class="floating-nav" aria-label="Быстрая навигация">
-      <div class="nav-brand">
-        <span class="nav-brand-mark">eFootball League</span>
-      </div>
+    <nav class="floating-nav" aria-label="Быстрая навигация">
+      <a class="nav-brand" href="#league-home" aria-label="Friends League — главная">
+        <img src="./assets/media/brand/friends-league.png" alt="Friends League" width="240" height="72" />
+      </a>
       <div class="nav-links">
-        <a class="nav-link" href="#hero-next-match-card">Главная</a>
+        <a class="nav-link" href="#league-home">Главная</a>
         <a class="nav-link" href="#next-match-panel">Матч</a>
         <a class="nav-link" href="#standings-section">Таблица</a>
         <a class="nav-link" href="#matches-panel">Календарь</a>
         <a class="nav-link" href="#analytics-section">Аналитика</a>
-        <a class="nav-admin-link" href="./admin.html">Админка</a>
       </div>
-      <div class="nav-progress" aria-hidden="true">
-        <span class="nav-progress-fill"></span>
-      </div>
-    </div>
+      <a class="nav-admin-link" href="./admin.html">Войти <span aria-hidden="true">↗</span></a>
+      <div class="nav-progress" aria-hidden="true"><span class="nav-progress-fill"></span></div>
+    </nav>
 
-    <header class="hero-shell shell">
-      <div class="hero-card hero-card-compact">
-        <div class="hero-topline hero-topline-compact">
-          <div>
-            <div class="hero-kicker">Турнир под контролем</div>
-            <div class="hero-season-pill">Сезон 2027</div>
+    <header class="hero-shell shell" id="league-home">
+      <div class="hero-card fl-hero">
+        <div class="fl-hero-meta"><span><i></i> ЛИГА ДРУЗЕЙ</span><span>eFootball 2027 / Регулярный сезон</span></div>
+        <div class="fl-hero-stage">
+          <div class="fl-art" aria-hidden="true">
+            <div class="fl-orbit fl-orbit-one"></div><div class="fl-orbit fl-orbit-two"></div>
+            <div class="fl-orb-position"><div class="fl-orb"></div></div>
+            <div class="fl-satellite"></div><span class="fl-art-coordinate">FL / 27</span>
           </div>
-          <div class="hero-topline-actions">
-            <a class="utility-link admin-entry-link" href="./admin.html">Войти в админку</a>
+          <div class="hero-copy fl-hero-copy">
+            <div class="fl-overline">Одна игра. Своя лига.</div>
+            <h1 class="hero-title"><span>FRIENDS</span><span class="fl-outline">LEAGUE<span class="fl-title-dot">.</span></span></h1>
+            <div class="fl-hero-bottom">
+              <p class="hero-description">Играем по-дружески.<br><span>Считаем по-серьёзному.</span></p>
+              <a class="fl-primary" href="#standings-section">Смотреть таблицу <span aria-hidden="true">↗</span></a>
+            </div>
           </div>
         </div>
-
-        <div class="hero-grid hero-grid-compact">
-          <div class="hero-copy hero-copy-compact">
-            <div class="hero-chip-row">
-              <span class="section-chip">Регулярный сезон</span>
-            </div>
-            <h1 class="hero-title hero-title-compact">Турнир eFootball 2027</h1>
-            <p class="hero-description hero-description-compact">
-              Закрытый турнир с общей таблицей, календарем, формой игроков и прогнозами на ближайшие матчи.
-            </p>
-            <div class="hero-route-row">
-              <a class="hero-route-chip hero-route-chip--primary" href="#next-match-panel">Главный матч</a>
-              <a class="hero-route-chip" href="#standings-section">Таблица</a>
-              <a class="hero-route-chip" href="#matches-panel">Календарь</a>
-              <a class="hero-route-chip" href="#analytics-section">Топ-аналитика</a>
-            </div>
-            <div class="hero-stats hero-stats-tight" id="hero-stats"></div>
-          </div>
-
-          <div class="hero-side">
-            <article class="hero-match-card" id="hero-next-match-card"></article>
-            <div id="hero-race"></div>
-          </div>
-        </div>
+        <div class="fl-hero-foot"><a href="#fl-season">Листайте — сезон в деталях <span aria-hidden="true">↓</span></a><span>МАТЧИ / ТАБЛИЦА / АНАЛИТИКА</span></div>
       </div>
     </header>
+
+    <section class="fl-season shell" id="fl-season" aria-label="Обзор сезона">
+      <div class="fl-section-intro"><span class="fl-section-index">01 / СЕЙЧАС В ЛИГЕ</span><h2>Каждый матч<br><span>имеет значение.</span></h2><p>Кто ведёт турнир, кто набирает форму<br>и что решит следующая встреча.</p></div>
+      <div class="fl-season-grid">
+        <div class="fl-season-overview"><div class="hero-stats" id="hero-stats"></div><div id="hero-race"></div></div>
+        <div class="hero-side"><article class="hero-match-card" id="hero-next-match-card"></article></div>
+      </div>
+    </section>
+    <div class="fl-marquee" aria-hidden="true"><div><span>FRIENDS LEAGUE</span><b>✳</b><span>EVERY MATCH MATTERS</span><b>✳</b><span>FRIENDS LEAGUE</span><b>✳</b><span>EVERY MATCH MATTERS</span><b>✳</b></div></div>
 
     <main class="shell public-layout">
       <section class="main-column">
@@ -274,6 +268,13 @@
       </aside>
     </main>
 
+    <footer class="fl-footer shell">
+      <div><img src="./assets/media/brand/friends-league.png" alt="Friends League" width="240" height="72" /><p>Играем по-дружески.<br>Считаем по-серьёзному.</p></div>
+      <div class="fl-footer-links"><a href="#standings-section">Таблица ↗</a><a href="#matches-panel">Календарь ↗</a><a href="./draw/">Жеребьёвка ↗</a><a href="./admin.html">Управление ↗</a></div>
+      <a class="fl-back-top" href="#league-home" aria-label="В начало страницы">↑</a>
+      <div class="fl-footer-bottom"><span>FRIENDS LEAGUE</span><span>eFootball 2027</span></div>
+    </footer>
+    <script defer src="./assets/js/friends-league-motion.js?v=1"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
     <script src="./assets/js/shared/league-core-a.js?v=27"></script>
