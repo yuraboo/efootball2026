@@ -190,3 +190,9 @@ body.friends-league { background:#030319; overflow-x:clip; }
  .fl-footer { grid-template-columns:1fr auto;gap:32px;padding-top:48px; }.fl-footer-links { grid-column:1/-1;grid-row:2; }.fl-back-top { width:48px;height:48px; }.fl-footer img { width:200px;height:60px; }
 }
 @media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto!important; } .friends-league *, .friends-league *::before,.friends-league *::after { animation:none!important;transition:none!important; } .fl-orb-position { transform:none!important; } }
+/* Clear inherited text gradients from the previous theme. */
+.friends-league .hero-title > span { background:none;background-clip:border-box;-webkit-background-clip:border-box;color:#fff;-webkit-text-fill-color:#fff; }
+.friends-league .hero-title > .fl-outline { color:transparent;-webkit-text-fill-color:transparent;-webkit-text-stroke:1.2px #fff; }
+.friends-league .hero-title .fl-title-dot { display:inline;background:none;color:#08e7f5;-webkit-text-fill-color:#08e7f5;-webkit-text-stroke:0; }
+.friends-league .panel-title { background:none;color:#fff;-webkit-text-fill-color:#fff; }
+.fl-hero-meta { position:relative;z-index:3; }
