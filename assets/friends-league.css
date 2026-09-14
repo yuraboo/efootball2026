@@ -196,3 +196,18 @@ body.friends-league { background:#030319; overflow-x:clip; }
 .friends-league .hero-title .fl-title-dot { display:inline;background:none;color:#08e7f5;-webkit-text-fill-color:#08e7f5;-webkit-text-stroke:0; }
 .friends-league .panel-title { background:none;color:#fff;-webkit-text-fill-color:#fff; }
 .fl-hero-meta { position:relative;z-index:3; }
+/* Editorial section headings and compact data strips. */
+.friends-league .panel-header-anchor > div:first-child { padding:0;border:0;border-radius:0;background:none;box-shadow:none; }
+.friends-league .panel-header-anchor .panel-kicker { padding:0;min-height:0;border:0;border-radius:0;background:none; }
+.friends-league #standings-section > .panel-header { display:grid;grid-template-columns:minmax(0,1fr);gap:28px; }
+.friends-league .standings-overview { display:grid;grid-template-columns:minmax(0,2fr) minmax(220px,1fr);align-items:center;gap:32px;padding:24px 0;background:none;border:0;border-block:1px solid var(--line);border-radius:0;box-shadow:none; }
+.friends-league .standings-progress { padding:0;background:none;border:0;border-radius:0; }
+.friends-league .standings-progress-bar { background:#08e7f5; }
+.friends-league #matches-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px; }
+.friends-league #matches-grid > .matches-headline { grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px; }
+.friends-league .matches-count { flex:none; }
+.friends-league .segment-btn { border:0; }
+@media(max-width:760px) {
+ .friends-league .standings-overview,.friends-league #matches-grid { grid-template-columns:minmax(0,1fr); }
+ .friends-league #matches-grid > .matches-headline { align-items:flex-start;flex-direction:column;gap:12px; }
+}
