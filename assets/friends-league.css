@@ -41,7 +41,7 @@ body.friends-league { background:#030319; overflow-x:clip; }
 .fl-primary:hover { transform:translateY(-4px);box-shadow:0 0 28px #08e7f530; }
 .fl-primary:hover span { transform:translate(3px,-3px); }
 .fl-art { position:absolute;inset:0 0 0 40%;z-index:0;pointer-events:none; }
-.fl-orb-position { position:absolute;width:clamp(300px,36vw,570px);aspect-ratio:1;right:-6%;top:2%;transform:translate3d(0,var(--fl-orb-y,0px),0); }
+.fl-orb-position { position:absolute;width:clamp(300px,36vw,570px);aspect-ratio:1;right:0;top:2%;transform:translate3d(0,var(--fl-orb-y,0px),0); }
 .fl-orb { width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 29% 21%,#c6ffff 0%,#08e7f5 1%,#157b9e 10%,#12094d 38%,#070422 65%,#ff00d4 97%);box-shadow:inset 3px 3px 7px #08e7f5a0,inset -9px -7px 32px #ff00d490,0 0 90px #12094d70;animation:fl-orb-breathe 9s ease-in-out infinite alternate; }
 .fl-orb::after { content:'';position:absolute;inset:8%;border-radius:50%;border:1px solid #ffffff12; }
 .fl-orbit { position:absolute;width:110%;height:58%;top:20%;left:-8%;border:1px solid #08e7f530;border-radius:50%;transform:rotate(-32deg); }
